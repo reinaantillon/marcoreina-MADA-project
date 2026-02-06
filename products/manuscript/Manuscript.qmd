@@ -1,6 +1,6 @@
 ---
-title: "Example Manuscript Template for a Data Analysis Project"
-author: ""
+title: "Data Analysis Project: Plasmid and replicon incidence in Salmonella per source attribution"
+author: "Marco Reina"
 format:
   docx:
     toc: false
@@ -24,20 +24,20 @@ library(knitr)
 
 **Authors**  
 
-* First Author$^{1,2,*}$ (ORCID: 0000-0000-1234-5678) 
-* Second Author$^{3, *}$
-* Third Author$^{3, \dagger}$
-* Last Author$^{1, 2, \land}$ 
+* Marco Reina$^{1}$
+* Elizabeth McMillan$^{2}$
+* Aaron R. Bodie$^{1, \land}$
+* 
 
 **Author affiliations**  
 
-1. College of Public Health, University of Georgia, Athens, GA, USA.
-2. Another Affiliation, Athens, GA, USA.
-3. Yet another Affiliation.
+1. Department of Poultry Science, University of Georgia, Athens, GA, USA.
+2. USDA ARS, Athens, GA, USA.
+
 
 $*$ These authors contributed equally to this work.
 
-$\land$ Corresponding author: some@email.com
+$\land$ Corresponding author: aaron.bodie@uga.edu
 
 $\dagger$ Disclaimer: The opinions expressed in this article are the
 author's own and don't reflect their employer.
@@ -56,19 +56,32 @@ _It is recommended to use a structured abstract with Background/Methods/Results/
 
 
 # Introduction 
+_Salmonella_ is a major foodborne pathogen responsible for 1.35 million gastroenteritis every year. _Salmonella_ is present along the continuum of several food chains, like poultry and produce, and it could harbor plasmids along the production chain. Acquiring such plasmids play a critical role in antimicrobial resistance (AMR), virulence, stress tolerance, and host adaptation. Many epidemiologically important resistance genes are plasmid borne, such as extended-spectrum β-lactamases, colistin resistance, and multidrug efflux systems. Understanding the incidence of plasmids in _Salmonella_ is essential for food safety surveillance, outbreak investigations, and risk assessment. 
 
 ## General Background Information
-_Provide enough background on your topic that others can understand the why and how of your analysis_ 
+Advances in whole-genome sequencing (WGS) have enabled large-scale surveillance of bacterial pathogens. The National Center for Biotechnology Information (NCBI) has public repositories such as Pathogen Detection system, which integrate thousands of foodborne pathogens genomes, such as _Salmonella_, which are generated through routine surveillance and research efforts. These resources provide a powerful framework to study plasmid prevalence and diversity across lineages, sources, and periods of time. The objective of this study is to characterize plasmid incidence in _Salmonella_ using publicly available WGS data. This could provide insights into how frequently plasmids are detected and how their presence may vary across sources. e.g. clinical, enviroment, food, etc.
 
 ## Description of data and data source
-_Describe what the data is, what it contains, where it is from, etc. Eventually this might be part of a methods section._
+
+The data used in this analysis will be obtained from two publicly available NCBI resources:
+
+NCBI Pathogen Detection (PD)
+The database includes assembled genomes, isolation source, collection date, and geographic information. 
+
+NCBI Datasets – Genomes
+The database includes assembled genomes, genome annotations, assembly statistics, and annotation files that can be used to identify plasmid-associated sequences or plasmid replicon types. 
+
+Together, these datasets contain genomic and metadata information necessary to assess the presence or absence of plasmids across a large collection of _Salmonella_ isolates. 
 
 ## Questions/Hypotheses to be addressed
-_State the research questions you plan to answer with this analysis._
 
-To cite other work (important everywhere, but likely happens first in introduction), make sure your references are in the BibTeX file specified in the YAML header above and have the right BibTeX key. Then you can include like this:
+This analysis will address the following research questions:
 
-Examples of reproducible research projects can for instance be found in [@mckay2020; @mckay2020a].
+Does plasmid incidence vary across different _Salmonella_ serovars?
+
+Are there observable patterns in plasmid presence associated with isolate with other factors, such as source (e.g., human, poultry, environmental) or collection year?
+
+Based on existing literature, the hypothesis is that higher plasmid incidence is expected in isolates associated with food-animal production and clinical sources due to selective pressures such as antimicrobial use. 
 
 
 
