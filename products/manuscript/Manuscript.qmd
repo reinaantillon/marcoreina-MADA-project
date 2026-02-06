@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis Project: Plasmid and replicon incidence in Salmonella per source attribution"
+title: "Data Analysis Project: Plasmid incidence in Salmonella per source attribution"
 author: "Marco Reina"
 format:
   docx:
