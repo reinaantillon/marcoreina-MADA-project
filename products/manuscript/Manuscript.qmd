@@ -106,15 +106,156 @@ knitr::include_graphics(here("assets","antigen-recognition.png"))
 ```
 
 
-
-
 ## Data acquisition
 _As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next._
 
-
 ## Data import and cleaning
-_Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along._
 
+```{r}
+library(readr)
+library(here)
+
+#Isolates obtained from NCBI Pathogen Detection database: Salmonella
+isolates_raw <- read_tsv(here("data/raw-data", "isolates.tsv"))
+write_csv(isolates_raw, here("data/processed-data/", "isolates1.csv"))
+isolates1 <- read.csv(here("data/processed-data/", "isolates1.csv"))
+
+#Genomes dataset from NCBI: Bacterial genomes
+genomes_raw <- read_tsv(here("data/raw-data/", "genomes_datasets.tsv"))
+write_csv(genomes_raw, here("data/processed-data/", "genomes1.csv"))
+genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
+```
+
+```{r}
+#Exploring NCBI Pathogen Detection dataset
+isolates1$year <-  as.numeric(substr(isolates1$Create.date, 1, 4))
+
+library(ggplot2)
+ggplot(isolates1, aes(x = year)) + geom_bar()
+
+#Creating a 5 year window
+isolates2 <- isolates1[(isolates1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
+
+#Observing trends per isolation type
+ggplot(isolates2, aes(x = year, fill = Isolation.type)) + geom_bar()
+
+#Removing NAs from isolation type
+isolates3 <- isolates2[!(isolates2$Isolation.type %in% NA), ]
+
+#Observing trends per source type
+ggplot(isolates3, aes(x = year, fill = Source.type)) + geom_bar()
+
+#Including only categories of interest
+isolates4 <- isolates3[(isolates3$Source.type %in% c("animal", "environmental", "food", "human")), ]
+
+#Observing only categories of interest
+ggplot(isolates4, aes(x = year, fill = Source.type)) + geom_bar()
+
+library(countries)
+
+#Identifying country names where isolates came from to NCBI
+isolates4$country_name <- country_name(x= isolates4$Location, to="ISO3")
+
+#Subsetting only for isolates obtained in the USA
+isolates5 <- isolates4[(isolates4$country_name %in% "USA"), ]
+
+#Observing the trends per number of contigs
+ggplot(isolates5, aes(x = Contigs)) + geom_bar()
+
+#Subsetting for small number of contigs (likely to be complete genomes or almost complete)
+isolates6 <- isolates5[(isolates5$Contigs <= 5), ]
+
+#Observing new subset based on contigs
+ggplot(isolates6, aes(x = Contigs)) + geom_bar()
+
+#Coloring bases on source type
+ggplot(isolates6, aes(x = Contigs, fill = Source.type)) + geom_bar()
+
+```
+
+```{r}
+
+#Subsetting genomes based on annotation name: NCBI Prokaryotic Genome Annotation Pipeline (PGAP)
+genomes2 <- genomes1[genomes1$Annotation.Name %in% "NCBI Prokaryotic Genome Annotation Pipeline (PGAP)", ]
+
+genomes2$BioSample <- genomes2$Assembly.BioSample.Accession
+
+genomes2$slm_filter <- substr(genomes2$Organism.Name, 1, 10)
+
+genomes3 <- genomes2[genomes2$slm_filter %in% "Salmonella", ]
+
+genomes3$release_year <- as.numeric(substr(genomes3$Assembly.Release.Date, 1, 4))
+
+genomes4 <- genomes3[genomes3$release_year >= 2021, ]
+
+genomes5 <- genomes4[!duplicated(genomes4$BioSample), ]
+
+```
+
+```{r}
+library(dplyr)
+
+genomes1$BioSample <- genomes1$Assembly.BioSample.Accession
+
+isolates_merged <- left_join(isolates6, genomes5, keep = FALSE, by = "BioSample")
+
+isolates_merged$WGS.accession	=	NULL
+isolates_merged$WGS.prefix	=	NULL
+isolates_merged$PFGE.secondary.enzyme.pattern	=	NULL
+isolates_merged$PFGE.primary.enzyme.pattern	=	NULL
+isolates_merged$Platform	=	NULL
+isolates_merged$Host.disease	=	NULL
+isolates_merged$Outbreak	=	NULL
+isolates_merged$SRA.release.date	=	NULL
+isolates_merged$SRA.Center	=	NULL
+isolates_merged$Run	=	NULL
+isolates_merged$Library.layout	=	NULL
+isolates_merged$Lat.Lon	=	NULL
+isolates_merged$AST.phenotypes	=	NULL
+isolates_merged$AMR.genotypes.core	=	NULL
+isolates_merged$Host	=	NULL
+isolates_merged$Min.same	=	NULL
+isolates_merged$Min.diff	=	NULL
+isolates_merged$Assembly.Paired.Assembly.Accession	=	NULL
+isolates_merged$Organism.Infraspecific.Names.Breed	=	NULL
+isolates_merged$Organism.Infraspecific.Names.Strain	=	NULL
+isolates_merged$Organism.Infraspecific.Names.Cultivar	=	NULL
+isolates_merged$Organism.Infraspecific.Names.Ecotype	=	NULL
+isolates_merged$Organism.Infraspecific.Names.Isolate	=	NULL
+isolates_merged$Organism.Infraspecific.Names.Sex	=	NULL
+isolates_merged$WGS.project.accession	=	NULL
+isolates_merged$Annotation.BUSCO.Complete	=	NULL
+isolates_merged$Annotation.BUSCO.Single.Copy	=	NULL
+isolates_merged$Annotation.BUSCO.Duplicated	=	NULL
+isolates_merged$Annotation.BUSCO.Fragmented	=	NULL
+isolates_merged$Annotation.BUSCO.Missing	=	NULL
+isolates_merged$Annotation.BUSCO.Lineage	=	NULL
+isolates_merged$Type.Material.Display.Text	=	NULL
+isolates_merged$CheckM.marker.set	=	NULL
+isolates_merged$CheckM.completeness	=	NULL
+isolates_merged$slm_filter	=	NULL
+isolates_merged$release_year	=	NULL
+
+write_csv(isolates_merged, here("data/processed-data/", "isolates_merged.csv"))
+```
+
+
+```{r}
+ggplot(isolates_merged, aes(x = Source.type)) + geom_bar() + facet_wrap(~ Level)
+
+isolates_clean1 <- isolates_merged[(isolates_merged$Level %in% "Complete Genome"), ]
+
+ggplot(isolates_merged, aes(x = Source.type)) + geom_bar()
+
+ggplot(isolates_clean1, aes(y = log(Annotation.Count.Gene.Pseudogene, 2), x = Source.type)) + geom_boxplot()
+
+ggplot(isolates_clean1, aes(y = log(Annotation.Count.Gene.Total, 2), x = Source.type)) + geom_boxplot()
+
+ggplot(isolates_clean1, aes(y = log(Annotation.Count.Gene.Protein.coding, 2), x = Source.type)) + geom_boxplot()
+
+ggplot(isolates_clean1, aes(y = log(Assembly.Stats.Total.Sequence.Length, 2), x = Source.type)) + geom_boxplot()
+
+```
 
 ## Statistical analysis
 _Explain anything related to your statistical analyses._
