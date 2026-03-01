@@ -115,14 +115,22 @@ _As applicable, explain where and how you got the data. If you directly import t
 library(readr)
 library(here)
 
-#Isolates obtained from NCBI Pathogen Detection database: Salmonella
+#Isolates obtained from _NCBI Pathogen Detection_ database: Salmonella
 isolates_raw <- read_tsv(here("data/raw-data", "isolates.tsv"))
+
+#Changing format from tsv to csv
 write_csv(isolates_raw, here("data/processed-data/", "isolates1.csv"))
+
+#Making a new object based on new csv
 isolates1 <- read.csv(here("data/processed-data/", "isolates1.csv"))
 
-#Genomes dataset from NCBI: Bacterial genomes
+#Genomes dataset from NCBI: _Bacterial genomes_
 genomes_raw <- read_tsv(here("data/raw-data/", "genomes_datasets.tsv"))
+
+#Changing format from tsv to csv
 write_csv(genomes_raw, here("data/processed-data/", "genomes1.csv"))
+
+#Making a new object based on new csv
 genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
 ```
 
@@ -131,6 +139,7 @@ genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
 isolates1$year <-  as.numeric(substr(isolates1$Create.date, 1, 4))
 
 library(ggplot2)
+#Observing if there is any trend in the years the isolates were obtained
 ggplot(isolates1, aes(x = year)) + geom_bar()
 
 #Creating a 5 year window
@@ -174,20 +183,25 @@ ggplot(isolates6, aes(x = Contigs, fill = Source.type)) + geom_bar()
 ```
 
 ```{r}
+#Naming a column BioSample in genomes dataset
+genomes1$BioSample <- genomes1$Assembly.BioSample.Accession
 
 #Subsetting genomes based on annotation name: NCBI Prokaryotic Genome Annotation Pipeline (PGAP)
 genomes2 <- genomes1[genomes1$Annotation.Name %in% "NCBI Prokaryotic Genome Annotation Pipeline (PGAP)", ]
 
-genomes2$BioSample <- genomes2$Assembly.BioSample.Accession
-
+#Substracting 10 characters to obtain the word: "Salmonella"
 genomes2$slm_filter <- substr(genomes2$Organism.Name, 1, 10)
 
+#Filtering by the word "Salmonella"
 genomes3 <- genomes2[genomes2$slm_filter %in% "Salmonella", ]
 
+#Substracting year of release and making it a numeric variable
 genomes3$release_year <- as.numeric(substr(genomes3$Assembly.Release.Date, 1, 4))
 
+#Filtering by release year over 2021
 genomes4 <- genomes3[genomes3$release_year >= 2021, ]
 
+#Removing duplicates based on BioSample column
 genomes5 <- genomes4[!duplicated(genomes4$BioSample), ]
 
 ```
@@ -195,10 +209,10 @@ genomes5 <- genomes4[!duplicated(genomes4$BioSample), ]
 ```{r}
 library(dplyr)
 
-genomes1$BioSample <- genomes1$Assembly.BioSample.Accession
-
+#Merging isolates and genomes datasets based on BioSample
 isolates_merged <- left_join(isolates6, genomes5, keep = FALSE, by = "BioSample")
 
+#Removing columns with >50% missing information
 isolates_merged$WGS.accession	=	NULL
 isolates_merged$WGS.prefix	=	NULL
 isolates_merged$PFGE.secondary.enzyme.pattern	=	NULL
@@ -233,29 +247,76 @@ isolates_merged$Annotation.BUSCO.Lineage	=	NULL
 isolates_merged$Type.Material.Display.Text	=	NULL
 isolates_merged$CheckM.marker.set	=	NULL
 isolates_merged$CheckM.completeness	=	NULL
+isolates_merged$CheckM.contamination	=	NULL
 isolates_merged$slm_filter	=	NULL
 isolates_merged$release_year	=	NULL
 
+#Saving merged dataset
 write_csv(isolates_merged, here("data/processed-data/", "isolates_merged.csv"))
 ```
 
 
 ```{r}
+#Staring exploration using ggplots
+
+#Plotting by level of assembly and source type
 ggplot(isolates_merged, aes(x = Source.type)) + geom_bar() + facet_wrap(~ Level)
 
+#Filtering by complete genome
 isolates_clean1 <- isolates_merged[(isolates_merged$Level %in% "Complete Genome"), ]
 
+#Plotting only by source type
 ggplot(isolates_merged, aes(x = Source.type)) + geom_bar()
 
-ggplot(isolates_clean1, aes(y = log(Annotation.Count.Gene.Pseudogene, 2), x = Source.type)) + geom_boxplot()
+#Exploring Pseudogenes by source type
+ggplot(isolates_clean1, aes(y = Annotation.Count.Gene.Pseudogene, x = Source.type)) + geom_boxplot()
 
-ggplot(isolates_clean1, aes(y = log(Annotation.Count.Gene.Total, 2), x = Source.type)) + geom_boxplot()
+#Exploring Total count gene by source type
+ggplot(isolates_clean1, aes(y = Annotation.Count.Gene.Total, x = Source.type)) + geom_boxplot()
 
-ggplot(isolates_clean1, aes(y = log(Annotation.Count.Gene.Protein.coding, 2), x = Source.type)) + geom_boxplot()
+#Exploring protein coding genes by source type
+ggplot(isolates_clean1, aes(y = Annotation.Count.Gene.Protein.coding, x = Source.type)) + geom_boxplot()
 
-ggplot(isolates_clean1, aes(y = log(Assembly.Stats.Total.Sequence.Length, 2), x = Source.type)) + geom_boxplot()
+#Exploring sequence lenght by source type
+ggplot(isolates_clean1, aes(y = Assembly.Stats.Total.Sequence.Length, x = Source.type)) + geom_boxplot()
 
 ```
+
+```{r}
+#Exploring if there is any relationships between the pseudogenes and total genes: ratio 1
+isolates_clean1$ratio1 <- (100*(isolates_clean1$Annotation.Count.Gene.Pseudogene/isolates_clean1$Annotation.Count.Gene.Total))
+
+#Exploring if there is any relationships between the protein coding genes and total genes: ratio 2
+isolates_clean1$ratio2 <- (100*(isolates_clean1$Annotation.Count.Gene.Protein.coding/isolates_clean1$Annotation.Count.Gene.Total))
+
+#Plotting ratio 1
+ggplot(isolates_clean1, aes(x = Source.type, y = ratio1)) + geom_boxplot()
+
+
+#Plotting ratio 2
+ggplot(isolates_clean1, aes(x = Source.type, y = ratio2)) + geom_boxplot()
+
+#Plotting sequence length and gene count
+ggplot(isolates_clean1, aes(x = Assembly.Stats.Total.Sequence.Length, y = Annotation.Count.Gene.Pseudogene, color = Source.type)) + geom_point() + theme_bw()
+
+#Plotting sequence length and pseudogene count
+ggplot(isolates_clean1, aes(x = Assembly.Stats.Total.Sequence.Length, y = Annotation.Count.Gene.Pseudogene)) + geom_point() + facet_wrap(~ Source.type) + theme_bw()
+
+#Plotting sequence length and protein coding genes
+ggplot(isolates_clean1, aes(x = Assembly.Stats.Total.Sequence.Length, y = Annotation.Count.Gene.Protein.coding, color = Source.type)) + geom_point() + theme_bw()
+
+#Plotting sequence length and protein coding genes
+ggplot(isolates_clean1, aes(x = Assembly.Stats.Total.Sequence.Length, y = Annotation.Count.Gene.Protein.coding)) + geom_point() + facet_wrap(~ Source.type) + theme_bw()
+
+#Plotting pseudogenes and protein coding genes
+ggplot(isolates_clean1, aes(y = Annotation.Count.Gene.Pseudogene, x = Annotation.Count.Gene.Protein.coding, color = Source.type)) + geom_point() + theme_bw()
+
+#Plotting pseudogenes and protein coding genes
+ggplot(isolates_clean1, aes(y = Annotation.Count.Gene.Pseudogene, x = Annotation.Count.Gene.Protein.coding)) + geom_point() + facet_wrap(~ Source.type) + theme_bw()
+
+
+```
+
 
 ## Statistical analysis
 _Explain anything related to your statistical analyses._
