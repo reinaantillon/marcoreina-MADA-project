@@ -1,0 +1,21 @@
+project: 
+  type: website
+  output-dir: docs
+
+website:
+  title: "Marco Reina Data Analysis Project"
+  navbar:
+    left:
+      - text: "EDA analysis"
+        file: code/eda-code/eda.html
+      - text: "Descriptive Analysis"
+        file: code/analysis-code/descriptive-analysis.html
+    right:
+      - icon: github 
+        href: https://github.com/reinaantillon/marcoreina-MADA-project
+format:
+  html:
+    theme: cerulean
+    highlight: zenburn
+    css: styles.css
+    toc: FALSE
