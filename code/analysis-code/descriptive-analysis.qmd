@@ -1,0 +1,192 @@
+---
+title: "Descriptive analysis script by Marco Reina"
+output: html_document
+---
+#### Code originally written by MR and improve with ChatGPT & Qween
+
+```{r}
+
+
+# Load libraries
+library(tidyverse)
+library(readr)
+library(here)
+library(dplyr)
+library(stringr)
+library(knitr)
+
+# Read data
+isolates1 <- read_csv(here("data/processed-data/", "isolates1.csv"))
+```
+
+```{r}
+
+#Split AMR genes
+amr_long <- isolates1 %>%
+  # Keep isolates even if no AMR genes
+  mutate(AMR.genotypes = if_else(
+    is.na(AMR.genotypes) | AMR.genotypes == "",
+    "None",
+    AMR.genotypes
+  )) %>%
+
+  # Split genes into rows
+  separate_rows(AMR.genotypes, sep = ",") %>%
+  mutate(
+    AMR_gene = str_trim(AMR.genotypes),
+    AMR_gene = na_if(AMR_gene, "None")
+  ) %>%
+  filter(!is.na(AMR_gene)) %>%
+  #Keeping only the COMPLETED profiles
+  filter(str_detect(AMR_gene, "=COMPLETE")) %>%     
+  mutate(AMR_gene = str_remove(AMR_gene, "=COMPLETE"))
+
+write_csv(amr_long, here("data/processed-data/", "amr_long.csv"))
+```
+
+```{r}
+# 2. Assign antimicrobial class
+
+amr_long <- amr_long %>%
+  mutate(
+    AMR_class = case_when(
+      # Beta-lactams
+      str_detect(AMR_gene, "^bla") ~ "Beta-lactam",
+      
+      # Tetracyclines
+      str_detect(AMR_gene, "tet") ~ "Tetracycline",
+      
+      # Sulfonamides
+      str_detect(AMR_gene, "^sul") ~ "Sulfonamide",
+      
+      # Trimethoprim (often co-resistance with sul)
+      str_detect(AMR_gene, "^dfr") ~ "Trimethoprim",
+      
+      # Quinolones (including efflux pumps)
+      str_detect(AMR_gene, "qnr|^oqx|^qepA") ~ "Quinolone",
+      
+      # Aminoglycosides (broadened pattern)
+      str_detect(AMR_gene, "aad|aph\\(|aac\\(|armA|^rmt|^ant") ~ "Aminoglycoside",
+      
+      # Phenicols (chloramphenicol family)
+      str_detect(AMR_gene, "floR|^cat|^cml") ~ "Phenicol",
+      
+      # Macrolides (broadened pattern)
+      str_detect(AMR_gene, "erm|^mef|^mph|^msr|^ere") ~ "Macrolide",
+      
+      # Lincosamides
+      str_detect(AMR_gene, "^lnu") ~ "Lincosamide",
+      
+      # Fosfomycin
+      str_detect(AMR_gene, "^fos") ~ "Fosfomycin",
+      
+      # Colistin/Polymyxin
+      str_detect(AMR_gene, "^mcr") ~ "Colistin",
+      
+      # Glycopeptides
+      str_detect(AMR_gene, "^van") ~ "Glycopeptide",
+      
+      # Rifamycins
+      str_detect(AMR_gene, "^arr") ~ "Rifamycin",
+
+      # Multidrug efflux pumps (RND family)
+      str_detect(AMR_gene, "^mds|^acr|^mex|^ade|^cme|^amrB") ~ "Efflux Pump",
+      
+      # Default catch-all
+      TRUE ~ "Other"
+    )
+  )
+```
+
+```{r}
+# 3. AMR summaries
+
+# Gene prevalence
+gene_prev <- amr_long %>%
+  distinct(BioSample, AMR_gene) %>%
+  count(AMR_gene, sort = TRUE)
+
+gene_prev
+
+# Class prevalence
+class_prev <- amr_long %>%
+  distinct(BioSample, AMR_class) %>%
+  count(AMR_class, sort = TRUE)
+
+class_prev
+
+# AMR status
+amr_status <- amr_long %>%
+  distinct(BioSample, AMR_class) %>%
+  count(BioSample, name = "n_classes")
+
+ggplot(amr_status, aes(x = n_classes)) + geom_bar()
+
+```
+
+```{r}
+isolates1 <- isolates1 %>%
+  left_join(amr_status %>% select(BioSample, n_classes),
+            by = "BioSample", keep = FALSE) 
+            
+
+```
+
+```{r}
+isolates1 <- isolates1 %>%           
+  mutate(
+    n_classes = tidyr::replace_na(n_classes, 0)
+  )
+
+isolates1 %>%
+  count(n_classes, sort = TRUE) %>%
+  mutate(
+    Percent = round(100 * n / sum(n), 1)
+  ) %>%
+  rename(
+    `Number of AMR Classes` = n_classes,
+    `Number of Isolates` = n
+  )
+
+ggplot(isolates1, aes(x = n_classes, fill = Source.type)) + geom_bar()
+```
+
+```{r}
+class_prev_by_source <- amr_long %>%
+  count(AMR_class, Source.type) %>%
+  pivot_wider(
+    names_from = Source.type,
+    values_from = n,
+    values_fill = 0
+  ) %>%
+  mutate(
+    Total = rowSums(across(where(is.numeric)))
+  ) %>%
+  arrange(desc(Total))
+
+class_prev_by_source
+```
+
+```{r}
+ggplot(amr_long, aes(x = reorder(AMR_class, AMR_class, function(x) length(x)), fill = Source.type)) +
+  geom_bar() +
+  coord_flip() 
+```
+
+### Data seems to be biased by predicted Efflux pumps, data will be filtered by over 1 class of AMR and by Efflux pumps to see what happens beyond this parameters
+
+```{r}
+isolates_over1n <- isolates1[(isolates1$n_classes > 1), ]
+
+ggplot(isolates_over1n, aes(x = n_classes, fill = Source.type)) + geom_bar()
+```
+
+
+```{r}
+amr_long_over1n <- amr_long[!(amr_long$AMR_class %in% "Efflux Pump"), ]
+ggplot(amr_long_over1n, aes(x = reorder(AMR_class, AMR_class, function(x) length(x)), fill = Source.type)) +
+  geom_bar() +
+  coord_flip() 
+```
+
+### Aminoglycoside, Tetracycline, and Sulfonamide  seems to be the AMR profiles of greatest concern

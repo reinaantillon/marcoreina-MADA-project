@@ -1,107 +1,243 @@
 ---
-title: "An example exploratory analysis script"
-date: "2024-02-07"
+title: "Exploratory analysis script by Marco Reina"
 output: html_document
 ---
 
-  
-  
-This Quarto file loads the cleaned data and does some exploring.
-
-This version has the code inside the Quarto file itself.
-
-Also note that while cleaning and exploring is split here, this is iterative. You saw that as part of the processing, we already had to explore the data somewhat to understand how to clean it. In general, as you explore, you'll find things that need cleaning. As you clean, you can explore more. Therefore, at times it might make more sense to combine the cleaning and exploring code parts into a single R or Quarto file. Or split things in any other logical way.
-
-As part of the exploratory analysis, you should produce plots or tables or other summary quantities for the most interesting/important quantities in your data. Depending on the total number of variables in your dataset, explore all or some of the others. Figures produced here might be histograms or density plots, correlation plots, etc. Tables might summarize your data.
-
-Start by exploring one variable at a time. Then continue by creating plots or tables of the outcome(s) of interest and the predictor/exposure/input variables you are most interested in. If your dataset is small, you can do that for all variables. 
-
-Plots produced here can be scatterplots, boxplots, violinplots, etc. Tables can be simple 2x2 tables or larger ones.
-
-# Setup
-
 ```{r}
-#load needed packages. make sure they are installed.
-library(here) #for data loading/saving
+# Loading libraries
+library(readr)
+library(here)
 library(dplyr)
-library(skimr)
+library(countries)
 library(ggplot2)
 ```
 
+### Raw data seems too big to ensure reproducibility. Smaller dataframes were created from the raw data. EDA will start from those files. The code to create the initial files is the following:
 
-Load the data.
+```r
+#Isolates obtained from _NCBI Pathogen Detection_ database: Salmonella
+isolates_raw <- read_tsv(here("data/raw-data", "isolates.tsv"))
 
-```{r}
-#Path to data. Note the use of the here() package and not absolute paths
-data_location <- here::here("data","processed-data","processeddata.rds")
-#load data
-mydata <- readRDS(data_location)
+#Changing format from tsv to csv
+write_csv(isolates_raw, here("data/processed-data/", "isolates1.csv"))
+
+#Making a new object based on new csv
+isolates0 <- read.csv(here("data/processed-data/", "isolates1.csv"))
+
+#Genomes dataset from NCBI: _Bacterial genomes_
+genomes_raw <- read_tsv(here("data/raw-data/", "genomes_datasets.tsv"))
+
+#Changing format from tsv to csv
+write_csv(genomes_raw, here("data/processed-data/", "genomes1.csv"))
+
+#Making a new object based on new csv
+genomes0 <- read.csv(here("data/processed-data/", "genomes1.csv"))
+
+#Removing non useful columns from isolates0
+isolates0$WGS.accession	=	NULL
+isolates0$WGS.prefix	=	NULL
+isolates0$PFGE.secondary.enzyme.pattern	=	NULL
+isolates0$PFGE.primary.enzyme.pattern	=	NULL
+isolates0$Platform	=	NULL
+isolates0$Host.disease	=	NULL
+isolates0$Outbreak	=	NULL
+isolates0$SRA.release.date	=	NULL
+isolates0$SRA.Center	=	NULL
+isolates0$Run	=	NULL
+isolates0$Library.layout	=	NULL
+isolates0$Lat.Lon	=	NULL
+isolates0$AST.phenotypes	=	NULL
+isolates0$AMR.genotypes.core	=	NULL
+isolates0$Host	=	NULL
+isolates0$Min.same	=	NULL
+isolates0$Min.diff	=	NULL
+
+#Removing non-useful columns from genomes0
+genomes0$Assembly.Paired.Assembly.Accession	=	NULL
+genomes0$Organism.Infraspecific.Names.Breed	=	NULL
+genomes0$Organism.Infraspecific.Names.Strain	=	NULL
+genomes0$Organism.Infraspecific.Names.Cultivar	=	NULL
+genomes0$Organism.Infraspecific.Names.Ecotype	=	NULL
+genomes0$Organism.Infraspecific.Names.Isolate	=	NULL
+genomes0$Organism.Infraspecific.Names.Sex	=	NULL
+genomes0$WGS.project.accession	=	NULL
+genomes0$Annotation.BUSCO.Complete	=	NULL
+genomes0$Annotation.BUSCO.Single.Copy	=	NULL
+genomes0$Annotation.BUSCO.Duplicated	=	NULL
+genomes0$Annotation.BUSCO.Fragmented	=	NULL
+genomes0$Annotation.BUSCO.Missing	=	NULL
+genomes0$Annotation.BUSCO.Lineage	=	NULL
+genomes0$Type.Material.Display.Text	=	NULL
+genomes0$CheckM.marker.set	=	NULL
+genomes0$CheckM.completeness	=	NULL
+genomes0$CheckM.contamination	=	NULL
+genomes0$slm_filter	=	NULL
+genomes0$release_year	=	NULL
+
+#Creating BioSample column
+genomes0$BioSample	=	genomes0$Assembly.BioSample.Accession
+
+#Both dataframes are still too large >100 MB they will be streamlined even more by keeping only selected columns
+
+#Selected columns for isolates dataframe
+isolates1 <- data.frame("Create.date"	=	isolates0$Create.date,
+                        "Location"	=	isolates0$Location,
+                        "Source.type"	=	isolates0$Source.type,
+                        "BioSample"	=	isolates0$BioSample,
+                        "AMR.genotypes"	=	isolates0$AMR.genotypes,
+                        "Computed.types"	=	isolates0$Computed.types
+)
+
+isolates1 <- na.omit(isolates1)
+
+#Identifying country names where isolates came from to NCBI
+isolates1$country_name <- country_name(x= isolates1$Location, to="ISO3")
+
+#Subsetting only for isolates obtained in the USA in the last 5 complete years
+isolates1 <- isolates1[(isolates1$country_name %in% "USA"), ]
+
+isolates1$year <-  as.numeric(substr(isolates1$Create.date, 1, 4))
+
+isolates1 <- isolates1[(isolates1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
+
+#Obtaining only categories of interest
+isolates1 <- isolates1[(isolates1$Source.type %in% c("animal", "enviromental", "food", "human")), ]
+
+#Saving new df, file under 100 MB
+write_csv(isolates1, here("data/processed-data/", "isolates1.csv"))
+
+#Selected colums for genomes dataframe
+genomes0$genus <-  substr(genomes0$Organism.Name, 1, 10)
+
+genomes1 <- data.frame("Annotation.Release.Date" = genomes0$Annotation.Release.Date,
+                        "Assembly.Stats.Total.Sequence.Length" = genomes0$Assembly.Stats.Total.Sequence.Length,
+                        "Assembly.Stats.Number.of.Contigs" = genomes0$Assembly.Stats.Number.of.Contigs,
+                        "Assembly.Level" = genomes0$Assembly.Level,
+                        "Assembly.Release.Date" = genomes0$Assembly.Release.Date,
+                        "BioSample" = genomes0$BioSample,
+                        "Annotation.Count.Gene.Total" = genomes0$Annotation.Count.Gene.Total,
+                        "Annotation.Count.Gene.Protein.coding" = genomes0$Annotation.Count.Gene.Protein.coding,
+                        "Annotation.Count.Gene.Pseudogene" = genomes0$Annotation.Count.Gene.Pseudogene,
+                        "genus" = genomes0$genus 
+)
+
+genomes1 <- genomes1[(genomes1$genus %in% "Salmonella"), ]
+
+genomes1 <- na.omit(genomes1)
+
+write_csv(genomes1, here("data/processed-data/", "genomes1.csv"))
 ```
 
-
-
-
-
-# Data exploration through tables
-
-Showing a bit of code to produce and save a summary table.
-
-
+### After creating files for use 
+# EDA CODE STARTS HERE:
 ```{r}
-summary_df = skimr::skim(mydata)
-print(summary_df)
-# save to file
-summarytable_file = here("results", "tables", "summarytable.rds")
-saveRDS(summary_df, file = summarytable_file)
+#Load files created
+isolates1 <- read.csv(here("data/processed-data/", "isolates1.csv"))
+summary(isolates1)
+
+genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
+summary(genomes1)
 ```
 
-We are saving the results to the `results` folder. Depending on how many tables/figures you have, it might make sense to have separate folders for each. And/or you could have separate folders for exploratory tables/figures and for final tables/figures. Just choose a setup that makes sense for your project and works for you, and provide enough documentation that someone can understand what you are doing.
-
-
-# Data exploration through figures
-
-Histogram plots for the continuous outcomes. 
-
-Height first.
-
+### Exploring isolates1.csv
+#### Data comes from progam of _Pathogen Detection_ from NCBI
 ```{r}
-p1 <- mydata %>% ggplot(aes(x=Height)) + geom_histogram() 
-plot(p1)
-figure_file = here("results", "figures","height-distribution.png")
-ggsave(filename = figure_file, plot=p1) 
+#Observing if there is any trend in the years the isolates were obtained
+ggplot(isolates1, aes(x = year)) + geom_bar()
+
+#Observing trends main within isolates
+ggplot(isolates1, aes(x = year, fill = Source.type)) + geom_bar()
+
+ggplot(isolates1, aes(x = year)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right")
 ```
 
-Now weights.
-
+### Exploring genomes1.csv
+#### Data comes from _Datasets_ by NIH
 ```{r}
-p2 <- mydata %>% ggplot(aes(x=Weight)) + geom_histogram() 
-plot(p2)
-figure_file = here("results", "figures","weight-distribution.png")
-ggsave(filename = figure_file, plot=p2) 
+#Substracting year of release date
+genomes1$year <- as.numeric(substr(genomes1$Assembly.Release.Date , 1, 4))
+
+#Observing trends main within genomes
+ggplot(genomes1, aes(x = year)) + geom_bar()
+
+#Trends of available genomes from the last 5 complete years
+genomes2 <- genomes1[(genomes1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
+ggplot(genomes2, aes(x = year)) + geom_bar()
+
+#Histograms for all rest of the parameter
+ggplot(genomes2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram()
+
+ggplot(genomes2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram()
+
+ggplot(genomes2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()
+
+ggplot(genomes2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram()
+
+ggplot(genomes2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
+
+ggplot(genomes2, aes(x = Assembly.Level)) + geom_bar()
 ```
 
-Now height as function of weight.
-
+### Merging both dataframes to assign sources, AMR genotype, and computed serovar
 ```{r}
-p3 <- mydata %>% ggplot(aes(x=Height, y=Weight)) + geom_point() + geom_smooth(method='lm')
-plot(p3)
-figure_file = here("results", "figures", "height-weight.png")
-ggsave(filename = figure_file, plot=p3) 
+#First merge based on BioSample column only samples that intersect in both databases
+merged_df0 <- inner_join(genomes2, isolates1, relationship = "many-to-many",  keep = FALSE, by = "BioSample")
+
+#Only 197 rows match between genomes and isolates
+merged_df0 <- merged_df0 %>% 
+  mutate(Annotation.Release.Date = as.Date(Annotation.Release.Date))
+
+#Removing repeated observations as they are several annotations dates, filtered by newer
+merged_df1 <- merged_df0 %>% 
+  group_by(BioSample) %>% 
+  filter(Annotation.Release.Date== max(Annotation.Release.Date, na.rm = TRUE)) %>% 
+  ungroup()
+
+#Saving file
+write_csv(merged_df1, here("data/processed-data/", "merged_df1.csv"))
 ```
 
-Once more height as function of weight, stratified by gender. Note that there is so little data, it's a bit silly. But we'll plot it anyway.
-
+### Exploring merged_df1.csv
 ```{r}
-p4 <- mydata %>% ggplot(aes(x=Height, y=Weight, color = Gender)) + geom_point() + geom_smooth(method='lm')
-plot(p4)
-figure_file = here("results", "figures", "height-weight-stratified.png")
-ggsave(filename = figure_file, plot=p4) 
+summary(merged_df1)
+
+ggplot(merged_df1, aes(x = year.y, fill = Source.type)) + geom_bar()
+
+ggplot(merged_df1, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right")
+
+ggplot(merged_df1, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram()
+
+ggplot(merged_df1, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram()
+
+ggplot(merged_df1, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()
+
+ggplot(merged_df1, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram()
+
+ggplot(merged_df1, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
+
+ggplot(merged_df1, aes(x = Assembly.Level)) + geom_bar()
+
+#Filtering by only complete genomes
+merged_df2 <- merged_df1[(merged_df1$Assembly.Level %in% "Complete Genome"), ]
+
+summary(merged_df2)
+
+#Repeating exploration
+ggplot(merged_df2, aes(x = year.y, fill = Source.type)) + geom_bar()
+
+ggplot(merged_df2, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right")
+
+ggplot(merged_df2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram()
+
+ggplot(merged_df2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram()
+
+ggplot(merged_df2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()
+
+ggplot(merged_df2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram()
+
+ggplot(merged_df2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
 ```
 
-
-
-# Notes
-
-For your own explorations, tables and figures can be "quick and dirty". As long as you can see what's going on, there is no need to polish them. That's in contrast to figures you'll produce for your final products (paper, report, presentation, website, etc.). Those should look as nice, polished and easy to understand as possible.
-
-
+### Only 137 genomes are complete and intersect between both datasets. These will be use only to assess genome structure
+### Isolates1 will be use to assess AMR genotypes
+### Genomes1-3 dataframes resulted to be only complimentary for the analysis 
