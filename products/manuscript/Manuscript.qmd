@@ -6,8 +6,7 @@ format:
     toc: false
     number-sections: true
     highlight-style: github
-bibliography: ../../assets/dataanalysis-references.bib
-csl: ../../assets/american-journal-of-epidemiology.csl
+
 ---
 
 The structure below is one possible setup for a manuscript stemming from a data analysis project. It loosely follows the structure of a standard scientific manuscript. Adjust as needed. You don't need to have exactly these sections, but the content covering those sections should be addressed.
@@ -15,7 +14,7 @@ The structure below is one possible setup for a manuscript stemming from a data 
 This uses [MS Word as output format](https://quarto.org/docs/output-formats/ms-word.html). See [the Quarto documentation](https://quarto.org/) for instructions on how to use other formats.
 
 
-```{r, echo=FALSE, message=FALSE}
+```r, echo=FALSE, message=FALSE
 # load a few R packages
 library(here)
 library(knitr)
@@ -98,11 +97,11 @@ _Describe your methods. That should describe the data, the cleaning processes, a
 Sometimes you might want to show a schematic diagram/figure that was not created with code (if you can do it with code, do it). @fig-schematic is an example of some - completely random/unrelated - schematic that was generated with BioRender.
 We store those figures in the `assets` folder.
 
-```{r}
+```r
 #| label: fig-schematic
 #| fig-cap: "A figure that is manually generated and shows some overview/schematic. This has nothing to do with the data, it's just a random one from one of our projects I found and placed here."
 #| echo: FALSE
-knitr::include_graphics(here("assets","antigen-recognition.png"))
+#knitr::include_graphics(here("assets","antigen-recognition.png"))
 ```
 
 
@@ -132,12 +131,12 @@ _Use a combination of text/tables/figures to explore and describe your data. Sho
 
 Note the loading of the data providing a **relative** path using the `../../` notation. (Two dots means a folder up). You never want to specify an **absolute** path like `C:\ahandel\myproject\results\` because if you share this with someone, it won't work for them since they don't have that path. You can also use the `here` R package to create paths. See examples of that below. I generally recommend the `here` package.
 
-```{r}
+```r
 #| label: tbl-summarytable
 #| tbl-cap: "Data summary table."
 #| echo: FALSE
-resulttable <- readRDS("../../results/tables/summarytable.rds")
-knitr::kable(resulttable)
+#resulttable <- readRDS("../../results/tables/summarytable.rds")
+#knitr::kable(resulttable)
 ```
 
 
@@ -153,7 +152,7 @@ _To get some further insight into your data, if reasonable you could compute sim
 #| label: fig-result
 #| fig-cap: "Height and weight stratified by gender."
 #| echo: FALSE
-knitr::include_graphics(here("results","figures","height-weight-stratified.png"))
+#knitr::include_graphics(here("results","figures","height-weight-stratified.png"))
 ```
 
 
@@ -163,12 +162,13 @@ _Use one or several suitable statistical/machine learning methods to analyze you
 
 Example @tbl-resulttable2 shows a summary of a linear model fit.
 
-```{r}
+```r
 #| label: tbl-resulttable2
 #| tbl-cap: "Linear model fit table."
 #| echo: FALSE
-resulttable2 <- readRDS(here("results","tables","resulttable2.rds"))
-knitr::kable(resulttable2)
+
+#resulttable2 <- readRDS(here("results","tables","resulttable2.rds"))
+#knitr::kable(resulttable2)
 ```
 
 

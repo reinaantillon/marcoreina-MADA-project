@@ -5,8 +5,6 @@ output: html_document
 #### Code originally written by MR and improve with ChatGPT & Qween
 
 ```{r}
-
-
 # Load libraries
 library(tidyverse)
 library(readr)
@@ -103,24 +101,22 @@ amr_long <- amr_long %>%
 
 # Gene prevalence
 gene_prev <- amr_long %>%
-  distinct(BioSample, AMR_gene) %>%
   count(AMR_gene, sort = TRUE)
 
 gene_prev
 
 # Class prevalence
 class_prev <- amr_long %>%
-  distinct(BioSample, AMR_class) %>%
   count(AMR_class, sort = TRUE)
 
 class_prev
 
 # AMR status
 amr_status <- amr_long %>%
-  distinct(BioSample, AMR_class) %>%
   count(BioSample, name = "n_classes")
 
-ggplot(amr_status, aes(x = n_classes)) + geom_bar()
+ggplot(amr_status, aes(x = n_classes)) + geom_bar() +
+  theme_bw()
 
 ```
 
@@ -129,10 +125,6 @@ isolates1 <- isolates1 %>%
   left_join(amr_status %>% select(BioSample, n_classes),
             by = "BioSample", keep = FALSE) 
             
-
-```
-
-```{r}
 isolates1 <- isolates1 %>%           
   mutate(
     n_classes = tidyr::replace_na(n_classes, 0)
@@ -148,7 +140,8 @@ isolates1 %>%
     `Number of Isolates` = n
   )
 
-ggplot(isolates1, aes(x = n_classes, fill = Source.type)) + geom_bar()
+ggplot(isolates1, aes(x = n_classes, fill = Source.type)) + geom_bar() +
+  theme_bw()
 ```
 
 ```{r}
@@ -170,7 +163,8 @@ class_prev_by_source
 ```{r}
 ggplot(amr_long, aes(x = reorder(AMR_class, AMR_class, function(x) length(x)), fill = Source.type)) +
   geom_bar() +
-  coord_flip() 
+  coord_flip() +
+  theme_bw()
 ```
 
 ### Data seems to be biased by predicted Efflux pumps, data will be filtered by over 1 class of AMR and by Efflux pumps to see what happens beyond this parameters
@@ -178,7 +172,8 @@ ggplot(amr_long, aes(x = reorder(AMR_class, AMR_class, function(x) length(x)), f
 ```{r}
 isolates_over1n <- isolates1[(isolates1$n_classes > 1), ]
 
-ggplot(isolates_over1n, aes(x = n_classes, fill = Source.type)) + geom_bar()
+ggplot(isolates_over1n, aes(x = n_classes, fill = Source.type)) + geom_bar() +
+  theme_bw()
 ```
 
 
@@ -186,7 +181,15 @@ ggplot(isolates_over1n, aes(x = n_classes, fill = Source.type)) + geom_bar()
 amr_long_over1n <- amr_long[!(amr_long$AMR_class %in% "Efflux Pump"), ]
 ggplot(amr_long_over1n, aes(x = reorder(AMR_class, AMR_class, function(x) length(x)), fill = Source.type)) +
   geom_bar() +
-  coord_flip() 
+  coord_flip() +
+  theme_bw()
 ```
 
 ### Aminoglycoside, Tetracycline, and Sulfonamide  seems to be the AMR profiles of greatest concern
+
+### Let's see their trends per year
+```{r}
+amr_long_filtered <- amr_long[(amr_long$AMR_class %in% c("Aminoglycoside", "Tetracycline", "Sulfonamide" )), ]
+
+ggplot(amr_long_filtered, aes (x= year, fill = AMR_class)) + geom_bar() + facet_wrap(~ AMR_class*Source.type, scales = "free") + theme_bw() + theme(legend.position = "bottom")
+```

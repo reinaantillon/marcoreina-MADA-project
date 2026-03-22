@@ -15,7 +15,7 @@ website:
         href: https://github.com/reinaantillon/marcoreina-MADA-project
 format:
   html:
-    theme: cerulean
+    theme: lux
     highlight: zenburn
     css: styles.css
     toc: FALSE

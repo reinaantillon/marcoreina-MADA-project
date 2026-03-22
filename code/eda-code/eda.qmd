@@ -143,12 +143,12 @@ summary(genomes1)
 #### Data comes from progam of _Pathogen Detection_ from NCBI
 ```{r}
 #Observing if there is any trend in the years the isolates were obtained
-ggplot(isolates1, aes(x = year)) + geom_bar()
+ggplot(isolates1, aes(x = year)) + geom_bar() + theme_bw()
 
 #Observing trends main within isolates
-ggplot(isolates1, aes(x = year, fill = Source.type)) + geom_bar()
+ggplot(isolates1, aes(x = year, fill = Source.type)) + geom_bar() + theme_bw()
 
-ggplot(isolates1, aes(x = year)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right")
+ggplot(isolates1, aes(x = year)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
 ```
 
 ### Exploring genomes1.csv
@@ -158,24 +158,24 @@ ggplot(isolates1, aes(x = year)) + geom_bar() + facet_wrap(~ Source.type, scales
 genomes1$year <- as.numeric(substr(genomes1$Assembly.Release.Date , 1, 4))
 
 #Observing trends main within genomes
-ggplot(genomes1, aes(x = year)) + geom_bar()
+ggplot(genomes1, aes(x = year)) + geom_bar() + theme_bw()
 
 #Trends of available genomes from the last 5 complete years
 genomes2 <- genomes1[(genomes1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
-ggplot(genomes2, aes(x = year)) + geom_bar()
+ggplot(genomes2, aes(x = year)) + geom_bar() + theme_bw()
 
 #Histograms for all rest of the parameter
-ggplot(genomes2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram()
+ggplot(genomes2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
 
-ggplot(genomes2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram()
+ggplot(genomes2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram() + theme_bw()
+ 
+ggplot(genomes2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()+ theme_bw()
 
-ggplot(genomes2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()
+ggplot(genomes2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram() + theme_bw()
 
-ggplot(genomes2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram()
+ggplot(genomes2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
 
-ggplot(genomes2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
-
-ggplot(genomes2, aes(x = Assembly.Level)) + geom_bar()
+ggplot(genomes2, aes(x = Assembly.Level)) + geom_bar() + theme_bw()
 ```
 
 ### Merging both dataframes to assign sources, AMR genotype, and computed serovar
@@ -201,21 +201,21 @@ write_csv(merged_df1, here("data/processed-data/", "merged_df1.csv"))
 ```{r}
 summary(merged_df1)
 
-ggplot(merged_df1, aes(x = year.y, fill = Source.type)) + geom_bar()
+ggplot(merged_df1, aes(x = year.y, fill = Source.type)) + geom_bar() + theme_bw()
 
-ggplot(merged_df1, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right")
+ggplot(merged_df1, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
 
-ggplot(merged_df1, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram()
+ggplot(merged_df1, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df1, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram()
+ggplot(merged_df1, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df1, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()
+ggplot(merged_df1, aes(x = Annotation.Count.Gene.Total)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df1, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram()
+ggplot(merged_df1, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df1, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
+ggplot(merged_df1, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df1, aes(x = Assembly.Level)) + geom_bar()
+ggplot(merged_df1, aes(x = Assembly.Level)) + geom_bar() + theme_bw()
 
 #Filtering by only complete genomes
 merged_df2 <- merged_df1[(merged_df1$Assembly.Level %in% "Complete Genome"), ]
@@ -223,19 +223,19 @@ merged_df2 <- merged_df1[(merged_df1$Assembly.Level %in% "Complete Genome"), ]
 summary(merged_df2)
 
 #Repeating exploration
-ggplot(merged_df2, aes(x = year.y, fill = Source.type)) + geom_bar()
+ggplot(merged_df2, aes(x = year.y, fill = Source.type)) + geom_bar() + theme_bw()
 
-ggplot(merged_df2, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right")
+ggplot(merged_df2, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
 
-ggplot(merged_df2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram()
+ggplot(merged_df2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram()
+ggplot(merged_df2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()
+ggplot(merged_df2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram()
+ggplot(merged_df2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram() + theme_bw()
 
-ggplot(merged_df2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
+ggplot(merged_df2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
 ```
 
 ### Only 137 genomes are complete and intersect between both datasets. These will be use only to assess genome structure
