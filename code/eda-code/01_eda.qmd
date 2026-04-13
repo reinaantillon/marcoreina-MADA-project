@@ -10,28 +10,33 @@ library(here)
 library(dplyr)
 library(countries)
 library(ggplot2)
+library(tidyr)
 ```
 
-### Raw data seems too big to ensure reproducibility. Smaller dataframes were created from the raw data. EDA will start from those files. The code to create the initial files is the following:
+# INITIAL CODE: NOT EXECUTABLE. DO NOT RUN. 
+
+##### This code is provided only for disclosure purpuses, and to show how I started wrangling the original dataset. However, the raw data seems too big to ensure reproducibility. Smaller dataframes were created from the original raw data and the executable code will start from there. For my project, two databases are going to be explored and merged to characterize AMR in Salmonella. 
+
+##### The code to create the initial files is the following:
 
 ```r
 #Isolates obtained from _NCBI Pathogen Detection_ database: Salmonella
 isolates_raw <- read_tsv(here("data/raw-data", "isolates.tsv"))
 
 #Changing format from tsv to csv
-write_csv(isolates_raw, here("data/processed-data/", "isolates1.csv"))
+write_csv(isolates_raw, here("data/raw-data/", "isolates0.csv"))
 
 #Making a new object based on new csv
-isolates0 <- read.csv(here("data/processed-data/", "isolates1.csv"))
+isolates0 <- read.csv(here("data/raw-data/", "isolates0.csv"))
 
 #Genomes dataset from NCBI: _Bacterial genomes_
 genomes_raw <- read_tsv(here("data/raw-data/", "genomes_datasets.tsv"))
 
 #Changing format from tsv to csv
-write_csv(genomes_raw, here("data/processed-data/", "genomes1.csv"))
+write_csv(genomes_raw, here("data/raw-data/", "genomes0.csv"))
 
 #Making a new object based on new csv
-genomes0 <- read.csv(here("data/processed-data/", "genomes1.csv"))
+genomes0 <- read.csv(here("data/raw-data/", "genomes0.csv"))
 
 #Removing non useful columns from isolates0
 isolates0$WGS.accession	=	NULL
@@ -82,13 +87,12 @@ genomes0$BioSample	=	genomes0$Assembly.BioSample.Accession
 #Selected columns for isolates dataframe
 isolates1 <- data.frame("Create.date"	=	isolates0$Create.date,
                         "Location"	=	isolates0$Location,
+                        "Isolation.source" = isolates0$Isolation.source,
                         "Source.type"	=	isolates0$Source.type,
                         "BioSample"	=	isolates0$BioSample,
                         "AMR.genotypes"	=	isolates0$AMR.genotypes,
                         "Computed.types"	=	isolates0$Computed.types
 )
-
-isolates1 <- na.omit(isolates1)
 
 #Identifying country names where isolates came from to NCBI
 isolates1$country_name <- country_name(x= isolates1$Location, to="ISO3")
@@ -101,7 +105,7 @@ isolates1$year <-  as.numeric(substr(isolates1$Create.date, 1, 4))
 isolates1 <- isolates1[(isolates1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
 
 #Obtaining only categories of interest
-isolates1 <- isolates1[(isolates1$Source.type %in% c("animal", "enviromental", "food", "human")), ]
+isolates1 <- isolates1[(isolates1$Source.type %in% c("animal", "environmental", "food", "human")), ]
 
 #Saving new df, file under 100 MB
 write_csv(isolates1, here("data/processed-data/", "isolates1.csv"))
@@ -128,60 +132,105 @@ genomes1 <- na.omit(genomes1)
 write_csv(genomes1, here("data/processed-data/", "genomes1.csv"))
 ```
 
-### After creating files for use 
-# EDA CODE STARTS HERE:
+After creating files for use 
+
+# EDA EXECUTABLE CODE STARTS HERE:
 ```{r}
 #Load files created
 isolates1 <- read.csv(here("data/processed-data/", "isolates1.csv"))
-summary(isolates1)
-
 genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
-summary(genomes1)
 ```
 
-### Exploring isolates1.csv
-#### Data comes from progam of _Pathogen Detection_ from NCBI
+### Exploring first dataset: isolates1.csv
+##### Data comes from progam of _Pathogen Detection_ from NCBI
+
 ```{r}
-#Observing if there is any trend in the years the isolates were obtained
+# Observing if there is any trend in the years the isolates were obtained
 ggplot(isolates1, aes(x = year)) + geom_bar() + theme_bw()
 
-#Observing trends main within isolates
+# Observing trends main within isolates
 ggplot(isolates1, aes(x = year, fill = Source.type)) + geom_bar() + theme_bw()
+ggsave(filename = "isolatesgraph1.png", path = here("results/figures/"))
 
 ggplot(isolates1, aes(x = year)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
+
+# Create summary table with counts and percentages
+isolates1_summary_table <- isolates1 %>%
+  group_by(Source.type, year) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(year) %>%
+  mutate(
+    percent = round(n / sum(n) * 100, 1),
+  ) %>%
+  ungroup() %>%
+  arrange(Source.type, year)
+
+# Print table
+print(isolates1_summary_table)
 ```
 
-### Exploring genomes1.csv
-#### Data comes from _Datasets_ by NIH
+##### From this first dataset, the majority of isolates obtained from Pathogen detection come from human sources. This indicates that the majority of the data presented in this database will come from clinical cases. A minimnal number of (<10%) comes from other sources like animal, food, and enviromental.
+
+```{r}
+#Now let's take a look if AMR is predicted for these isolates
+isolates1$AMR_predicted <- !is.na(isolates1$AMR.genotypes)
+
+#Graphic version of predicted AMR
+ggplot(isolates1, aes(x = year, fill = AMR_predicted)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
+ggsave(filename = "isolatesgraph2.png", path = here("results/figures/"))
+```
+
+##### From this information we can observe that the majority of isolates are predicted to have AMR genes (~97.3%). This will be explored in the Descriptive analysis. 
+
+### Exploring second dataset: genomes1.csv
+##### Data comes from _Datasets_ by NIH, this dataset is not part of any surveillance program. However, I am choosing to use this second database because it contains information about genome structure. While Pathogen Detection has predicted AMR and sources. Therefore both databases could complement each other once they are intersected.
+
 ```{r}
 #Substracting year of release date
-genomes1$year <- as.numeric(substr(genomes1$Assembly.Release.Date , 1, 4))
+genomes1$year <- as.character(substr(genomes1$Assembly.Release.Date , 1, 4))
 
 #Observing trends main within genomes
 ggplot(genomes1, aes(x = year)) + geom_bar() + theme_bw()
 
 #Trends of available genomes from the last 5 complete years
-genomes2 <- genomes1[(genomes1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
-ggplot(genomes2, aes(x = year)) + geom_bar() + theme_bw()
+# genomes2 <- genomes1[(genomes1$year %in% c(2025, 2024, 2023, 2022, 2021)), ]
+# ggplot(genomes2, aes(x = year)) + geom_bar() + theme_bw()
 
-#Histograms for all rest of the parameter
-ggplot(genomes2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
+#Histograms for all rest of the parameters based on genome structure
+ggplot(genomes1, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
 
-ggplot(genomes2, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram() + theme_bw()
+ggplot(genomes1, aes(x = Assembly.Stats.Number.of.Contigs)) + geom_histogram() + theme_bw()
  
-ggplot(genomes2, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()+ theme_bw()
+ggplot(genomes1, aes(x = Annotation.Count.Gene.Total)) + geom_histogram()+ theme_bw()
 
-ggplot(genomes2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram() + theme_bw()
+ggplot(genomes1, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogram() + theme_bw()
 
-ggplot(genomes2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
+ggplot(genomes1, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
 
-ggplot(genomes2, aes(x = Assembly.Level)) + geom_bar() + theme_bw()
+ggplot(genomes1, aes(x = Assembly.Level)) + geom_bar() + theme_bw()
 ```
+
+##### From this information it can be observed that the majority of paramaters resemble a normal distribution, with some of them being skewed either left or right. Now let's explore how they relate with each other. Year in Genomes Datasets do not correspond to the year in Pathogen Detection. Therefore, genomes will not be filtered by year.
+
+```{r}
+#dataframe only with numeric values
+genomes1_pairs_comp <- data.frame(
+  "Length" = genomes1$Assembly.Stats.Total.Sequence.Length,
+  "Contigs" = genomes1$Assembly.Stats.Number.of.Contigs,
+  "Gene.Total" = genomes1$Annotation.Count.Gene.Total,
+  "Protein.coding" = genomes1$Annotation.Count.Gene.Protein.coding,
+  "Pseudogene" = genomes1$Annotation.Count.Gene.Pseudogene
+)
+pairs(genomes1_pairs_comp)
+cor(genomes1_pairs_comp)
+```
+
+##### As expected, sequence length seems to be highly correlated with total of genes and total of protein coding genes. However, it is interesting to note that pseudogenes are not correlated with sequence length or any other of the tested parameters. This will be further explored in the descriptive analysis. 
 
 ### Merging both dataframes to assign sources, AMR genotype, and computed serovar
 ```{r}
 #First merge based on BioSample column only samples that intersect in both databases
-merged_df0 <- inner_join(genomes2, isolates1, relationship = "many-to-many",  keep = FALSE, by = "BioSample")
+merged_df0 <- inner_join(genomes1, isolates1, relationship = "many-to-many",  keep = FALSE, by = "BioSample")
 
 #Only 197 rows match between genomes and isolates
 merged_df0 <- merged_df0 %>% 
@@ -199,11 +248,11 @@ write_csv(merged_df1, here("data/processed-data/", "merged_df1.csv"))
 
 ### Exploring merged_df1.csv
 ```{r}
-summary(merged_df1)
+#Now repeating the previous exploration, but applied to the shared items between both databases
 
-ggplot(merged_df1, aes(x = year.y, fill = Source.type)) + geom_bar() + theme_bw()
+ggplot(merged_df1, aes(x = year.y, fill = Source.type)) + geom_bar() + theme_bw() # Year based on Pathogen Detection
 
-ggplot(merged_df1, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
+ggplot(merged_df1, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw() # Year based on Pathogen Detection
 
 ggplot(merged_df1, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
 
@@ -217,15 +266,17 @@ ggplot(merged_df1, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
 
 ggplot(merged_df1, aes(x = Assembly.Level)) + geom_bar() + theme_bw()
 
+```
+
+##### From this information we can observe that the majority of the intersecting items are completed genomes, which is actually helpful for us to analyze genome structure. We can also observe that 2021 is overrepresented, this is ok, as it might just represent a delay in the incorporation from Pathogen Detection to Datasets. I will be filtering by complete genomes, as some of items showed to be over 50 contigs (not good).
+
+```{r}
 #Filtering by only complete genomes
 merged_df2 <- merged_df1[(merged_df1$Assembly.Level %in% "Complete Genome"), ]
 
-summary(merged_df2)
-
-#Repeating exploration
-ggplot(merged_df2, aes(x = year.y, fill = Source.type)) + geom_bar() + theme_bw()
-
-ggplot(merged_df2, aes(x = year.y)) + geom_bar() + facet_wrap(~ Source.type, scales = "free", ncol = 1, strip.position = "right") + theme_bw()
+#Repeating exploration one more time
+ggplot(merged_df2, aes(x = Source.type, fill = Source.type)) + geom_bar() + theme_bw()
+ggsave(filename = "genomesgraph1.png", path = here("results/figures/"))
 
 ggplot(merged_df2, aes(x = Assembly.Stats.Total.Sequence.Length)) + geom_histogram() + theme_bw()
 
@@ -238,6 +289,4 @@ ggplot(merged_df2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogr
 ggplot(merged_df2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
 ```
 
-### Only 137 genomes are complete and intersect between both datasets. These will be use only to assess genome structure
-### Isolates1 will be use to assess AMR genotypes
-### Genomes1-3 dataframes resulted to be only complimentary for the analysis 
+##### 214 genomes are complete and intersect between both datasets. These will be use only to assess genome structure. Isolates1 will be use to assess AMR genotypes. Genomes1-3 dataframes resulted to be only complimentary for the analysis 
