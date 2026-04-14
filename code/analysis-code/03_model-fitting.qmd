@@ -1,0 +1,116 @@
+### MODEL FITTING
+###### Using second dataset: "Genomes"
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(readr)
+library(here)
+library(dplyr)
+library(stringr)
+library(knitr)
+library(forcats) 
+library(tidymodels)
+
+#Load files created data has been previously cleaned
+genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
+
+# Deleting  columns that are not going to be used
+genomes1$Annotation.Release.Date = NULL
+genomes1$Assembly.Release.Date = NULL
+genomes1$genus = NULL
+genomes1$BioSample = NULL
+
+colnames(genomes1) <- c("Length", "Contigs", "Assembly", "Gene.Total", "Protein.coding", "Pseudogenes")
+```
+
+# For the modeling I have decided to take predict the number of protein coding genes based on the rest of parameters obtained from the Genomes dataset
+
+```{r}
+lm_null <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ 1, data = genomes1)
+
+lm_fit1 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length, data = genomes1)
+
+lm_fit2 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Contigs, data = genomes1)
+
+lm_fit3 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Contigs + Assembly, data = genomes1)
+
+lm_fit4 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Contigs + Assembly + Gene.Total, data = genomes1)
+
+lm_fit5 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Contigs + Assembly + Gene.Total + Pseudogenes, data = genomes1)
+
+```
+
+
+```{r}
+#Predidiction and differences for each fit
+genomes1 <- genomes1 %>%
+  mutate(
+    pred0 = predict(lm_null, new_data = genomes1, type = "numeric")$.pred,
+    pred1 = predict(lm_fit1, new_data = genomes1, type = "numeric")$.pred,
+    pred2 = predict(lm_fit2, new_data = genomes1, type = "numeric")$.pred,
+    pred3 = predict(lm_fit3, new_data = genomes1, type = "numeric")$.pred,
+    pred4 = predict(lm_fit4, new_data = genomes1, type = "numeric")$.pred,
+    pred5 = predict(lm_fit5, new_data = genomes1, type = "numeric")$.pred
+  ) %>%
+    mutate(
+    diff0 = pred0 - Protein.coding,
+    diff1 = pred1 - Protein.coding,
+    diff2 = pred2 - Protein.coding,
+    diff3 = pred3 - Protein.coding,
+    diff4 = pred4 - Protein.coding,
+    diff5 = pred5 - Protein.coding
+  )
+```
+
+```{r}
+ggplot(genomes1, aes(y = Protein.coding, x = pred0)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred1)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred2)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred3)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred4)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred5)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    theme_bw()
+```
+
