@@ -126,11 +126,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../code/eda-code/eda.html"> 
+    <a class="nav-link" href="../../code/eda-code/01_eda.html"> 
 <span class="menu-text">EDA analysis</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../code/analysis-code/descriptive-analysis.html"> 
+    <a class="nav-link active" href="../../code/analysis-code/02_descriptive-analysis.html" aria-current="page"> 
 <span class="menu-text">Descriptive Analysis</span></a>
   </li>  
 </ul>
@@ -229,8 +229,8 @@ dttm (1): Create.date
 <section id="the-goal-of-this-analysis-is-to-characterize-amr-incidence-in-salmonella" class="level5">
 <h5 class="anchored" data-anchor-id="the-goal-of-this-analysis-is-to-characterize-amr-incidence-in-salmonella">The goal of this analysis is to characterize AMR incidence in <em>Salmonella</em></h5>
 </section>
-<section id="as-the-data-comes-from-an-observational-surveillance-program-only-descriptive-analysis-will-be-performed" class="level5">
-<h5 class="anchored" data-anchor-id="as-the-data-comes-from-an-observational-surveillance-program-only-descriptive-analysis-will-be-performed">As the data comes from an observational surveillance program, only descriptive analysis will be performed</h5>
+<section id="as-the-data-comes-from-an-observational-surveillance-program-only-descriptive-analysis-will-be-performed.-this-approach-has-changed-from-the-original-intention-described-in-the-manuscript." class="level5">
+<h5 class="anchored" data-anchor-id="as-the-data-comes-from-an-observational-surveillance-program-only-descriptive-analysis-will-be-performed.-this-approach-has-changed-from-the-original-intention-described-in-the-manuscript.">As the data comes from an observational surveillance program, only descriptive analysis will be performed. This approach has changed from the original intention described in the manuscript.</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Split AMR genes</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>amr_long <span class="ot">&lt;-</span> isolates1 <span class="sc">%&gt;%</span></span>
@@ -334,7 +334,7 @@ dttm (1): Create.date
 <section id="amr-summaries" class="level1">
 <h1>AMR summaries</h1>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gene prevalence</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gene prevalence overall</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>gene_prev <span class="ot">&lt;-</span> amr_long <span class="sc">%&gt;%</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(AMR_gene, AMR_status) <span class="sc">%&gt;%</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) </span>
@@ -358,7 +358,7 @@ dttm (1): Create.date
 10 aac(3)-IId  PARTIAL_END_OF_CONTIG    12
 # ℹ 504 more rows</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Class prevalence</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Class prevalence overall</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>class_prev <span class="ot">&lt;-</span> amr_long <span class="sc">%&gt;%</span>  </span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_status <span class="sc">==</span> <span class="st">"COMPLETE"</span>) <span class="sc">%&gt;%</span>  </span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(AMR_class) <span class="sc">%&gt;%</span>  </span>
@@ -413,18 +413,20 @@ dttm (1): Create.date
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing Efflux pumps</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="ot">&lt;-</span> amr_long[<span class="sc">!</span>(amr_long<span class="sc">$</span>AMR_class <span class="sc">%in%</span> <span class="st">"Efflux Pump"</span>), ]</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Class prevalence after removing Efflux pumps</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>class_prev1 <span class="ot">&lt;-</span> amr_long1 <span class="sc">%&gt;%</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_status <span class="sc">==</span> <span class="st">"COMPLETE"</span>) <span class="sc">%&gt;%</span>  </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(AMR_class) <span class="sc">%&gt;%</span>  </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(BioSample), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span>  </span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span>  </span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_total =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),           </span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_pct =</span> <span class="fu">round</span>(<span class="fu">cumsum</span>(pct_total), <span class="dv">1</span>)         </span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>class_prev1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Keeping only completed profiles</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="ot">&lt;-</span> amr_long1[(amr_long1<span class="sc">$</span>AMR_status <span class="sc">%in%</span> <span class="st">"COMPLETE"</span>), ]</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Class prevalence after removing Efflux pumps and keeping only completed profiles</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>class_prev1 <span class="ot">&lt;-</span> amr_long1 <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(AMR_class) <span class="sc">%&gt;%</span>  </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(BioSample), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span>  </span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span>  </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_total =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),           </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_pct =</span> <span class="fu">round</span>(<span class="fu">cumsum</span>(pct_total), <span class="dv">1</span>)         </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>class_prev1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 16 × 4
    AMR_class          n pct_total cum_pct
@@ -446,7 +448,7 @@ dttm (1): Create.date
 15 Streptothricin    33       0     100. 
 16 Glycopeptide       1       0     100. </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting classes frequencies after removing Efflux pumps</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting classes frequencies after removing Efflux pumps and keeping only completed profiles</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(class_prev1, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(AMR_class, n), <span class="at">y =</span> n)) <span class="sc">+</span> </span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
@@ -488,18 +490,18 @@ dttm (1): Create.date
 <pre><code># A tibble: 13 × 2
    n_classes      n
        &lt;int&gt;  &lt;int&gt;
- 1         0 176975
- 2         1  40839
- 3         2   6021
- 4         3   2969
- 5         4   6256
- 6         5   5295
- 7         6   3053
- 8         7   1358
- 9         8   2509
-10         9    345
-11        10    131
-12        11     19
+ 1         0 207263
+ 2         1  11317
+ 3         2   6020
+ 4         3   4187
+ 5         4   5876
+ 6         5   5621
+ 7         6   1685
+ 8         7   1094
+ 9         8   2380
+10         9    241
+11        10     76
+12        11     10
 13        12      2</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Creating a variable based on n_classes </span></span>
@@ -531,90 +533,128 @@ dttm (1): Create.date
 <pre><code>Saving 7 x 5 in image</code></pre>
 </div>
 </div>
-<section id="while-the-scales-are-different-it-is-interesting-to-observe-that-the-trends-between-environmental-and-human-amr-look-very-familiar.-while-the-amr-between-animal-and-food-resemble-also-look-similar-to-each-other." class="level5">
-<h5 class="anchored" data-anchor-id="while-the-scales-are-different-it-is-interesting-to-observe-that-the-trends-between-environmental-and-human-amr-look-very-familiar.-while-the-amr-between-animal-and-food-resemble-also-look-similar-to-each-other.">While the scales are different, it is interesting to observe that the trends between environmental and human AMR look very familiar. While the AMR between animal and food resemble also look similar to each other.</h5>
+<section id="while-the-scales-are-different-it-is-interesting-to-observe-that-the-trends-between-environmental-and-human-amr-look-very-familiar.-while-the-amr-between-animal-and-food-resemble-also-look-similar-to-each-other.-proportionally-there-are-more-isolates-with-mdr-observed-in-animal-and-food-sources.-however-we-have-to-take-in-consideration-this-is-only-observational-data." class="level5">
+<h5 class="anchored" data-anchor-id="while-the-scales-are-different-it-is-interesting-to-observe-that-the-trends-between-environmental-and-human-amr-look-very-familiar.-while-the-amr-between-animal-and-food-resemble-also-look-similar-to-each-other.-proportionally-there-are-more-isolates-with-mdr-observed-in-animal-and-food-sources.-however-we-have-to-take-in-consideration-this-is-only-observational-data.">While the scales are different, it is interesting to observe that the trends between environmental and human AMR look very familiar. While the AMR between animal and food resemble also look similar to each other. Proportionally, there are more isolates with MDR observed in animal and food sources. However, we have to take in consideration this is only observational data.</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a wide version for understanding cooccurrance</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>amr_wide <span class="ot">&lt;-</span> amr_long1 <span class="sc">%&gt;%</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_gene <span class="sc">!=</span> <span class="st">"None"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class) <span class="sc">%&gt;%</span>  </span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">present =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> BioSample,</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> AMR_class,</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> present,</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_fill =</span> <span class="dv">0</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Removing classes that represent less than 5%</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Macrolide <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Lincosamide <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Rifamycin <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Bleomycin <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Colistin <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Gentamicin <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Streptothricin <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>amr_wide<span class="sc">$</span>Glycopeptide <span class="ot">=</span> <span class="cn">NULL</span></span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>isolates2 <span class="ot">&lt;-</span> <span class="fu">left_join</span>(isolates1, amr_wide, <span class="at">by =</span> <span class="st">"BioSample"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">replace_na</span>(.x, <span class="dv">0</span>)))</span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>isolates2<span class="sc">$</span>AMR.genotypes <span class="ot">=</span> <span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Keep only the columns needed for the pivot + identifiers</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(BioSample, AMR_class, serotype, Source.type) <span class="sc">%&gt;%</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove duplicate BioSample + AMR_class combinations while preserving metadata</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">present =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> <span class="fu">c</span>(BioSample, serotype, Source.type),</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> AMR_class,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> present,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_fill =</span> <span class="dv">0</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>isolates2 <span class="ot">&lt;-</span> <span class="fu">left_join</span>(isolates1, amr_wide, <span class="at">by =</span> <span class="st">"BioSample"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">replace_na</span>(.x, <span class="dv">0</span>)))</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>isolates2<span class="sc">$</span>AMR.genotypes <span class="ot">=</span> <span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#AMR matrix</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>amr_mat <span class="ot">&lt;-</span> amr_wide <span class="sc">%&gt;%</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>BioSample) <span class="sc">%&gt;%</span>   <span class="co"># keep only features</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Correlation matrix</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>cor_mat <span class="ot">&lt;-</span> <span class="fu">cor</span>(amr_mat)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>cor_mat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>amr_order <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Tetracycline"</span>, <span class="st">"Aminoglycoside"</span>, <span class="st">"Sulfonamide"</span>, <span class="st">"Beta_lactam"</span>, <span class="st">"Phenicol"</span>, <span class="st">"Quinolone"</span>, <span class="st">"Trimethoprim"</span>, <span class="st">"Fosfomycin"</span>, <span class="st">"Macrolide"</span>, <span class="st">"Lincosamide"</span>, <span class="st">"Rifamycin"</span>, <span class="st">"Bleomycin"</span>, <span class="st">"Colistin"</span>, <span class="st">"Gentamicin"</span>, <span class="st">"Streptothricin"</span>, <span class="st">"Glycopeptide"</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#AMR matrix full dataset</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>amr_mat <span class="ot">&lt;-</span> amr_wide <span class="sc">%&gt;%</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>BioSample) <span class="sc">%&gt;%</span>   </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Correlation matrix</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>cor_mat <span class="ot">&lt;-</span> <span class="fu">cor</span>(amr_mat)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>cor_mat</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>               Aminoglycoside   Quinolone  Sulfonamide Tetracycline
-Aminoglycoside    1.000000000 -0.22030445  0.760852914  0.742817099
-Quinolone        -0.220304453  1.00000000 -0.118668343 -0.275427428
-Sulfonamide       0.760852914 -0.11866834  1.000000000  0.696225829
-Tetracycline      0.742817099 -0.27542743  0.696225829  1.000000000
-Beta_lactam       0.594636177 -0.13901475  0.682119939  0.528843736
-Fosfomycin       -0.158588036 -0.40302304 -0.145797834 -0.162933653
-Phenicol          0.488677381  0.05208392  0.572807080  0.466282859
-Trimethoprim      0.308044602  0.09341472  0.407619769  0.292804255
-MDR Regulator    -0.013310868 -0.02537259 -0.009926852 -0.012069677
-Streptogramin    -0.008492836 -0.01392279 -0.007502806 -0.009095192
-                Beta_lactam   Fosfomycin     Phenicol Trimethoprim
-Aminoglycoside  0.594636177 -0.158588036  0.488677381  0.308044602
-Quinolone      -0.139014748 -0.403023042  0.052083919  0.093414721
-Sulfonamide     0.682119939 -0.145797834  0.572807080  0.407619769
-Tetracycline    0.528843736 -0.162933653  0.466282859  0.292804255
-Beta_lactam     1.000000000 -0.149755413  0.520851287  0.322626326
-Fosfomycin     -0.149755413  1.000000000 -0.096527631 -0.071633739
-Phenicol        0.520851287 -0.096527631  1.000000000  0.499813128
-Trimethoprim    0.322626326 -0.071633739  0.499813128  1.000000000
-MDR Regulator  -0.007432685 -0.010096911 -0.006117122 -0.002942509
-Streptogramin  -0.003833820 -0.004835649 -0.004769624 -0.004249328
-               MDR Regulator Streptogramin
-Aminoglycoside -0.0133108677 -0.0084928356
-Quinolone      -0.0253725886 -0.0139227867
-Sulfonamide    -0.0099268524 -0.0075028063
-Tetracycline   -0.0120696767 -0.0090951925
-Beta_lactam    -0.0074326850 -0.0038338197
-Fosfomycin     -0.0100969112 -0.0048356493
-Phenicol       -0.0061171215 -0.0047696238
-Trimethoprim   -0.0029425088 -0.0042493281
-MDR Regulator   1.0000000000 -0.0005165268
-Streptogramin  -0.0005165268  1.0000000000</code></pre>
+<pre><code>               Aminoglycoside    Quinolone  Sulfonamide Tetracycline
+Aminoglycoside     1.00000000 -0.024613910  0.610737669  0.515499455
+Quinolone         -0.02461391  1.000000000  0.059317386 -0.017504054
+Sulfonamide        0.61073767  0.059317386  1.000000000  0.497602318
+Tetracycline       0.51549946 -0.017504054  0.497602318  1.000000000
+Beta_lactam        0.40384404  0.127359099  0.552009142  0.272556001
+Fosfomycin        -0.30000716 -0.126264394 -0.254794083 -0.339583214
+Phenicol           0.35370374  0.229929012  0.472774816  0.311094638
+Bleomycin          0.08472418  0.041859911  0.018034485  0.061012598
+Macrolide          0.11419677  0.374778538  0.253459539  0.155387577
+Trimethoprim       0.13244787  0.327960250  0.281501098  0.090157845
+Gentamicin         0.01555117 -0.019810625 -0.023001234 -0.002380992
+Rifamycin          0.09321845  0.162878637  0.088739623  0.065588281
+Colistin           0.05326273  0.058029001  0.039369757  0.024839249
+Lincosamide        0.09865618  0.178332048  0.092096529  0.071065089
+Streptothricin     0.02255535  0.001465341 -0.010087302 -0.011074762
+Glycopeptide       0.00392475 -0.002719361  0.004746922  0.003415446
+                Beta_lactam    Fosfomycin     Phenicol     Bleomycin
+Aminoglycoside  0.403844042 -0.3000071562  0.353703737  0.0847241752
+Quinolone       0.127359099 -0.1262643939  0.229929012  0.0418599112
+Sulfonamide     0.552009142 -0.2547940827  0.472774816  0.0180344855
+Tetracycline    0.272556001 -0.3395832138  0.311094638  0.0610125984
+Beta_lactam     1.000000000 -0.2467711863  0.414480051  0.0453214111
+Fosfomycin     -0.246771186  1.0000000000 -0.150692149  0.0329952896
+Phenicol        0.414480051 -0.1506921492  1.000000000  0.0372441178
+Bleomycin       0.045321411  0.0329952896  0.037244118  1.0000000000
+Macrolide       0.202138205 -0.1076015855  0.394380071  0.0572592515
+Trimethoprim    0.195013706 -0.1158625645  0.434471936  0.0413513625
+Gentamicin     -0.017042990 -0.0005376667 -0.020592885 -0.0044357162
+Rifamycin       0.120222078 -0.0011080733  0.098734667  0.0594577260
+Colistin        0.049247823  0.0052868384  0.026119781  0.0280182377
+Lincosamide     0.117483162 -0.0299164047  0.157675172  0.0304071605
+Streptothricin  0.019575773 -0.0052670485 -0.005407101  0.0040344788
+Glycopeptide   -0.004656474 -0.0021925680  0.008528215 -0.0006088809
+                   Macrolide Trimethoprim    Gentamicin     Rifamycin
+Aminoglycoside  0.1141967685  0.132447875  0.0155511694  0.0932184539
+Quinolone       0.3747785384  0.327960250 -0.0198106253  0.1628786374
+Sulfonamide     0.2534595392  0.281501098 -0.0230012336  0.0887396228
+Tetracycline    0.1553875768  0.090157845 -0.0023809915  0.0655882806
+Beta_lactam     0.2021382048  0.195013706 -0.0170429903  0.1202220780
+Fosfomycin     -0.1076015855 -0.115862564 -0.0005376667 -0.0011080733
+Phenicol        0.3943800709  0.434471936 -0.0205928847  0.0987346671
+Bleomycin       0.0572592515  0.041351362 -0.0044357162  0.0594577260
+Macrolide       1.0000000000  0.488139716 -0.0115101717  0.1056256236
+Trimethoprim    0.4881397156  1.000000000 -0.0174907717  0.1912767563
+Gentamicin     -0.0115101717 -0.017490772  1.0000000000 -0.0044934673
+Rifamycin       0.1056256236  0.191276756 -0.0044934673  1.0000000000
+Colistin        0.0003848075  0.079076969  0.2219303196  0.4431215433
+Lincosamide     0.1078962163  0.151354112 -0.0048759191  0.1881186106
+Streptothricin  0.0066078234  0.028338181 -0.0010872494  0.0038948390
+Glycopeptide   -0.0015799758 -0.002636512 -0.0001891872 -0.0006168083
+                    Colistin   Lincosamide Streptothricin  Glycopeptide
+Aminoglycoside  0.0532627293  0.0986561795   0.0225553458  0.0039247499
+Quinolone       0.0580290011  0.1783320480   0.0014653413 -0.0027193607
+Sulfonamide     0.0393697570  0.0920965294  -0.0100873023  0.0047469216
+Tetracycline    0.0248392491  0.0710650889  -0.0110747624  0.0034154461
+Beta_lactam     0.0492478227  0.1174831623   0.0195757734 -0.0046564738
+Fosfomycin      0.0052868384 -0.0299164047  -0.0052670485 -0.0021925680
+Phenicol        0.0261197808  0.1576751724  -0.0054071011  0.0085282153
+Bleomycin       0.0280182377  0.0304071605   0.0040344788 -0.0006088809
+Macrolide       0.0003848075  0.1078962163   0.0066078234 -0.0015799758
+Trimethoprim    0.0790769692  0.1513541116   0.0283381812 -0.0026365117
+Gentamicin      0.2219303196 -0.0048759191  -0.0010872494 -0.0001891872
+Rifamycin       0.4431215433  0.1881186106   0.0038948390 -0.0006168083
+Colistin        1.0000000000 -0.0058154981   0.0046505046 -0.0005755431
+Lincosamide    -0.0058154981  1.0000000000  -0.0038464724 -0.0006693066
+Streptothricin  0.0046505046 -0.0038464724   1.0000000000 -0.0001492443
+Glycopeptide   -0.0005755431 -0.0006693066  -0.0001492443  1.0000000000</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>cor_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat)) <span class="sc">%&gt;%</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">corr =</span> Freq)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_df, <span class="fu">aes</span>(AMR1, AMR2, <span class="at">fill =</span> corr)) <span class="sc">+</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"AMR Correlation Heatmap"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">corr =</span> Freq) <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR1 =</span> <span class="fu">factor</span>(AMR1, <span class="at">levels =</span> amr_order),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR2 =</span> <span class="fu">factor</span>(AMR2, <span class="at">levels =</span> amr_order)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>()</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_df, <span class="fu">aes</span>(AMR1, AMR2, <span class="at">fill =</span> corr)) <span class="sc">+</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"AMR Correlation Heatmap"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -641,46 +681,921 @@ Streptogramin  -0.0005165268  1.0000000000</code></pre>
 </section>
 <section id="in-particular-quinolone-and-fosfomycin-seem-to-most-negative-correlation-between-each-other" class="level5">
 <h5 class="anchored" data-anchor-id="in-particular-quinolone-and-fosfomycin-seem-to-most-negative-correlation-between-each-other">&gt; In particular, Quinolone and Fosfomycin seem to most negative correlation between each other</h5>
+</section>
+<section id="after-learning-about-the-mdr-and-the-coocurrance-af-amr-in-all-isolates-i-am-interested-in-two-more-things-is-cooccurance-the-same-across-sources-and-what-are-the-serovars-leading-each-one-of-the-main-amr-classes" class="level5">
+<h5 class="anchored" data-anchor-id="after-learning-about-the-mdr-and-the-coocurrance-af-amr-in-all-isolates-i-am-interested-in-two-more-things-is-cooccurance-the-same-across-sources-and-what-are-the-serovars-leading-each-one-of-the-main-amr-classes">After learning about the MDR and the coocurrance af AMR in all isolates, I am interested in two more things: Is cooccurance the same across sources? and what are the serovars leading each one of the main AMR classes?</h5>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Option 2, Jaccard matrix. Not sure if going to be used, most likely Pearson Correlation will be used (above)</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>cooc_mat <span class="ot">&lt;-</span> <span class="fu">t</span>(amr_mat) <span class="sc">%*%</span> amr_mat</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>cooc_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cooc_mat)) <span class="sc">%&gt;%</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">count =</span> Freq) <span class="sc">%&gt;%</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR1 <span class="sc">!=</span> AMR2)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ======= AMR matrix per source: HUMAN =========== #</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>amr_mat_human <span class="ot">&lt;-</span> amr_wide <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Source.type <span class="sc">==</span> <span class="st">"human"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>BioSample) <span class="sc">%&gt;%</span>   </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>row_sums <span class="ot">&lt;-</span> <span class="fu">diag</span>(cooc_mat)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>jaccard <span class="ot">&lt;-</span> cooc_mat <span class="sc">/</span> (<span class="fu">outer</span>(row_sums, row_sums, <span class="st">"+"</span>) <span class="sc">-</span> cooc_mat)</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>jaccard</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Correlation matrix</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>cor_mat_human <span class="ot">&lt;-</span> <span class="fu">cor</span>(amr_mat_human) </span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>cor_mat_human</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>               Aminoglycoside   Quinolone Sulfonamide Tetracycline  Beta_lactam
-Aminoglycoside    1.000000000 0.202595305 0.716529146  0.719767090 5.442097e-01
-Quinolone         0.202595305 1.000000000 0.205252785  0.202027015 1.697468e-01
-Sulfonamide       0.716529146 0.205252785 1.000000000  0.653846154 6.227722e-01
-Tetracycline      0.719767090 0.202027015 0.653846154  1.000000000 4.912629e-01
-Beta_lactam       0.544209717 0.169746762 0.622772194  0.491262854 1.000000e+00
-Fosfomycin        0.055500076 0.026917095 0.050205817  0.059490813 3.957472e-02
-Phenicol          0.369036797 0.150555493 0.443224299  0.347403072 4.153402e-01
-Trimethoprim      0.236696210 0.138460121 0.300403045  0.225346687 2.563003e-01
-MDR Regulator     0.001221598 0.001093082 0.001345701  0.001345694 1.457154e-03
-Streptogramin     0.000000000 0.000000000 0.000000000  0.000000000 5.637932e-05
-               Fosfomycin    Phenicol Trimethoprim MDR Regulator Streptogramin
-Aminoglycoside 0.05550008 0.369036797  0.236696210   0.001221598  0.000000e+00
-Quinolone      0.02691710 0.150555493  0.138460121   0.001093082  0.000000e+00
-Sulfonamide    0.05020582 0.443224299  0.300403045   0.001345701  0.000000e+00
-Tetracycline   0.05949081 0.347403072  0.225346687   0.001345694  0.000000e+00
-Beta_lactam    0.03957472 0.415340160  0.256300294   0.001457154  5.637932e-05
-Fosfomycin     1.00000000 0.035086839  0.038040473   0.000946880  0.000000e+00
-Phenicol       0.03508684 1.000000000  0.392411721   0.001357115  0.000000e+00
-Trimethoprim   0.03804047 0.392411721  1.000000000   0.001653088  0.000000e+00
-MDR Regulator  0.00094688 0.001357115  0.001653088   1.000000000  0.000000e+00
-Streptogramin  0.00000000 0.000000000  0.000000000   0.000000000  1.000000e+00</code></pre>
+<pre><code>               Aminoglycoside    Quinolone  Sulfonamide Tetracycline
+Aminoglycoside    1.000000000  0.006681849  0.704048410  0.554078545
+Quinolone         0.006681849  1.000000000  0.058769071  0.003054120
+Sulfonamide       0.704048410  0.058769071  1.000000000  0.509452085
+Tetracycline      0.554078545  0.003054120  0.509452085  1.000000000
+Beta_lactam       0.495331654  0.086851813  0.586747791  0.318352454
+Fosfomycin       -0.308728472 -0.157359236 -0.282004707 -0.361199436
+Phenicol          0.384242058  0.238190260  0.489139863  0.348150819
+Bleomycin         0.089526050  0.039235441  0.013297586  0.062746998
+Macrolide         0.140956065  0.367120557  0.278308381  0.184969207
+Trimethoprim      0.166326834  0.324825009  0.299940932  0.119733237
+Gentamicin        0.009243530 -0.009704398  0.002797439 -0.001461556
+Rifamycin         0.095476867  0.146201955  0.078235193  0.072643114
+Colistin          0.042348115  0.035652940  0.026111403  0.020457225
+Lincosamide       0.114958402  0.172617565  0.098476039  0.082109377
+Streptothricin    0.027188226 -0.001544899 -0.011621750 -0.010664789
+Glycopeptide      0.004730365 -0.003430627  0.005308988  0.004053855
+                Beta_lactam   Fosfomycin     Phenicol     Bleomycin
+Aminoglycoside  0.495331654 -0.308728472  0.384242058  0.0895260503
+Quinolone       0.086851813 -0.157359236  0.238190260  0.0392354410
+Sulfonamide     0.586747791 -0.282004707  0.489139863  0.0132975862
+Tetracycline    0.318352454 -0.361199436  0.348150819  0.0627469981
+Beta_lactam     1.000000000 -0.296837580  0.397754997  0.0302577286
+Fosfomycin     -0.296837580  1.000000000 -0.165984089  0.0331704448
+Phenicol        0.397754997 -0.165984089  1.000000000  0.0428171393
+Bleomycin       0.030257729  0.033170445  0.042817139  1.0000000000
+Macrolide       0.188628957 -0.123442679  0.425563041  0.0398962274
+Trimethoprim    0.182565414 -0.137276539  0.461352298  0.0216900969
+Gentamicin     -0.004002592  0.004024295 -0.005501748 -0.0018921803
+Rifamycin       0.101328096 -0.010281120  0.095309985  0.0667771615
+Colistin        0.029489160 -0.015847311  0.024618573  0.0321187989
+Lincosamide     0.117347599 -0.033195271  0.166758902  0.0189501531
+Streptothricin  0.019121580 -0.006170293 -0.006985898  0.0048578596
+Glycopeptide   -0.005721785 -0.002499933  0.009289215 -0.0006689096
+                  Macrolide Trimethoprim    Gentamicin     Rifamycin
+Aminoglycoside  0.140956065  0.166326834  9.243530e-03  0.0954768671
+Quinolone       0.367120557  0.324825009 -9.704398e-03  0.1462019549
+Sulfonamide     0.278308381  0.299940932  2.797439e-03  0.0782351927
+Tetracycline    0.184969207  0.119733237 -1.461556e-03  0.0726431142
+Beta_lactam     0.188628957  0.182565414 -4.002592e-03  0.1013280964
+Fosfomycin     -0.123442679 -0.137276539  4.024295e-03 -0.0102811205
+Phenicol        0.425563041  0.461352298 -5.501748e-03  0.0953099850
+Bleomycin       0.039896227  0.021690097 -1.892180e-03  0.0667771615
+Macrolide       1.000000000  0.508735022 -5.550764e-03  0.0979631731
+Trimethoprim    0.508735022  1.000000000 -4.110315e-03  0.1659167386
+Gentamicin     -0.005550764 -0.004110315  1.000000e+00 -0.0018827103
+Rifamycin       0.097963173  0.165916739 -1.882710e-03  1.0000000000
+Colistin       -0.011002693  0.042187011  1.220996e-01  0.3603058786
+Lincosamide     0.090124600  0.153729130 -2.286069e-03  0.1842542362
+Streptothricin  0.005064746  0.029275660 -5.361252e-04  0.0049197054
+Glycopeptide   -0.001962265 -0.003154132 -9.327816e-05 -0.0006655618
+                    Colistin   Lincosamide Streptothricin  Glycopeptide
+Aminoglycoside  0.0423481147  0.1149584016   0.0271882261  4.730365e-03
+Quinolone       0.0356529398  0.1726175653  -0.0015448991 -3.430627e-03
+Sulfonamide     0.0261114031  0.0984760394  -0.0116217498  5.308988e-03
+Tetracycline    0.0204572248  0.0821093772  -0.0106647890  4.053855e-03
+Beta_lactam     0.0294891604  0.1173475995   0.0191215800 -5.721785e-03
+Fosfomycin     -0.0158473109 -0.0331952708  -0.0061702930 -2.499933e-03
+Phenicol        0.0246185727  0.1667589021  -0.0069858976  9.289215e-03
+Bleomycin       0.0321187989  0.0189501531   0.0048578596 -6.689096e-04
+Macrolide      -0.0110026931  0.0901246000   0.0050647455 -1.962265e-03
+Trimethoprim    0.0421870107  0.1537291296   0.0292756597 -3.154132e-03
+Gentamicin      0.1220995762 -0.0022860690  -0.0005361252 -9.327816e-05
+Rifamycin       0.3603058786  0.1842542362   0.0049197054 -6.655618e-04
+Colistin        1.0000000000 -0.0018640142   0.0068740574 -5.710748e-04
+Lincosamide    -0.0018640142  1.0000000000  -0.0046449434 -8.081541e-04
+Streptothricin  0.0068740574 -0.0046449434   1.0000000000 -1.895270e-04
+Glycopeptide   -0.0005710748 -0.0008081541  -0.0001895270  1.000000e+00</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>cor_df_human <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat_human)) <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">corr =</span> Freq) <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR1 =</span> <span class="fu">factor</span>(AMR1, <span class="at">levels =</span> amr_order),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR2 =</span> <span class="fu">factor</span>(AMR2, <span class="at">levels =</span> amr_order)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">corr =</span> <span class="fu">replace_na</span>(corr, <span class="dv">0</span>))</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#drop_na()</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_df_human, <span class="fu">aes</span>(AMR1, AMR2, <span class="at">fill =</span> corr)) <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"AMR Correlation Heatmap: HUMAN"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ======= AMR matrix per source: ENVIRONMENTAL =========== #</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>amr_mat_env <span class="ot">&lt;-</span> amr_wide <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Source.type <span class="sc">==</span> <span class="st">"environmental"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>BioSample) <span class="sc">%&gt;%</span>   </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Correlation matrix</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>cor_mat_env <span class="ot">&lt;-</span> <span class="fu">cor</span>(amr_mat_env) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in cor(amr_mat_env): the standard deviation is zero</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>cor_mat_env</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Aminoglycoside   Quinolone Sulfonamide Tetracycline Beta_lactam
+Aminoglycoside    1.000000000 -0.25223627  0.32574338   0.54007353  0.33006320
+Quinolone        -0.252236267  1.00000000 -0.04154178  -0.22525558  0.02467596
+Sulfonamide       0.325743376 -0.04154178  1.00000000   0.42392000  0.55440016
+Tetracycline      0.540073533 -0.22525558  0.42392000   1.00000000  0.26213399
+Beta_lactam       0.330063201  0.02467596  0.55440016   0.26213399  1.00000000
+Fosfomycin       -0.210389026 -0.10015078 -0.19898696  -0.21692626 -0.13793189
+Phenicol          0.298047973  0.01599934  0.51273205   0.22381879  0.64570022
+Bleomycin         0.083623969  0.07022470  0.02987243   0.07519715  0.06757858
+Macrolide         0.059389949  0.25650387  0.12082917   0.04986539  0.20199920
+Trimethoprim      0.002146332  0.19017888  0.37143949   0.14825594  0.23197134
+Gentamicin        0.083623969 -0.04154281 -0.06108430   0.04986539 -0.03995791
+Rifamycin         0.094537994  0.31705698  0.16230591   0.06251017  0.23487550
+Colistin          0.137511452  0.21054183  0.09425102   0.09205357  0.12484620
+Lincosamide       0.035436285  0.06922684  0.06083817   0.03186536  0.03433311
+Streptothricin             NA          NA          NA           NA          NA
+Glycopeptide               NA          NA          NA           NA          NA
+                 Fosfomycin    Phenicol   Bleomycin   Macrolide Trimethoprim
+Aminoglycoside -0.210389026  0.29804797  0.08362397  0.05938995  0.002146332
+Quinolone      -0.100150776  0.01599934  0.07022470  0.25650387  0.190178877
+Sulfonamide    -0.198986959  0.51273205  0.02987243  0.12082917  0.371439489
+Tetracycline   -0.216926259  0.22381879  0.07519715  0.04986539  0.148255943
+Beta_lactam    -0.137931886  0.64570022  0.06757858  0.20199920  0.231971338
+Fosfomycin      1.000000000 -0.17302511  0.06670826 -0.08070959 -0.107769770
+Phenicol       -0.173025114  1.00000000  0.02345750  0.16474444  0.239295613
+Bleomycin       0.066708263  0.02345750  1.00000000  0.16930080  0.065150013
+Macrolide      -0.080709594  0.16474444  0.16930080  1.00000000  0.245984650
+Trimethoprim   -0.107769770  0.23929561  0.06515001  0.24598465  1.000000000
+Gentamicin     -0.031570308 -0.06131466 -0.01529903 -0.01529903 -0.055406411
+Rifamycin      -0.003946301  0.15658222  0.14667695  0.22866329  0.312161530
+Colistin       -0.025443766  0.05780110  0.08998432  0.14755536  0.172074596
+Lincosamide     0.023062342  0.03987599  0.20863722  0.20863722  0.117009516
+Streptothricin           NA          NA          NA          NA           NA
+Glycopeptide             NA          NA          NA          NA           NA
+                 Gentamicin    Rifamycin    Colistin  Lincosamide
+Aminoglycoside  0.083623969  0.094537994  0.13751145  0.035436285
+Quinolone      -0.041542807  0.317056981  0.21054183  0.069226842
+Sulfonamide    -0.061084300  0.162305906  0.09425102  0.060838168
+Tetracycline    0.049865395  0.062510173  0.09205357  0.031865359
+Beta_lactam    -0.039957909  0.234875501  0.12484620  0.034333107
+Fosfomycin     -0.031570308 -0.003946301 -0.02544377  0.023062342
+Phenicol       -0.061314662  0.156582219  0.05780110  0.039875995
+Bleomycin      -0.015299026  0.146676946  0.08998432  0.208637218
+Macrolide      -0.015299026  0.228663295  0.14755536  0.208637218
+Trimethoprim   -0.055406411  0.312161530  0.17207460  0.117009516
+Gentamicin      1.000000000 -0.017295750  0.55055263 -0.006483077
+Rifamycin      -0.017295750  1.000000000  0.58521565  0.183753617
+Colistin        0.550552631  0.585215653  1.00000000 -0.010660788
+Lincosamide    -0.006483077  0.183753617 -0.01066079  1.000000000
+Streptothricin           NA           NA          NA           NA
+Glycopeptide             NA           NA          NA           NA
+               Streptothricin Glycopeptide
+Aminoglycoside             NA           NA
+Quinolone                  NA           NA
+Sulfonamide                NA           NA
+Tetracycline               NA           NA
+Beta_lactam                NA           NA
+Fosfomycin                 NA           NA
+Phenicol                   NA           NA
+Bleomycin                  NA           NA
+Macrolide                  NA           NA
+Trimethoprim               NA           NA
+Gentamicin                 NA           NA
+Rifamycin                  NA           NA
+Colistin                   NA           NA
+Lincosamide                NA           NA
+Streptothricin              1           NA
+Glycopeptide               NA            1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>cor_df_env <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat_env)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">corr =</span> Freq)   <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR1 =</span> <span class="fu">factor</span>(AMR1, <span class="at">levels =</span> amr_order),</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR2 =</span> <span class="fu">factor</span>(AMR2, <span class="at">levels =</span> amr_order)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">corr =</span> <span class="fu">replace_na</span>(corr, <span class="dv">0</span>))</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#drop_na() %&gt;%</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">#filter(!(AMR1 %in% c("Glycopeptide", "Streptothricin")))</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_df_env, <span class="fu">aes</span>(AMR1, AMR2, <span class="at">fill =</span> corr)) <span class="sc">+</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"AMR Correlation Heatmap: ENVIRONMENTAL"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ======= AMR matrix per source: ANIMAL =========== #</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>amr_mat_animal <span class="ot">&lt;-</span> amr_wide <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Source.type <span class="sc">==</span> <span class="st">"animal"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>BioSample) <span class="sc">%&gt;%</span>   </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Correlation matrix</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>cor_mat_animal <span class="ot">&lt;-</span> <span class="fu">cor</span>(amr_mat_animal)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in cor(amr_mat_animal): the standard deviation is zero</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>cor_mat_animal</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Aminoglycoside    Quinolone Sulfonamide Tetracycline Beta_lactam
+Aminoglycoside     1.00000000  0.037541682  0.55726872  0.388816403  0.43492161
+Quinolone          0.03754168  1.000000000  0.10474373  0.008113805  0.19921551
+Sulfonamide        0.55726872  0.104743730  1.00000000  0.452316270  0.57702180
+Tetracycline       0.38881640  0.008113805  0.45231627  1.000000000  0.27205348
+Beta_lactam        0.43492161  0.199215508  0.57702180  0.272053481  1.00000000
+Fosfomycin        -0.26332563  0.064703899 -0.17898967 -0.242058531 -0.17157912
+Phenicol           0.41040858  0.107912506  0.51978849  0.288552507  0.56724002
+Bleomycin          0.08757555  0.088181942  0.02336948  0.066869437  0.10601388
+Macrolide          0.11484044  0.292913279  0.16049016  0.074316741  0.20962256
+Trimethoprim       0.11496562  0.387038320  0.23586469  0.037405772  0.21018502
+Gentamicin         0.04818586 -0.040735853 -0.09463484 -0.004139011 -0.06665939
+Rifamycin          0.13169445  0.348574008  0.16311360  0.028940601  0.22204505
+Colistin           0.12898831  0.271134919  0.11464477  0.045971017  0.15186077
+Lincosamide        0.05493308  0.202040796  0.06022731  0.031477214  0.08770323
+Streptothricin             NA           NA          NA           NA          NA
+Glycopeptide               NA           NA          NA           NA          NA
+                Fosfomycin    Phenicol    Bleomycin   Macrolide Trimethoprim
+Aminoglycoside -0.26332563  0.41040858  0.087575549  0.11484044   0.11496562
+Quinolone       0.06470390  0.10791251  0.088181942  0.29291328   0.38703832
+Sulfonamide    -0.17898967  0.51978849  0.023369482  0.16049016   0.23586469
+Tetracycline   -0.24205853  0.28855251  0.066869437  0.07431674   0.03740577
+Beta_lactam    -0.17157912  0.56724002  0.106013879  0.20962256   0.21018502
+Fosfomycin      1.00000000 -0.16843124  0.055963184 -0.06337434   0.01845372
+Phenicol       -0.16843124  1.00000000 -0.013087807  0.15887066   0.21706000
+Bleomycin       0.05596318 -0.01308781  1.000000000  0.19337910   0.18643395
+Macrolide      -0.06337434  0.15887066  0.193379098  1.00000000   0.39496303
+Trimethoprim    0.01845372  0.21706000  0.186433953  0.39496303   1.00000000
+Gentamicin     -0.00577172 -0.07424319 -0.019278885 -0.02562654  -0.04766915
+Rifamycin       0.06721934  0.10253165  0.006548555  0.17598101   0.41941884
+Colistin        0.08301452  0.01303476 -0.016686891  0.08197901   0.33911688
+Lincosamide    -0.03324073  0.10314724  0.035558564  0.28000670   0.12845146
+Streptothricin          NA          NA           NA          NA           NA
+Glycopeptide            NA          NA           NA          NA           NA
+                 Gentamicin    Rifamycin    Colistin Lincosamide Streptothricin
+Aminoglycoside  0.048185860  0.131694454  0.12898831  0.05493308             NA
+Quinolone      -0.040735853  0.348574008  0.27113492  0.20204080             NA
+Sulfonamide    -0.094634844  0.163113604  0.11464477  0.06022731             NA
+Tetracycline   -0.004139011  0.028940601  0.04597102  0.03147721             NA
+Beta_lactam    -0.066659394  0.222045046  0.15186077  0.08770323             NA
+Fosfomycin     -0.005771720  0.067219340  0.08301452 -0.03324073             NA
+Phenicol       -0.074243193  0.102531646  0.01303476  0.10314724             NA
+Bleomycin      -0.019278885  0.006548555 -0.01668689  0.03555856             NA
+Macrolide      -0.025626535  0.175981010  0.08197901  0.28000670             NA
+Trimethoprim   -0.047669147  0.419418844  0.33911688  0.12845146             NA
+Gentamicin      1.000000000 -0.022534228  0.32775601 -0.01403703             NA
+Rifamycin      -0.022534228  1.000000000  0.65500748  0.22722319             NA
+Colistin        0.327756007  0.655007476  1.00000000 -0.03340615             NA
+Lincosamide    -0.014037032  0.227223189 -0.03340615  1.00000000             NA
+Streptothricin           NA           NA          NA          NA              1
+Glycopeptide             NA           NA          NA          NA             NA
+               Glycopeptide
+Aminoglycoside           NA
+Quinolone                NA
+Sulfonamide              NA
+Tetracycline             NA
+Beta_lactam              NA
+Fosfomycin               NA
+Phenicol                 NA
+Bleomycin                NA
+Macrolide                NA
+Trimethoprim             NA
+Gentamicin               NA
+Rifamycin                NA
+Colistin                 NA
+Lincosamide              NA
+Streptothricin           NA
+Glycopeptide              1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>cor_df_animal <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat_animal)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">corr =</span> Freq) <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR1 =</span> <span class="fu">factor</span>(AMR1, <span class="at">levels =</span> amr_order),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR2 =</span> <span class="fu">factor</span>(AMR2, <span class="at">levels =</span> amr_order)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">corr =</span> <span class="fu">replace_na</span>(corr, <span class="dv">0</span>))</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#drop_na() %&gt;%</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">#filter(!(AMR1 %in% c("Glycopeptide", "Streptothricin")))</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_df_animal, <span class="fu">aes</span>(AMR1, AMR2, <span class="at">fill =</span> corr)) <span class="sc">+</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"AMR Correlation Heatmap: ANIMAL"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ======= AMR matrix per source: FOOD =========== #</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>amr_mat_food <span class="ot">&lt;-</span> amr_wide <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Source.type <span class="sc">==</span> <span class="st">"food"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>BioSample) <span class="sc">%&gt;%</span>   </span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Correlation matrix</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>cor_mat_food <span class="ot">&lt;-</span> <span class="fu">cor</span>(amr_mat_food, <span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in cor(amr_mat_food, use = "pairwise.complete.obs"): the standard
+deviation is zero</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>cor_mat_food</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Aminoglycoside    Quinolone   Sulfonamide Tetracycline
+Aminoglycoside     1.00000000 -0.089523516  0.1110798050  0.222633184
+Quinolone         -0.08952352  1.000000000 -0.0109361963 -0.008960271
+Sulfonamide        0.11107980 -0.010936196  1.0000000000  0.480955572
+Tetracycline       0.22263318 -0.008960271  0.4809555721  1.000000000
+Beta_lactam       -0.02784602  0.110056613  0.3179693361  0.106651407
+Fosfomycin        -0.27358521 -0.003598274 -0.1274996832 -0.256925475
+Phenicol           0.20339916  0.110380175  0.2989953911  0.105872685
+Bleomycin          0.04865048  0.015642704  0.0217204324  0.030680493
+Macrolide          0.02203937  0.245566133  0.0688017563  0.025419062
+Trimethoprim       0.01541685  0.107960772  0.1388968757 -0.056825254
+Gentamicin        -0.04721329 -0.007347336 -0.0343812934 -0.069952783
+Rifamycin          0.03620359  0.227649901  0.0528091246  0.035265654
+Colistin          -0.01754263  0.036931437 -0.0001424281 -0.044315817
+Lincosamide        0.03027186  0.180872400  0.0471871571  0.029487594
+Streptothricin             NA           NA            NA           NA
+Glycopeptide               NA           NA            NA           NA
+                 Beta_lactam    Fosfomycin     Phenicol    Bleomycin
+Aminoglycoside -0.0278460225 -0.2735852088  0.203399158  0.048650480
+Quinolone       0.1100566134 -0.0035982744  0.110380175  0.015642704
+Sulfonamide     0.3179693361 -0.1274996832  0.298995391  0.021720432
+Tetracycline    0.1066514072 -0.2569254750  0.105872685  0.030680493
+Beta_lactam     1.0000000000  0.0005783305  0.285062975  0.074552769
+Fosfomycin      0.0005783305  1.0000000000 -0.040159341 -0.002752220
+Phenicol        0.2850629752 -0.0401593405  1.000000000  0.005270998
+Bleomycin       0.0745527690 -0.0027522201  0.005270998  1.000000000
+Macrolide       0.1114386061  0.0126715265  0.142706005  0.173593894
+Trimethoprim    0.1058713012 -0.0548692248  0.320947379  0.056110063
+Gentamicin      0.0218827813 -0.0029687539 -0.018432454 -0.003814582
+Rifamycin       0.1254817053 -0.0235939240  0.054949735  0.032077799
+Colistin        0.0465006384  0.0682722813 -0.008994717  0.024643430
+Lincosamide     0.0578866734 -0.0081466918  0.053475992  0.219322824
+Streptothricin            NA            NA           NA           NA
+Glycopeptide              NA            NA           NA           NA
+                  Macrolide Trimethoprim   Gentamicin    Rifamycin
+Aminoglycoside  0.022039367   0.01541685 -0.047213292  0.036203593
+Quinolone       0.245566133   0.10796077 -0.007347336  0.227649901
+Sulfonamide     0.068801756   0.13889688 -0.034381293  0.052809125
+Tetracycline    0.025419062  -0.05682525 -0.069952783  0.035265654
+Beta_lactam     0.111438606   0.10587130  0.021882781  0.125481705
+Fosfomycin      0.012671526  -0.05486922 -0.002968754 -0.023593924
+Phenicol        0.142706005   0.32094738 -0.018432454  0.054949735
+Bleomycin       0.173593894   0.05611006 -0.003814582  0.032077799
+Macrolide       1.000000000   0.15508657 -0.004122713  0.237194985
+Trimethoprim    0.155086573   1.00000000 -0.015277565  0.154690120
+Gentamicin     -0.004122713  -0.01527756  1.000000000 -0.002838648
+Rifamycin       0.237194985   0.15469012 -0.002838648  1.000000000
+Colistin       -0.007034140   0.04290123  0.055530901  0.454157502
+Lincosamide     0.202479234   0.09341702 -0.002373553  0.296467150
+Streptothricin           NA           NA           NA           NA
+Glycopeptide             NA           NA           NA           NA
+                    Colistin  Lincosamide Streptothricin Glycopeptide
+Aminoglycoside -0.0175426299  0.030271857             NA           NA
+Quinolone       0.0369314372  0.180872400             NA           NA
+Sulfonamide    -0.0001424281  0.047187157             NA           NA
+Tetracycline   -0.0443158174  0.029487594             NA           NA
+Beta_lactam     0.0465006384  0.057886673             NA           NA
+Fosfomycin      0.0682722813 -0.008146692             NA           NA
+Phenicol       -0.0089947167  0.053475992             NA           NA
+Bleomycin       0.0246434302  0.219322824             NA           NA
+Macrolide      -0.0070341402  0.202479234             NA           NA
+Trimethoprim    0.0429012258  0.093417019             NA           NA
+Gentamicin      0.0555309012 -0.002373553             NA           NA
+Rifamycin       0.4541575025  0.296467150             NA           NA
+Colistin        1.0000000000 -0.004049737             NA           NA
+Lincosamide    -0.0040497366  1.000000000             NA           NA
+Streptothricin            NA           NA             NA           NA
+Glycopeptide              NA           NA             NA           NA</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>cor_df_food <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(cor_mat_food)) <span class="sc">%&gt;%</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">AMR1 =</span> Var1, <span class="at">AMR2 =</span> Var2, <span class="at">corr =</span> Freq) <span class="sc">%&gt;%</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR1 =</span> <span class="fu">factor</span>(AMR1, <span class="at">levels =</span> amr_order),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">AMR2 =</span> <span class="fu">factor</span>(AMR2, <span class="at">levels =</span> amr_order)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">corr =</span> <span class="fu">replace_na</span>(corr, <span class="dv">0</span>))</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#drop_na()</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cor_df_food, <span class="fu">aes</span>(AMR1, AMR2, <span class="at">fill =</span> corr)) <span class="sc">+</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"AMR Correlation Heatmap: FOOD"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-10-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="from-this-information-we-can-observe-that-trends-are-different-among-sources.-animal-and-environmental-matrixes-resemble-closely-the-correlations-observed-in-human-isolates.-also-only-human-isolates-presented-glycopeptide-and-streptothricin-as-predicted-amr-classes." class="level6">
+<h6 class="anchored" data-anchor-id="from-this-information-we-can-observe-that-trends-are-different-among-sources.-animal-and-environmental-matrixes-resemble-closely-the-correlations-observed-in-human-isolates.-also-only-human-isolates-presented-glycopeptide-and-streptothricin-as-predicted-amr-classes.">From this information we can observe that trends are different among sources. Animal and environmental matrixes resemble closely the correlations observed in human isolates. Also, only human isolates presented Glycopeptide and Streptothricin as predicted AMR classes.</h6>
+</section>
+</section>
+<section id="additional-observations" class="level5">
+<h5 class="anchored" data-anchor-id="additional-observations">Additional observations:</h5>
+<section id="the-pairs-gentamicin-colistin-and-rifamycin-colistin-are-both-infrequent-but-they-seem-to-cooccur-in-animal-and-environmental-samples." class="level6">
+<h6 class="anchored" data-anchor-id="the-pairs-gentamicin-colistin-and-rifamycin-colistin-are-both-infrequent-but-they-seem-to-cooccur-in-animal-and-environmental-samples.">&gt; The pairs: Gentamicin-Colistin and Rifamycin-Colistin are both infrequent but they seem to cooccur in animal and environmental samples.</h6>
+</section>
+<section id="tetracycline-aminoglycoside-sulfonamide-beta_lactams-and-phenicol-are-high-frequency-and-cooccurance-with-each-other-in-human-animal-and-environmental-samples" class="level6">
+<h6 class="anchored" data-anchor-id="tetracycline-aminoglycoside-sulfonamide-beta_lactams-and-phenicol-are-high-frequency-and-cooccurance-with-each-other-in-human-animal-and-environmental-samples">&gt; Tetracycline, Aminoglycoside, Sulfonamide, Beta_lactams, and Phenicol are high frequency and cooccurance with each other in human, animal, and environmental samples</h6>
+</section>
+<section id="food-isolates-have-the-lowest-correlation-values-among-amr-classes" class="level6">
+<h6 class="anchored" data-anchor-id="food-isolates-have-the-lowest-correlation-values-among-amr-classes">&gt; Food isolates have the lowest correlation values among AMR classes</h6>
+</section>
+<section id="fosfomycin-has-a-negative-correlation-to-the-majority-of-amr-classes-across-all-sources" class="level6">
+<h6 class="anchored" data-anchor-id="fosfomycin-has-a-negative-correlation-to-the-majority-of-amr-classes-across-all-sources">&gt; Fosfomycin has a negative correlation to the majority of AMR classes across all sources</h6>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Plotting top serovars</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype, AMR_class) <span class="sc">%&gt;%</span>  </span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n, <span class="at">.desc =</span> <span class="cn">FALSE</span>, <span class="at">.fun =</span> max), </span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Plotting top serovars by each source</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype, AMR_class) <span class="sc">%&gt;%</span>  </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n, <span class="at">.desc =</span> <span class="cn">FALSE</span>, <span class="at">.fun =</span> max), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(serotype <span class="sc">==</span> <span class="st">"I 4,[5],12:i:-"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class, Source.type) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(AMR_class, Source.type) <span class="sc">%&gt;%</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(AMR_class, n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"I 4,[5],12:i:-"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(serotype <span class="sc">==</span> <span class="st">"Newport"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class, Source.type) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(AMR_class, Source.type) <span class="sc">%&gt;%</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(AMR_class, n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Newport"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(serotype <span class="sc">==</span> <span class="st">"Typhimurium"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class, Source.type) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(AMR_class, Source.type) <span class="sc">%&gt;%</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(AMR_class, n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Typhimurium"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(serotype <span class="sc">==</span> <span class="st">"Infantis"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class, Source.type) <span class="sc">%&gt;%</span> </span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(AMR_class, Source.type) <span class="sc">%&gt;%</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(AMR_class, n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Infantis"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-12-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(serotype <span class="sc">==</span> <span class="st">"Dublin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, AMR_class, Source.type) <span class="sc">%&gt;%</span> </span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(AMR_class, Source.type) <span class="sc">%&gt;%</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(AMR_class, n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dublin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-12-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Now serovar trends will be graph per each one of the AMR classes, while not all of them will be included in the manuscruipt. Maybe as supplemental material.</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Tetracycline"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Tetracycline"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Aminoglycoside"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Aminoglycoside"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Sulfonamide"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sulfonamide"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Beta_lactam"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Beta_lactam"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Phenicol"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Phenicol"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Quinolone"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Quinolone"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Trimethoprim"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Trimethoprim"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Fosfomycin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Fosfomycin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-8.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Macrolide"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb63-13"><a href="#cb63-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb63-14"><a href="#cb63-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Macrolide"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-9.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Lincosamide"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb64-12"><a href="#cb64-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb64-13"><a href="#cb64-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb64-14"><a href="#cb64-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Lincosamide"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-10.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Rifamycin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb65-14"><a href="#cb65-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Rifamycin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-11.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Bleomycin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Bleomycin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-12.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Colistin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Colistin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-13.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Gentamicin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Gentamicin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-14.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Streptothricin"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb69-11"><a href="#cb69-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb69-12"><a href="#cb69-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb69-13"><a href="#cb69-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb69-14"><a href="#cb69-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Streptothricin"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-15.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>amr_long1 <span class="sc">%&gt;%</span> </span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(AMR_class <span class="sc">==</span> <span class="st">"Glycopeptide"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(BioSample, Source.type, serotype) <span class="sc">%&gt;%</span>  </span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Source.type, serotype) <span class="sc">%&gt;%</span>           </span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Source.type) <span class="sc">%&gt;%</span>                  </span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(serotype, n), <span class="at">y =</span> n, <span class="at">fill =</span> serotype)) <span class="sc">+</span> </span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span>  </span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span>  </span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Source.type, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Glycopeptide"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_descriptive-analysis_files/figure-html/unnamed-chunk-13-16.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 
 
+</section>
 </section>
 </section>
 </section>

@@ -289,4 +289,4 @@ ggplot(merged_df2, aes(x = Annotation.Count.Gene.Protein.coding)) + geom_histogr
 ggplot(merged_df2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram() + theme_bw()
 ```
 
-##### 214 genomes are complete and intersect between both datasets. These will be use only to assess genome structure. Isolates1 will be use to assess AMR genotypes. Genomes1-3 dataframes resulted to be only complimentary for the analysis 
+##### 214 genomes are complete and intersect between both datasets. These will be use only to assess genome structure. Isolates1 will be use to assess AMR genotypes.

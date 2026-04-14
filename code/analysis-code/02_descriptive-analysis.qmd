@@ -31,7 +31,7 @@ isolates1$country_name	=	NULL
 ```
 
 ##### The goal of this analysis is to characterize AMR incidence in _Salmonella_
-##### As the data comes from an observational surveillance program, only descriptive analysis will be performed
+##### As the data comes from an observational surveillance program, only descriptive analysis will be performed. This approach has changed from the original intention described in the manuscript.
 
 ```{r}
 #Split AMR genes
@@ -137,7 +137,7 @@ write_csv(amr_long, here("data/processed-data/", "amr_long.csv"))
 
 # AMR summaries
 ```{r}
-# Gene prevalence
+# Gene prevalence overall
 gene_prev <- amr_long %>%
   group_by(AMR_gene, AMR_status) %>%
   summarise(n = n(), .groups = "drop") 
@@ -146,7 +146,7 @@ write_csv(gene_prev, here("data/processed-data/", "gene_prev.csv"))
 
 gene_prev
 
-# Class prevalence
+# Class prevalence overall
 class_prev <- amr_long %>%  
   filter(AMR_status == "COMPLETE") %>%  
   group_by(AMR_class) %>%  
@@ -174,9 +174,11 @@ ggplot(class_prev, aes(x = fct_reorder(AMR_class, n), y = n)) +
 # Removing Efflux pumps
 amr_long1 <- amr_long[!(amr_long$AMR_class %in% "Efflux Pump"), ]
 
-# Class prevalence after removing Efflux pumps
+# Keeping only completed profiles
+amr_long1 <- amr_long1[(amr_long1$AMR_status %in% "COMPLETE"), ]
+
+# Class prevalence after removing Efflux pumps and keeping only completed profiles
 class_prev1 <- amr_long1 %>%
-  filter(AMR_status == "COMPLETE") %>%  
   group_by(AMR_class) %>%  
   summarise(n = n_distinct(BioSample), .groups = "drop") %>%  
   arrange(desc(n)) %>%  
@@ -187,7 +189,7 @@ class_prev1 <- amr_long1 %>%
 
 class_prev1
 
-# Plotting classes frequencies after removing Efflux pumps
+# Plotting classes frequencies after removing Efflux pumps and keeping only completed profiles
 ggplot(class_prev1, aes(x = fct_reorder(AMR_class, n), y = n)) + 
   geom_col() +  
   coord_flip() +  
@@ -195,8 +197,8 @@ ggplot(class_prev1, aes(x = fct_reorder(AMR_class, n), y = n)) +
 
 #Saving file
 ggsave(filename = "amr_graph1.png", path = here("results/figures/"))
-```
 
+```
 
 #### This indicates that ~95% of drug resistant classes are: Tetracycline, Aminoglycoside, Sulfonamide, Beta-lactam, Phenicol, Quinolone, Trimethoprim, Fosfomycin. 
 
@@ -238,32 +240,26 @@ isolates1 <- isolates1 %>%
 
 ggsave(filename = "amr_graph2.png", path = here("results/figures/"))
 
+
 ```
 
-##### While the scales are different, it is interesting to observe that the trends between environmental and human AMR look very familiar. While the AMR between animal and food resemble also look similar to each other.
+##### While the scales are different, it is interesting to observe that the trends between environmental and human AMR look very familiar. While the AMR between animal and food resemble also look similar to each other. Proportionally, there are more isolates with MDR observed in animal and food sources. However, we have to take in consideration this is only observational data.
 
 ```{r}
 # Creating a wide version for understanding cooccurrance
 amr_wide <- amr_long1 %>%
   filter(AMR_gene != "None") %>%
-  distinct(BioSample, AMR_class) %>%  
+  # Keep only the columns needed for the pivot + identifiers
+  select(BioSample, AMR_class, serotype, Source.type) %>%
+  # Remove duplicate BioSample + AMR_class combinations while preserving metadata
+  distinct(BioSample, AMR_class, .keep_all = TRUE) %>%
   mutate(present = 1) %>%
   pivot_wider(
-    id_cols = BioSample,
+    id_cols = c(BioSample, serotype, Source.type),
     names_from = AMR_class,
     values_from = present,
     values_fill = 0
   )
-
-#Removing classes that represent less than 5%
-amr_wide$Macrolide = NULL
-amr_wide$Lincosamide = NULL
-amr_wide$Rifamycin = NULL
-amr_wide$Bleomycin = NULL
-amr_wide$Colistin = NULL
-amr_wide$Gentamicin = NULL
-amr_wide$Streptothricin = NULL
-amr_wide$Glycopeptide = NULL
 
 isolates2 <- left_join(isolates1, amr_wide, by = "BioSample") %>%
    mutate(across(where(is.numeric), ~replace_na(.x, 0)))
@@ -272,9 +268,13 @@ isolates2$AMR.genotypes = NULL
 ```
 
 ```{r}
-#AMR matrix
+amr_order <- c(
+  "Tetracycline", "Aminoglycoside", "Sulfonamide", "Beta_lactam", "Phenicol", "Quinolone", "Trimethoprim", "Fosfomycin", "Macrolide", "Lincosamide", "Rifamycin", "Bleomycin", "Colistin", "Gentamicin", "Streptothricin", "Glycopeptide"
+)
+
+#AMR matrix full dataset
 amr_mat <- amr_wide %>%
-  select(-BioSample) %>%   # keep only features
+  select(-BioSample) %>%   
   select(where(is.numeric)) %>%
   as.matrix()
 
@@ -283,12 +283,18 @@ cor_mat <- cor(amr_mat)
 cor_mat
 
 cor_df <- as.data.frame(as.table(cor_mat)) %>%
-  rename(AMR1 = Var1, AMR2 = Var2, corr = Freq)
+  rename(AMR1 = Var1, AMR2 = Var2, corr = Freq) %>%
+  mutate(
+    AMR1 = factor(AMR1, levels = amr_order),
+    AMR2 = factor(AMR2, levels = amr_order)
+  ) %>%
+    drop_na()
+
 
 ggplot(cor_df, aes(AMR1, AMR2, fill = corr)) +
   geom_tile() +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
-  theme_minimal() +
+  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(title = "AMR Correlation Heatmap")
 ```
@@ -300,20 +306,447 @@ ggplot(cor_df, aes(AMR1, AMR2, fill = corr)) +
 ##### Quinolone, Fosfomycin, MDR Regulator, and Streptogramin seem to have a negative correlation with most of the other classes.
 ##### > In particular, Quinolone and Fosfomycin seem to most negative correlation between each other
 
+##### After learning about the MDR and the coocurrance af AMR in all isolates, I am interested in two more things: Is cooccurance the same across sources? and what are the serovars leading each one of the main AMR classes?
+
 ```{r}
-# Option 2, Jaccard matrix. Not sure if going to be used, most likely Pearson Correlation will be used (above)
-cooc_mat <- t(amr_mat) %*% amr_mat
+# ======= AMR matrix per source: HUMAN =========== #
+amr_mat_human <- amr_wide %>%
+  filter(Source.type == "human") %>%
+  select(-BioSample) %>%   
+  select(where(is.numeric)) %>%
+  as.matrix()
 
-cooc_df <- as.data.frame(as.table(cooc_mat)) %>%
-  rename(AMR1 = Var1, AMR2 = Var2, count = Freq) %>%
-  filter(AMR1 != AMR2)
+#Correlation matrix
+cor_mat_human <- cor(amr_mat_human) 
+cor_mat_human
 
-row_sums <- diag(cooc_mat)
+cor_df_human <- as.data.frame(as.table(cor_mat_human)) %>%
+  rename(AMR1 = Var1, AMR2 = Var2, corr = Freq) %>%
+  mutate(
+    AMR1 = factor(AMR1, levels = amr_order),
+    AMR2 = factor(AMR2, levels = amr_order)
+  ) %>%
+    mutate(corr = replace_na(corr, 0))
+    #drop_na()
 
-jaccard <- cooc_mat / (outer(row_sums, row_sums, "+") - cooc_mat)
+ggplot(cor_df_human, aes(AMR1, AMR2, fill = corr)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "AMR Correlation Heatmap: HUMAN")
 
-jaccard
+# ======= AMR matrix per source: ENVIRONMENTAL =========== #
+amr_mat_env <- amr_wide %>%
+  filter(Source.type == "environmental") %>%
+  select(-BioSample) %>%   
+  select(where(is.numeric)) %>%
+  as.matrix()
+
+#Correlation matrix
+cor_mat_env <- cor(amr_mat_env) 
+cor_mat_env
+
+cor_df_env <- as.data.frame(as.table(cor_mat_env)) %>%
+  rename(AMR1 = Var1, AMR2 = Var2, corr = Freq)   %>%
+  mutate(
+    AMR1 = factor(AMR1, levels = amr_order),
+    AMR2 = factor(AMR2, levels = amr_order)
+  ) %>%
+    mutate(corr = replace_na(corr, 0))
+    #drop_na() %>%
+    #filter(!(AMR1 %in% c("Glycopeptide", "Streptothricin")))
+
+ggplot(cor_df_env, aes(AMR1, AMR2, fill = corr)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "AMR Correlation Heatmap: ENVIRONMENTAL")
+
+# ======= AMR matrix per source: ANIMAL =========== #
+amr_mat_animal <- amr_wide %>%
+  filter(Source.type == "animal") %>%
+  select(-BioSample) %>%   
+  select(where(is.numeric)) %>%
+  as.matrix()
+
+#Correlation matrix
+cor_mat_animal <- cor(amr_mat_animal)
+cor_mat_animal
+
+cor_df_animal <- as.data.frame(as.table(cor_mat_animal)) %>%
+  rename(AMR1 = Var1, AMR2 = Var2, corr = Freq) %>%
+  mutate(
+    AMR1 = factor(AMR1, levels = amr_order),
+    AMR2 = factor(AMR2, levels = amr_order)
+  ) %>%
+    mutate(corr = replace_na(corr, 0))
+    #drop_na() %>%
+    #filter(!(AMR1 %in% c("Glycopeptide", "Streptothricin")))
+
+ggplot(cor_df_animal, aes(AMR1, AMR2, fill = corr)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "AMR Correlation Heatmap: ANIMAL")
+
+# ======= AMR matrix per source: FOOD =========== #
+amr_mat_food <- amr_wide %>%
+  filter(Source.type == "food") %>%
+  select(-BioSample) %>%   
+  select(where(is.numeric)) %>%
+  as.matrix()
+
+#Correlation matrix
+cor_mat_food <- cor(amr_mat_food, use = "pairwise.complete.obs") 
+cor_mat_food
+
+cor_df_food <- as.data.frame(as.table(cor_mat_food)) %>%
+  rename(AMR1 = Var1, AMR2 = Var2, corr = Freq) %>%
+  mutate(
+    AMR1 = factor(AMR1, levels = amr_order),
+    AMR2 = factor(AMR2, levels = amr_order)
+  ) %>%
+    mutate(corr = replace_na(corr, 0))
+    #drop_na()
+
+ggplot(cor_df_food, aes(AMR1, AMR2, fill = corr)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "AMR Correlation Heatmap: FOOD")
 ```
 
+###### From this information we can observe that trends are different among sources. Animal and environmental matrixes resemble closely the correlations observed in human isolates. Also, only human isolates presented Glycopeptide and Streptothricin as predicted AMR classes. 
+
+##### Additional observations:
+###### > The pairs: Gentamicin-Colistin and Rifamycin-Colistin are both infrequent but they seem to cooccur in animal and environmental samples. 
+###### > Tetracycline, Aminoglycoside, Sulfonamide, Beta_lactams, and Phenicol are high frequency and cooccurance with each other in human, animal, and environmental samples
+###### > Food isolates have the lowest correlation values among AMR classes
+###### > Fosfomycin has a negative correlation to the majority of AMR classes across all sources
 
 
+```{r}
+#Plotting top serovars
+amr_long1 %>% 
+  distinct(BioSample, Source.type, serotype, AMR_class) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n, .desc = FALSE, .fun = max), 
+             y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  theme(legend.position = "none")
+
+#Plotting top serovars by each source
+amr_long1 %>% 
+  distinct(BioSample, Source.type, serotype, AMR_class) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n, .desc = FALSE, .fun = max), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") 
+
+
+
+```
+
+```{r}
+amr_long1 %>%
+  filter(serotype == "I 4,[5],12:i:-") %>%
+  distinct(BioSample, AMR_class, Source.type) %>% 
+  count(AMR_class, Source.type) %>%
+  drop_na() %>%
+  ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free_x", nrow = 1) +
+  labs(title = "I 4,[5],12:i:-")
+
+amr_long1 %>%
+  filter(serotype == "Newport") %>%
+  distinct(BioSample, AMR_class, Source.type) %>% 
+  count(AMR_class, Source.type) %>%
+  ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free_x", nrow = 1) +
+  labs(title = "Newport")
+
+amr_long1 %>%
+  filter(serotype == "Typhimurium") %>%
+  distinct(BioSample, AMR_class, Source.type) %>% 
+  count(AMR_class, Source.type) %>%
+  ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free_x", nrow = 1) +
+  labs(title = "Typhimurium")
+
+amr_long1 %>%
+  filter(serotype == "Infantis") %>%
+  distinct(BioSample, AMR_class, Source.type) %>% 
+  count(AMR_class, Source.type) %>%
+  ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free_x", nrow = 1) +
+  labs(title = "Infantis")
+
+amr_long1 %>%
+  filter(serotype == "Dublin") %>%
+  distinct(BioSample, AMR_class, Source.type) %>% 
+  count(AMR_class, Source.type) %>%
+  ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free_x", nrow = 1) +
+  labs(title = "Dublin")
+
+```
+
+```{r}
+#Now serovar trends will be graph per each one of the AMR classes, while not all of them will be included in the manuscruipt. Maybe as supplemental material.
+
+amr_long1 %>% 
+  filter(AMR_class == "Tetracycline") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Tetracycline")
+
+amr_long1 %>% 
+  filter(AMR_class == "Aminoglycoside") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Aminoglycoside")
+
+amr_long1 %>% 
+  filter(AMR_class == "Sulfonamide") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Sulfonamide")
+
+amr_long1 %>% 
+  filter(AMR_class == "Beta_lactam") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Beta_lactam")
+
+amr_long1 %>% 
+  filter(AMR_class == "Phenicol") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Phenicol")
+
+amr_long1 %>% 
+  filter(AMR_class == "Quinolone") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Quinolone")
+
+amr_long1 %>% 
+  filter(AMR_class == "Trimethoprim") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Trimethoprim")
+
+amr_long1 %>% 
+  filter(AMR_class == "Fosfomycin") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Fosfomycin")
+
+amr_long1 %>% 
+  filter(AMR_class == "Macrolide") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Macrolide")
+
+amr_long1 %>% 
+  filter(AMR_class == "Lincosamide") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Lincosamide")
+
+amr_long1 %>% 
+  filter(AMR_class == "Rifamycin") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Rifamycin")
+
+amr_long1 %>% 
+  filter(AMR_class == "Bleomycin") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Bleomycin")
+
+amr_long1 %>% 
+  filter(AMR_class == "Colistin") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Colistin")
+
+amr_long1 %>% 
+  filter(AMR_class == "Gentamicin") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Gentamicin")
+
+amr_long1 %>% 
+  filter(AMR_class == "Streptothricin") %>%
+  distinct(BioSample, Source.type, serotype) %>%  
+  count(Source.type, serotype) %>%           
+  group_by(Source.type) %>%                  
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  theme(legend.position = "none") +
+  labs(title = "Streptothricin")
+
+```

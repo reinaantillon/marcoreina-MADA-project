@@ -9,7 +9,7 @@ website:
       - text: "EDA analysis"
         file: code/eda-code/01_eda.html
       - text: "Descriptive Analysis"
-        file: code/analysis-code/02_escriptive-analysis.html
+        file: code/analysis-code/02_descriptive-analysis.qmd
     right:
       - icon: github 
         href: https://github.com/reinaantillon/marcoreina-MADA-project
