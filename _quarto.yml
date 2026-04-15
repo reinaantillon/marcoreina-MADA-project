@@ -10,6 +10,8 @@ website:
         file: code/eda-code/01_eda.html
       - text: "Descriptive Analysis"
         file: code/analysis-code/02_descriptive-analysis.qmd
+      - text: "Modeling"
+        file: code/analysis-code/03_model-fitting.qmd
     right:
       - icon: github 
         href: https://github.com/reinaantillon/marcoreina-MADA-project

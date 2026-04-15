@@ -12,6 +12,9 @@ library(stringr)
 library(knitr)
 library(forcats) 
 library(tidymodels)
+library(dotwhisker)
+library(purrr)
+library(parsnip)
 
 #Load files created data has been previously cleaned
 genomes1 <- read.csv(here("data/processed-data/", "genomes1.csv"))
@@ -28,6 +31,7 @@ colnames(genomes1) <- c("Length", "Contigs", "Assembly", "Gene.Total", "Protein.
 # For the modeling I have decided to take predict the number of protein coding genes based on the rest of parameters obtained from the Genomes dataset
 
 ```{r}
+#Creating all linear models 
 lm_null <- linear_reg() %>%
   set_engine("lm") %>% 
   fit(Protein.coding ~ 1, data = genomes1)
@@ -52,8 +56,26 @@ lm_fit5 <- linear_reg() %>%
   set_engine("lm") %>% 
   fit(Protein.coding ~ Length + Contigs + Assembly + Gene.Total + Pseudogenes, data = genomes1)
 
-```
+lm_fit6 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Contigs + Gene.Total + Pseudogenes, data = genomes1)
 
+lm_fit7 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Gene.Total + Pseudogenes, data = genomes1)
+
+lm_fit8 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Length + Gene.Total, data = genomes1)
+
+lm_fit9 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Gene.Total, data = genomes1)
+
+lm_fit10 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Protein.coding ~ Pseudogenes, data = genomes1)
+```
 
 ```{r}
 #Predidiction and differences for each fit
@@ -64,53 +86,185 @@ genomes1 <- genomes1 %>%
     pred2 = predict(lm_fit2, new_data = genomes1, type = "numeric")$.pred,
     pred3 = predict(lm_fit3, new_data = genomes1, type = "numeric")$.pred,
     pred4 = predict(lm_fit4, new_data = genomes1, type = "numeric")$.pred,
-    pred5 = predict(lm_fit5, new_data = genomes1, type = "numeric")$.pred
+    pred5 = predict(lm_fit5, new_data = genomes1, type = "numeric")$.pred,
+    pred6 = predict(lm_fit6, new_data = genomes1, type = "numeric")$.pred,
+    pred7 = predict(lm_fit7, new_data = genomes1, type = "numeric")$.pred,
+    pred8 = predict(lm_fit8, new_data = genomes1, type = "numeric")$.pred,
+    pred9 = predict(lm_fit9, new_data = genomes1, type = "numeric")$.pred,
+    pred10 = predict(lm_fit10, new_data = genomes1, type = "numeric")$.pred
   ) %>%
     mutate(
-    diff0 = pred0 - Protein.coding,
-    diff1 = pred1 - Protein.coding,
-    diff2 = pred2 - Protein.coding,
-    diff3 = pred3 - Protein.coding,
-    diff4 = pred4 - Protein.coding,
-    diff5 = pred5 - Protein.coding
+    res0 = pred0 - Protein.coding,
+    res1 = pred1 - Protein.coding,
+    res2 = pred2 - Protein.coding,
+    res3 = pred3 - Protein.coding,
+    res4 = pred4 - Protein.coding,
+    res5 = pred5 - Protein.coding,
+    res6 = pred6 - Protein.coding,
+    res7 = pred7 - Protein.coding,
+    res8 = pred8 - Protein.coding,
+    res9 = pred9 - Protein.coding,
+    res10 = pred10 - Protein.coding
   )
 ```
 
 ```{r}
+# Plotting predicted vs actual
+
 ggplot(genomes1, aes(y = Protein.coding, x = pred0)) +
-    geom_point() +
+    geom_point(size = 2) +
     geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
-    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
     theme_bw()
 
 ggplot(genomes1, aes(y = Protein.coding, x = pred1)) +
-    geom_point() +
+    geom_point(size = 2) +
     geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
-    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
     theme_bw()
 
 ggplot(genomes1, aes(y = Protein.coding, x = pred2)) +
-    geom_point() +
+    geom_point(size = 2) +
     geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
-    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
     theme_bw()
 
 ggplot(genomes1, aes(y = Protein.coding, x = pred3)) +
-    geom_point() +
+    geom_point(size = 2) +
     geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
-    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
     theme_bw()
 
 ggplot(genomes1, aes(y = Protein.coding, x = pred4)) +
-    geom_point() +
+    geom_point(size = 2) +
     geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
-    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
     theme_bw()
 
 ggplot(genomes1, aes(y = Protein.coding, x = pred5)) +
-    geom_point() +
+    geom_point(size = 2) +
     geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
-    lims(x = c(2000, 8000), y = c(2000, 8000)) +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred6)) +
+    geom_point(size = 2) +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred7)) +
+    geom_point(size = 2) +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred8)) +
+    geom_point(size = 2) +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred9)) +
+    geom_point(size = 2) +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
+    theme_bw()
+
+ggplot(genomes1, aes(y = Protein.coding, x = pred10)) +
+    geom_point(size = 2) +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 8000), y = c(0, 8000)) +
     theme_bw()
 ```
+
+```{r}
+# Plotting residuals
+
+ggplot(genomes1, aes(x = Protein.coding, y = res0)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding, y = res1)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding, y = res2)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding, y = res3)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding, y = res4)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding,  y= res5)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding,  y= res6)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding,  y= res7)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding,  y= res8)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding,  y= res9)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(genomes1, aes(x = Protein.coding,  y= res10)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+```
+
+```{r}
+AIC(extract_fit_engine(lm_null))
+AIC(extract_fit_engine(lm_fit1))
+AIC(extract_fit_engine(lm_fit2))
+AIC(extract_fit_engine(lm_fit3))
+AIC(extract_fit_engine(lm_fit4))
+AIC(extract_fit_engine(lm_fit5))
+AIC(extract_fit_engine(lm_fit6))
+AIC(extract_fit_engine(lm_fit7))
+AIC(extract_fit_engine(lm_fit8))
+AIC(extract_fit_engine(lm_fit9))
+AIC(extract_fit_engine(lm_fit10))
+```
+
+```{r}
+# Create a NAMED list (the key fix!)
+model_list <- list(
+  null  = lm_null,
+  fit1  = lm_fit1, fit2  = lm_fit2, fit3  = lm_fit3,
+  fit4  = lm_fit4, fit5  = lm_fit5, fit6  = lm_fit6,
+  fit7  = lm_fit7, fit8  = lm_fit8, fit9  = lm_fit9,
+  fit10 = lm_fit10
+)
+
+# Extract AIC (using map_dfr instead of deprecated map_df)
+AIC_df <- map_dfr(model_list, ~{
+  engine <- extract_fit_engine(.x)
+  tibble(AIC = AIC(engine))
+}, .id = "model_id")
+
+# Plot (map model_id directly, not as.numeric)
+AIC_df %>%
+  arrange(AIC) %>%  
+  mutate(model_id = factor(model_id, levels = model_id)) %>%  
+  ggplot(aes(x = model_id, y = AIC)) +
+  geom_col() +
+  theme_bw() +
+  labs(x = "Model", y = "AIC") 
+```
+
 
