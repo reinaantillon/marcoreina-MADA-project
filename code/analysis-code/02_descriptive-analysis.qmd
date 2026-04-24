@@ -13,9 +13,13 @@ library(dplyr)
 library(stringr)
 library(knitr)
 library(forcats) 
+library(tidytext)
 
 # Read data
 isolates1 <- read_csv(here("data/processed-data/", "isolates1.csv"))
+
+# Get the total number of isolates
+totaln_isolates <- nrow(isolates1)
 
 #Split computed serovars
 isolates1 <- isolates1 %>%
@@ -153,11 +157,8 @@ class_prev <- amr_long %>%
   summarise(n = n_distinct(BioSample), .groups = "drop") %>%  
   arrange(desc(n)) %>%  
   mutate(
-    pct_total = round(n / sum(n) * 100, 1),           
-    cum_pct = round(cumsum(pct_total), 1)         
+    Percentage = round(n / totaln_isolates * 100, 1) 
   )
-
-write_csv(class_prev, here("data/processed-data/", "class_prev.csv"))
 
 class_prev
 
@@ -183,11 +184,12 @@ class_prev1 <- amr_long1 %>%
   summarise(n = n_distinct(BioSample), .groups = "drop") %>%  
   arrange(desc(n)) %>%  
   mutate(
-    pct_total = round(n / sum(n) * 100, 1),           
-    cum_pct = round(cumsum(pct_total), 1)         
+    Percentage = round(n / totaln_isolates * 100, 1)          
   )
 
 class_prev1
+
+write_csv(class_prev1, here("data/processed-data/", "class_prev1csv"))
 
 # Plotting classes frequencies after removing Efflux pumps and keeping only completed profiles
 ggplot(class_prev1, aes(x = fct_reorder(AMR_class, n), y = n)) + 
@@ -200,7 +202,7 @@ ggsave(filename = "amr_graph1.png", path = here("results/figures/"))
 
 ```
 
-#### This indicates that ~95% of drug resistant classes are: Tetracycline, Aminoglycoside, Sulfonamide, Beta-lactam, Phenicol, Quinolone, Trimethoprim, Fosfomycin. 
+#### This indicates that most prevalent drug resistant classes are in Salmonella are: Tetracycline, Aminoglycoside, Sulfonamide, Beta-lactam, Phenicol, Quinolone, Trimethoprim, Fosfomycin. 
 
 ```{r}
 # Create the count of AMR classes
@@ -252,7 +254,7 @@ amr_wide <- amr_long1 %>%
   # Keep only the columns needed for the pivot + identifiers
   select(BioSample, AMR_class, serotype, Source.type) %>%
   # Remove duplicate BioSample + AMR_class combinations while preserving metadata
-  distinct(BioSample, AMR_class, .keep_all = TRUE) %>%
+  distinct(BioSample, .keep_all = TRUE) %>%
   mutate(present = 1) %>%
   pivot_wider(
     id_cols = c(BioSample, serotype, Source.type),
@@ -261,10 +263,6 @@ amr_wide <- amr_long1 %>%
     values_fill = 0
   )
 
-isolates2 <- left_join(isolates1, amr_wide, by = "BioSample") %>%
-   mutate(across(where(is.numeric), ~replace_na(.x, 0)))
-
-isolates2$AMR.genotypes = NULL
 ```
 
 ```{r}
@@ -428,13 +426,12 @@ ggplot(cor_df_food, aes(AMR1, AMR2, fill = corr)) +
 ###### > Food isolates have the lowest correlation values among AMR classes
 ###### > Fosfomycin has a negative correlation to the majority of AMR classes across all sources
 
-
 ```{r}
 #Plotting top serovars
 amr_long1 %>% 
-  distinct(BioSample, Source.type, serotype, AMR_class) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%  
+  arrange(desc(n)) %>% 
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
   ggplot(aes(x = fct_reorder(serotype, n, .desc = FALSE, .fun = max), 
@@ -446,28 +443,26 @@ amr_long1 %>%
 
 #Plotting top serovars by each source
 amr_long1 %>% 
-  distinct(BioSample, Source.type, serotype, AMR_class) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n, .desc = FALSE, .fun = max), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
-  theme(legend.position = "none") 
-
-
+  scale_x_reordered() +
+  theme(legend.position = "none")
 
 ```
 
 ```{r}
 amr_long1 %>%
   filter(serotype == "I 4,[5],12:i:-") %>%
-  distinct(BioSample, AMR_class, Source.type) %>% 
-  count(AMR_class, Source.type) %>%
-  drop_na() %>%
+  group_by(Source.type, AMR_class) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
   ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
   geom_col() +
   coord_flip() +
@@ -477,8 +472,8 @@ amr_long1 %>%
 
 amr_long1 %>%
   filter(serotype == "Newport") %>%
-  distinct(BioSample, AMR_class, Source.type) %>% 
-  count(AMR_class, Source.type) %>%
+  group_by(Source.type, AMR_class) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
   ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
   geom_col() +
   coord_flip() +
@@ -488,8 +483,8 @@ amr_long1 %>%
 
 amr_long1 %>%
   filter(serotype == "Typhimurium") %>%
-  distinct(BioSample, AMR_class, Source.type) %>% 
-  count(AMR_class, Source.type) %>%
+  group_by(Source.type, AMR_class) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
   ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
   geom_col() +
   coord_flip() +
@@ -499,8 +494,8 @@ amr_long1 %>%
 
 amr_long1 %>%
   filter(serotype == "Infantis") %>%
-  distinct(BioSample, AMR_class, Source.type) %>% 
-  count(AMR_class, Source.type) %>%
+  group_by(Source.type, AMR_class) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
   ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
   geom_col() +
   coord_flip() +
@@ -510,8 +505,8 @@ amr_long1 %>%
 
 amr_long1 %>%
   filter(serotype == "Dublin") %>%
-  distinct(BioSample, AMR_class, Source.type) %>% 
-  count(AMR_class, Source.type) %>%
+  group_by(Source.type, AMR_class) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
   ggplot(aes(x = fct_reorder(AMR_class, n), y = n)) +
   geom_col() +
   coord_flip() +
@@ -522,231 +517,265 @@ amr_long1 %>%
 ```
 
 ```{r}
-#Now serovar trends will be graph per each one of the AMR classes, while not all of them will be included in the manuscruipt. Maybe as supplemental material.
-
 amr_long1 %>% 
   filter(AMR_class == "Tetracycline") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
+  theme(legend.position = "none") +
+  labs(title = "Tetracycline")
+```
+
+```{r}
+#Now serovar trends will be graph per each one of the AMR classes, while not all of them will be included in the manuscruipt. Maybe as supplemental material.
+
+amr_long1 %>% 
+  filter(AMR_class == "Tetracycline") %>%
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
+  slice_max(n, n = 5, with_ties = FALSE) %>% 
+  ungroup() %>%
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
+  geom_col() +  
+  coord_flip() +  
+  theme_bw() +
+  facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Tetracycline")
 
 amr_long1 %>% 
   filter(AMR_class == "Aminoglycoside") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Aminoglycoside")
 
 amr_long1 %>% 
   filter(AMR_class == "Sulfonamide") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Sulfonamide")
 
 amr_long1 %>% 
   filter(AMR_class == "Beta_lactam") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Beta_lactam")
 
 amr_long1 %>% 
   filter(AMR_class == "Phenicol") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Phenicol")
 
 amr_long1 %>% 
   filter(AMR_class == "Quinolone") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Quinolone")
 
 amr_long1 %>% 
   filter(AMR_class == "Trimethoprim") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Trimethoprim")
 
 amr_long1 %>% 
   filter(AMR_class == "Fosfomycin") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Fosfomycin")
 
 amr_long1 %>% 
   filter(AMR_class == "Macrolide") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Macrolide")
 
 amr_long1 %>% 
   filter(AMR_class == "Lincosamide") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Lincosamide")
 
 amr_long1 %>% 
   filter(AMR_class == "Rifamycin") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Rifamycin")
 
 amr_long1 %>% 
   filter(AMR_class == "Bleomycin") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Bleomycin")
 
 amr_long1 %>% 
   filter(AMR_class == "Colistin") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Colistin")
 
 amr_long1 %>% 
   filter(AMR_class == "Gentamicin") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Gentamicin")
 
 amr_long1 %>% 
   filter(AMR_class == "Streptothricin") %>%
-  distinct(BioSample, Source.type, serotype) %>%  
-  count(Source.type, serotype) %>%           
-  group_by(Source.type) %>%                  
+  group_by(Source.type, serotype) %>%
+  summarise(n = n_distinct(BioSample), .groups = "drop") %>%
+  group_by(Source.type) %>%
   slice_max(n, n = 5, with_ties = FALSE) %>% 
   ungroup() %>%
-  ggplot(aes(x = fct_reorder(serotype, n), y = n, fill = serotype)) + 
+  ggplot(aes(x = reorder_within(serotype, n, Source.type), y = n, fill = serotype)) + 
   geom_col() +  
   coord_flip() +  
   theme_bw() +
   facet_wrap(~ Source.type, scales = "free") +
+  scale_x_reordered() +
   theme(legend.position = "none") +
   labs(title = "Streptothricin")
 
 ```
+

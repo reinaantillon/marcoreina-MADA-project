@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "Marco Reina Data Analysis Project"
+  title: "Marco Reina MADA Project"
   navbar:
     left:
       - text: "EDA analysis"
@@ -12,6 +12,10 @@ website:
         file: code/analysis-code/02_descriptive-analysis.qmd
       - text: "Modeling"
         file: code/analysis-code/03_model-fitting.qmd
+      - text: "Random Forest"
+        file: code/analysis-code/04_random-forest.qmd
+      - text: "Manuscript"
+        file: products/manuscript/Manuscript.qmd
     right:
       - icon: github 
         href: https://github.com/reinaantillon/marcoreina-MADA-project

@@ -1,0 +1,17 @@
+AMR_class,n,Percentage
+Tetracycline,26572,10.8
+Aminoglycoside,24171,9.8
+Sulfonamide,20618,8.4
+Beta_lactam,17522,7.1
+Phenicol,10132,4.1
+Quinolone,8535,3.5
+Trimethoprim,8131,3.3
+Fosfomycin,6015,2.4
+Macrolide,3377,1.4
+Lincosamide,653,0.3
+Rifamycin,556,0.2
+Bleomycin,542,0.2
+Colistin,485,0.2
+Gentamicin,53,0
+Streptothricin,33,0
+Glycopeptide,1,0
