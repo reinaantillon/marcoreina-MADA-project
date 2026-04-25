@@ -60,9 +60,7 @@ top_20_serovars <- amr_wide_rf %>%
      slice_max(n, n = 20, with_ties = FALSE) %>%
          arrange(desc(amr_positive)) 
 
-```
 
-```{r}
 #Creating list with top serovars
 top_20 <- c("I 4,[5],12:i:-", "Infantis", "Typhimurium", "Newport", "Agona", "Kentucky", "Enteritidis", "Anatum",     "Saintpaul", "Braenderup", "Muenchen", "Sandiego", "Javiana", "Montevideo", "Oranienburg", "Thompson", "Mississippi", "Bareilly", "Poona", "Rubislaw")
 
@@ -77,12 +75,21 @@ amr_wide_rf <- amr_wide_rf %>%
 rngseed <- 1234
 set.seed(rngseed)
 
+amr_wide_rf <- amr_wide_rf %>%
+  mutate(amr_prevalence = factor(amr_prevalence, levels = c(1, 0)),
+          Tetracycline = factor(Tetracycline, levels = c(1, 0)),           
+          Aminoglycoside = factor(Aminoglycoside, levels = c(1, 0)),  
+          Sulfonamide = factor(Sulfonamide, levels = c(1, 0)),  
+          Beta_lactam = factor(Beta_lactam, levels = c(1, 0)),  
+          Phenicol = factor(Phenicol, levels = c(1, 0)),   
+  )
 
 amr_wide_rf <- amr_wide_rf %>%
-  mutate(Tetracycline = factor(Tetracycline, levels = c(1, 0)))
+  mutate()
 
 set.seed(rngseed)
-split <- initial_split(amr_wide_rf, prop = 0.75, strata = Tetracycline)
+
+split <- initial_split(amr_wide_rf, prop = 0.75, strata = amr_prevalence)
 
 train_data <- training(split)
 test_data  <- testing(split)
@@ -94,130 +101,38 @@ rf_spec <- rand_forest(
   min_n = 5
 ) %>%
   set_engine("ranger", seed = rngseed, importance = "permutation")
-
-
-rf_fit1 <- rf_spec %>%
-  fit(Tetracycline ~ Source.type + top_20, data = train_data)
-
-rf_fit1
 ```
 
 ```{r}
-test_pred1 <- test_data %>%
-  bind_cols(
-    predict(rf_fit1, new_data = test_data),                 # class
-    predict(rf_fit1, new_data = test_data, type = "prob")   # probabilities
-  )
-
-conf_mat(test_pred1, truth = Tetracycline, estimate = .pred_class)
-sens(test_pred1, truth = Tetracycline, estimate = .pred_class)
-spec(test_pred1, truth = Tetracycline, estimate = .pred_class)
-accuracy(test_pred1, truth = Tetracycline, estimate = .pred_class)
-precision(test_pred1, truth = Tetracycline, estimate = .pred_class)
-f_meas(test_pred1, truth = Tetracycline, estimate = .pred_class) 
-
-roc_curve(test_pred1, truth = Tetracycline, .pred_1) %>%
-  autoplot()
-
-roc_auc(test_pred1, truth = Tetracycline, .pred_1)
-```
-
-```{r}
-ggplot(test_pred1, aes(x = .pred_1, fill = Tetracycline)) +
-  geom_density(alpha = 0.5) +
-  theme_bw()
-```
-
-```{r}
-# Extract and plot
-rf_fit1 %>%
-  extract_fit_engine() %>%
-  vip(num_features = 10) +
-  theme_bw() +
-  labs(title = "Variable Importance for Tetracycline Resistance Prediction")
-```
-
-```{r}
-set.seed(rngseed)
-
-rf_fit2 <- rf_spec %>%
+rf_fit_tet <- rf_spec %>%
   fit(Tetracycline ~ Source.type + top_20 + sample_month, data = train_data)
 
-rf_fit2
+rf_fit_tet 
 
-test_pred2 <- test_data %>%
+test_pred_tet <- test_data %>%
   bind_cols(
-    predict(rf_fit2, new_data = test_data),                 # class
-    predict(rf_fit2, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_tet, new_data = test_data),                 # class
+    predict(rf_fit_tet, new_data = test_data, type = "prob")   # probabilities
   )
 
-conf_mat(test_pred2, truth = Tetracycline, estimate = .pred_class)
-sens(test_pred2, truth = Tetracycline, estimate = .pred_class)
-spec(test_pred2, truth = Tetracycline, estimate = .pred_class)
-accuracy(test_pred2, truth = Tetracycline, estimate = .pred_class)
-precision(test_pred2, truth = Tetracycline, estimate = .pred_class)
-f_meas(test_pred2, truth = Tetracycline, estimate = .pred_class) 
+conf_mat(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
+sens(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
+spec(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
+accuracy(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
+precision(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
+f_meas(test_pred_tet, truth = Tetracycline, estimate = .pred_class) 
 
-roc_curve(test_pred2, truth = Tetracycline, .pred_1) %>%
+roc_curve(test_pred_tet, truth = Tetracycline, .pred_1) %>%
   autoplot()
 
-roc_auc(test_pred2, truth = Tetracycline, .pred_1)
-```
+roc_auc(test_pred_tet, truth = Tetracycline, .pred_1)
 
-
-```{r}
-ggplot(test_pred2, aes(x = .pred_1, fill = Tetracycline)) +
+ggplot(test_pred_tet, aes(x = .pred_1, fill = Tetracycline)) +
   geom_density(alpha = 0.5) +
   theme_bw()
-```
 
-```{r}
 # Extract and plot
-rf_fit2 %>%
-  extract_fit_engine() %>%
-  vip(num_features = 10) +
-  theme_bw() +
-  labs(title = "Variable Importance for Tetracycline Resistance Prediction")
-```
-
-
-```{r}
-
-set.seed(rngseed)
-rf_fit3 <- rf_spec %>%
-  fit(Tetracycline ~ Source.type + top_20 + sample_month + Fosfomycin + Quinolone, data = train_data)
-
-rf_fit3
-
-test_pred3 <- test_data %>%
-  bind_cols(
-    predict(rf_fit3, new_data = test_data),                 # class
-    predict(rf_fit3, new_data = test_data, type = "prob")   # probabilities
-  )
-
-conf_mat(test_pred3, truth = Tetracycline, estimate = .pred_class)
-sens(test_pred3, truth = Tetracycline, estimate = .pred_class)
-spec(test_pred3, truth = Tetracycline, estimate = .pred_class)
-accuracy(test_pred3, truth = Tetracycline, estimate = .pred_class)
-precision(test_pred3, truth = Tetracycline, estimate = .pred_class)
-f_meas(test_pred3, truth = Tetracycline, estimate = .pred_class) 
-
-roc_curve(test_pred3, truth = Tetracycline, .pred_1) %>%
-  autoplot()
-
-roc_auc(test_pred3, truth = Tetracycline, .pred_1)
-```
-
-
-```{r}
-ggplot(test_pred3, aes(x = .pred_1, fill = Tetracycline)) +
-  geom_density(alpha = 0.5) +
-  theme_bw()
-```
-
-```{r}
-# Extract and plot
-rf_fit3 %>%
+rf_fit_tet %>%
   extract_fit_engine() %>%
   vip(num_features = 10) +
   theme_bw() +
@@ -227,62 +142,189 @@ rf_fit3 %>%
 ```{r}
 set.seed(rngseed)
 
-rf_fit4 <- rf_spec %>%
-  fit(Tetracycline ~ Source.type + top_20 + sample_month + Aminoglycoside + Sulfonamide + Beta_lactam + Phenicol, data = train_data)
+rf_fit_ami <- rf_spec %>%
+  fit(Aminoglycoside ~ Source.type + top_20 + sample_month, data = train_data)
 
-rf_fit4
+rf_fit_ami
 
-test_pred4 <- test_data %>%
+test_pred_ami <- test_data %>%
   bind_cols(
-    predict(rf_fit4, new_data = test_data),                 # class
-    predict(rf_fit4, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_ami, new_data = test_data),                 # class
+    predict(rf_fit_ami, new_data = test_data, type = "prob")   # probabilities
   )
 
-conf_mat(test_pred4, truth = Tetracycline, estimate = .pred_class)
-sens(test_pred4, truth = Tetracycline, estimate = .pred_class)
-spec(test_pred4, truth = Tetracycline, estimate = .pred_class)
-accuracy(test_pred4, truth = Tetracycline, estimate = .pred_class)
-precision(test_pred4, truth = Tetracycline, estimate = .pred_class)
-f_meas(test_pred4, truth = Tetracycline, estimate = .pred_class) 
+conf_mat(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
+sens(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
+spec(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
+accuracy(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
+precision(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
+f_meas(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class) 
 
-roc_curve(test_pred4, truth = Tetracycline, .pred_1) %>%
+roc_curve(test_pred_ami, truth = Aminoglycoside, .pred_1) %>%
   autoplot()
 
-roc_auc(test_pred4, truth = Tetracycline, .pred_1)
-```
+roc_auc(test_pred_ami, truth = Aminoglycoside, .pred_1)
 
-
-```{r}
-ggplot(test_pred4, aes(x = .pred_1, fill = Tetracycline)) +
+ggplot(test_pred_ami, aes(x = .pred_1, fill = Aminoglycoside)) +
   geom_density(alpha = 0.5) +
   theme_bw()
+
+# Extract and plot
+rf_fit_ami %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Aminoglycoside Resistance Prediction")
 ```
 
 
 ```{r}
-# 1. Create a function to extract all metrics at once
-get_metrics <- function(pred_df, model_name) {
-  metrics_set <- metric_set(accuracy, sens, spec, precision, f_meas, roc_auc)
-  
-  metrics_set(pred_df, truth = Tetracycline, estimate = .pred_class, .pred_1) %>%
-    mutate(model = model_name) %>% # Add a column to identify the model
-    select(model, .metric, .estimate)
-}
+set.seed(rngseed)
+rf_fit_sul <- rf_spec %>%
+  fit(Sulfonamide ~ Source.type + top_20 + sample_month, data = train_data)
 
-# 2. Collect metrics for all 4 fits
-# (Assuming you have test_pred1, test_pred2, test_pred3, and test_pred4)
-all_results <- bind_rows(
-  get_metrics(test_pred1, "Model 1: Base"),
-  get_metrics(test_pred2, "Model 2: Seasonal"),
-  get_metrics(test_pred3, "Model 3: Negative correlation"),
-  get_metrics(test_pred4, "Model 4: Positive correlation")
-)
+rf_fit_sul
 
-# 3. Pivot the table for a side-by-side comparison
-comparison_table <- all_results %>%
-  pivot_wider(names_from = .metric, values_from = .estimate)
+test_pred_sul <- test_data %>%
+  bind_cols(
+    predict(rf_fit_sul, new_data = test_data),                 # class
+    predict(rf_fit_sul, new_data = test_data, type = "prob")   # probabilities
+  )
 
-print(comparison_table)
+conf_mat(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
+sens(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
+spec(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
+accuracy(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
+precision(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
+f_meas(test_pred_sul, truth = Sulfonamide, estimate = .pred_class) 
+
+roc_curve(test_pred_sul, truth = Sulfonamide, .pred_1) %>%
+  autoplot()
+
+roc_auc(test_pred_sul, truth = Sulfonamide, .pred_1)
+
+ggplot(test_pred_sul, aes(x = .pred_1, fill = Sulfonamide)) +
+  geom_density(alpha = 0.5) +
+  theme_bw()
+
+# Extract and plot
+rf_fit_sul %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Sulfonamide Resistance Prediction")
 ```
 
+```{r}
+set.seed(rngseed)
 
+rf_fit_bet <- rf_spec %>%
+  fit(Beta_lactam ~ Source.type + top_20 + sample_month, data = train_data)
+
+rf_fit_bet
+
+test_pred_bet <- test_data %>%
+  bind_cols(
+    predict(rf_fit_bet, new_data = test_data),                 # class
+    predict(rf_fit_bet, new_data = test_data, type = "prob")   # probabilities
+  )
+
+conf_mat(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
+sens(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
+spec(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
+accuracy(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
+precision(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
+f_meas(test_pred_bet, truth = Beta_lactam, estimate = .pred_class) 
+
+roc_curve(test_pred_bet, truth = Beta_lactam, .pred_1) %>%
+  autoplot()
+
+roc_auc(test_pred_bet, truth = Beta_lactam, .pred_1)
+
+ggplot(test_pred_bet, aes(x = .pred_1, fill = Beta_lactam)) +
+  geom_density(alpha = 0.5) +
+  theme_bw()
+
+# Extract and plot
+rf_fit_bet %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Beta lactams Prediction")
+```
+
+```{r}
+set.seed(rngseed)
+
+rf_fit_phe <- rf_spec %>%
+  fit(Phenicol ~ Source.type + top_20 + sample_month, data = train_data)
+
+rf_fit_phe
+
+test_pred_phe <- test_data %>%
+  bind_cols(
+    predict(rf_fit_phe, new_data = test_data),                 # class
+    predict(rf_fit_phe, new_data = test_data, type = "prob")   # probabilities
+  )
+
+conf_mat(test_pred_phe, truth = Phenicol, estimate = .pred_class)
+sens(test_pred_phe, truth = Phenicol, estimate = .pred_class)
+spec(test_pred_phe, truth = Phenicol, estimate = .pred_class)
+accuracy(test_pred_phe, truth = Phenicol, estimate = .pred_class)
+precision(test_pred_phe, truth = Phenicol, estimate = .pred_class)
+f_meas(test_pred_phe, truth = Phenicol, estimate = .pred_class) 
+
+roc_curve(test_pred_phe, truth = Phenicol, .pred_1) %>%
+  autoplot()
+
+roc_auc(test_pred_phe, truth = Phenicol, .pred_1)
+
+ggplot(test_pred_phe, aes(x = .pred_1, fill = Phenicol)) +
+  geom_density(alpha = 0.5) +
+  theme_bw()
+
+# Extract and plot
+rf_fit_phe %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Beta lactams Prediction")
+```
+
+```{r}
+set.seed(rngseed)
+
+rf_fit_amr <- rf_spec %>%
+  fit(amr_prevalence ~ Source.type + top_20 + sample_month, data = train_data)
+
+rf_fit_amr
+
+test_pred5 <- test_data %>%
+  bind_cols(
+    predict(rf_fit_amr, new_data = test_data),                 # class
+    predict(rf_fit_amr, new_data = test_data, type = "prob")   # probabilities
+  )
+
+conf_mat(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+sens(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+spec(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+accuracy(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+precision(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+f_meas(test_pred5, truth = amr_prevalence, estimate = .pred_class) 
+
+roc_curve(test_pred5, truth = amr_prevalence, .pred_1) %>%
+  autoplot()
+
+roc_auc(test_pred5, truth = amr_prevalence, .pred_1)
+
+ggplot(test_pred5, aes(x = .pred_1, fill = amr_prevalence)) +
+  geom_density(alpha = 0.5) +
+  theme_bw()
+
+# Extract and plot
+rf_fit_amr %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for AMR Prediction")
+```
