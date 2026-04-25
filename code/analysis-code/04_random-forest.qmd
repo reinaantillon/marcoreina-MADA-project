@@ -6,6 +6,7 @@ library(lubridate)
 library(tidyverse)
 library(tidymodels)
 library(here)
+library(vip)
 
 # Read data
 amr_long_rf <- read_csv(here("data/processed-data/amr_long.csv"))
@@ -92,7 +93,7 @@ rf_spec <- rand_forest(
   mtry = floor(sqrt(ncol(train_data) - 1)),
   min_n = 5
 ) %>%
-  set_engine("ranger", seed = rngseed)
+  set_engine("ranger", seed = rngseed, importance = "permutation")
 
 
 rf_fit1 <- rf_spec %>%
@@ -122,16 +123,19 @@ roc_auc(test_pred1, truth = Tetracycline, .pred_1)
 ```
 
 ```{r}
-
-```
-
-```{r}
 ggplot(test_pred1, aes(x = .pred_1, fill = Tetracycline)) +
   geom_density(alpha = 0.5) +
   theme_bw()
 ```
 
-
+```{r}
+# Extract and plot
+rf_fit1 %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Tetracycline Resistance Prediction")
+```
 
 ```{r}
 set.seed(rngseed)
@@ -165,6 +169,15 @@ roc_auc(test_pred2, truth = Tetracycline, .pred_1)
 ggplot(test_pred2, aes(x = .pred_1, fill = Tetracycline)) +
   geom_density(alpha = 0.5) +
   theme_bw()
+```
+
+```{r}
+# Extract and plot
+rf_fit2 %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Tetracycline Resistance Prediction")
 ```
 
 
@@ -202,6 +215,14 @@ ggplot(test_pred3, aes(x = .pred_1, fill = Tetracycline)) +
   theme_bw()
 ```
 
+```{r}
+# Extract and plot
+rf_fit3 %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for Tetracycline Resistance Prediction")
+```
 
 ```{r}
 set.seed(rngseed)
@@ -236,3 +257,32 @@ ggplot(test_pred4, aes(x = .pred_1, fill = Tetracycline)) +
   geom_density(alpha = 0.5) +
   theme_bw()
 ```
+
+
+```{r}
+# 1. Create a function to extract all metrics at once
+get_metrics <- function(pred_df, model_name) {
+  metrics_set <- metric_set(accuracy, sens, spec, precision, f_meas, roc_auc)
+  
+  metrics_set(pred_df, truth = Tetracycline, estimate = .pred_class, .pred_1) %>%
+    mutate(model = model_name) %>% # Add a column to identify the model
+    select(model, .metric, .estimate)
+}
+
+# 2. Collect metrics for all 4 fits
+# (Assuming you have test_pred1, test_pred2, test_pred3, and test_pred4)
+all_results <- bind_rows(
+  get_metrics(test_pred1, "Model 1: Base"),
+  get_metrics(test_pred2, "Model 2: Seasonal"),
+  get_metrics(test_pred3, "Model 3: Negative correlation"),
+  get_metrics(test_pred4, "Model 4: Positive correlation")
+)
+
+# 3. Pivot the table for a side-by-side comparison
+comparison_table <- all_results %>%
+  pivot_wider(names_from = .metric, values_from = .estimate)
+
+print(comparison_table)
+```
+
+
