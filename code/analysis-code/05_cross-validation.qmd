@@ -1,0 +1,154 @@
+# CROSS VALIDATION 
+
+```{r}
+# Load packages
+library(lubridate)
+library(tidyverse)
+library(tidymodels)
+library(here)
+library(vip)
+library(gt)
+
+# Read data
+amr_long_rf <- read_csv(here("data/processed-data/amr_long.csv"))
+
+amr_long_rf <- amr_long_rf %>%
+  mutate(AMR_class_strict = if_else(AMR_status == "COMPLETE", AMR_class, "NO AMR"))
+
+amr_wide_rf <- amr_long_rf %>%
+  select(Create.date, BioSample, AMR_class_strict, serotype, Source.type) %>%
+  distinct(BioSample, AMR_class_strict, .keep_all = TRUE) %>%
+  mutate(present = 1) %>%
+  pivot_wider(
+    id_cols = c(Create.date, BioSample, serotype, Source.type),
+    names_from = AMR_class_strict,
+    values_from = present,
+    values_fill = 0
+  ) 
+
+amr_wide_rf$`Efflux Pump` = NULL
+amr_wide_rf$`NO AMR` = NULL 
+
+amr_wide_rf <- amr_wide_rf %>%
+  mutate(
+    sample_year = as.factor(year(Create.date)),
+    sample_month = month(Create.date, label = TRUE),
+    total_amr_classes = rowSums(across(c("Aminoglycoside", "Fosfomycin","Beta_lactam", "Gentamicin", "Trimethoprim", "Quinolone", "Phenicol", "Colistin", "Macrolide", "Bleomycin", "Tetracycline", "Sulfonamide", "Lincosamide"))),
+    amr_prevalence = if_else(total_amr_classes == 0, 0, 1),
+    mdr_prevalence = if_else(total_amr_classes <= 3, 0, 1)
+  )
+
+#Creating list with top serovars
+top_20 <- c("I 4,[5],12:i:-", "Infantis", "Typhimurium", "Newport", "Agona", "Kentucky", "Enteritidis", "Anatum",     "Saintpaul", "Braenderup", "Muenchen", "Sandiego", "Javiana", "Montevideo", "Oranienburg", "Thompson", "Mississippi", "Bareilly", "Poona", "Rubislaw")
+
+# Creating the new column to  "Other" for serovars that are not in the top 20
+amr_wide_rf <- amr_wide_rf %>%
+  mutate(top_20 = if_else(serotype %in% top_20, serotype, "Other"))
+
+# Set seed
+rngseed <- 1234
+set.seed(rngseed)
+
+amr_wide_rf <- amr_wide_rf %>%
+  mutate(amr_prevalence = factor(amr_prevalence, levels = c(1, 0)),
+          Tetracycline = factor(Tetracycline, levels = c(1, 0)),           
+          Aminoglycoside = factor(Aminoglycoside, levels = c(1, 0)),  
+          Sulfonamide = factor(Sulfonamide, levels = c(1, 0)),  
+          Beta_lactam = factor(Beta_lactam, levels = c(1, 0)),  
+          Phenicol = factor(Phenicol, levels = c(1, 0)),   
+  )
+
+amr_wide_rf <- amr_wide_rf %>%
+  mutate()
+
+set.seed(rngseed)
+
+split <- initial_split(amr_wide_rf, prop = 0.75, strata = amr_prevalence)
+
+train_data <- training(split)
+test_data  <- testing(split)
+
+rf_spec <- rand_forest(
+  mode = "classification",
+  trees = 500,
+  mtry = floor(sqrt(ncol(train_data) - 1)),
+  min_n = 5
+) %>%
+  set_engine("ranger", seed = rngseed, importance = "permutation")
+
+```
+
+```{r}
+set.seed(rngseed)
+
+rf_fit_amr <- rf_spec %>%
+  fit(amr_prevalence ~ Source.type + top_20 + sample_month, data = train_data)
+
+rf_fit_amr
+
+test_pred5 <- test_data %>%
+  bind_cols(
+    predict(rf_fit_amr, new_data = test_data),                 
+    predict(rf_fit_amr, new_data = test_data, type = "prob")   
+  )
+
+conf_mat(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+sens(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+spec(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+accuracy(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+precision(test_pred5, truth = amr_prevalence, estimate = .pred_class)
+f_meas(test_pred5, truth = amr_prevalence, estimate = .pred_class) 
+roc_curve(test_pred5, truth = amr_prevalence, .pred_1) %>%
+  autoplot()
+roc_auc(test_pred5, truth = amr_prevalence, .pred_1)
+ggplot(test_pred5, aes(x = .pred_1, fill = amr_prevalence)) +
+  geom_density(alpha = 0.5) +
+  theme_bw()
+
+# Extract and plot
+rf_fit_amr %>%
+  extract_fit_engine() %>%
+  vip(num_features = 10) +
+  theme_bw() +
+  labs(title = "Variable Importance for AMR Prediction")
+```
+
+
+```{r}
+set.seed(rngseed)
+
+# 1. Create cross-validation folds
+folds <- vfold_cv(train_data, v = 10)
+
+# 2. Build a workflow (combines formula + model spec)
+rf_wf <- workflow() %>%
+  add_formula(amr_prevalence ~ Source.type + top_20 + sample_month) %>%
+  add_model(rf_spec)
+
+# 3. Fit resamples using the workflow
+rf_fit_cv <- fit_resamples(
+  rf_wf, 
+  resamples = folds,
+  metrics = metric_set(roc_auc)
+)
+
+# 4. View the results
+collect_metrics(rf_fit_cv)
+```
+
+# HONEST ASSESSMENT
+
+```{r}
+# Predictions
+test_pred_class <- predict(rf_fit_amr, new_data = test_data)
+test_pred_prob  <- predict(rf_fit_amr, new_data = test_data, type = "prob")
+
+# Combine
+test_results <- test_data %>%
+  select(amr_prevalence) %>%
+  bind_cols(test_pred_class, test_pred_prob)
+
+# ROC AUC
+test_results %>% roc_auc(truth = amr_prevalence, .pred_1)
+
+```

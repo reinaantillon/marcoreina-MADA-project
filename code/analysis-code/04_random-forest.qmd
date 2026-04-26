@@ -1,12 +1,14 @@
 # RANDOM FOREST APPROACH
 
-#### After creating a model that can determine the amount of protein coding genes, I wanted to go for a different approach for something that does not have a linear relationship. For that I wanted to approach to predict AMR based on metadata like serotype, source type, and even month of the year. 
+#### I wanted to go for a different approach for something that does not have a linear relationship. For that I wanted to approach to predict AMR based on metadata like serotype, source type, and even month of the year. 
+
 ```{r}
 library(lubridate)
 library(tidyverse)
 library(tidymodels)
 library(here)
 library(vip)
+library(gt)
 
 # Read data
 amr_long_rf <- read_csv(here("data/processed-data/amr_long.csv"))
@@ -111,8 +113,8 @@ rf_fit_tet
 
 test_pred_tet <- test_data %>%
   bind_cols(
-    predict(rf_fit_tet, new_data = test_data),                 # class
-    predict(rf_fit_tet, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_tet, new_data = test_data),                
+    predict(rf_fit_tet, new_data = test_data, type = "prob")   
   )
 
 conf_mat(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
@@ -121,12 +123,9 @@ spec(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
 accuracy(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
 precision(test_pred_tet, truth = Tetracycline, estimate = .pred_class)
 f_meas(test_pred_tet, truth = Tetracycline, estimate = .pred_class) 
-
 roc_curve(test_pred_tet, truth = Tetracycline, .pred_1) %>%
   autoplot()
-
 roc_auc(test_pred_tet, truth = Tetracycline, .pred_1)
-
 ggplot(test_pred_tet, aes(x = .pred_1, fill = Tetracycline)) +
   geom_density(alpha = 0.5) +
   theme_bw()
@@ -149,8 +148,8 @@ rf_fit_ami
 
 test_pred_ami <- test_data %>%
   bind_cols(
-    predict(rf_fit_ami, new_data = test_data),                 # class
-    predict(rf_fit_ami, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_ami, new_data = test_data),                
+    predict(rf_fit_ami, new_data = test_data, type = "prob")   
   )
 
 conf_mat(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
@@ -159,12 +158,9 @@ spec(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
 accuracy(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
 precision(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class)
 f_meas(test_pred_ami, truth = Aminoglycoside, estimate = .pred_class) 
-
 roc_curve(test_pred_ami, truth = Aminoglycoside, .pred_1) %>%
   autoplot()
-
 roc_auc(test_pred_ami, truth = Aminoglycoside, .pred_1)
-
 ggplot(test_pred_ami, aes(x = .pred_1, fill = Aminoglycoside)) +
   geom_density(alpha = 0.5) +
   theme_bw()
@@ -187,8 +183,8 @@ rf_fit_sul
 
 test_pred_sul <- test_data %>%
   bind_cols(
-    predict(rf_fit_sul, new_data = test_data),                 # class
-    predict(rf_fit_sul, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_sul, new_data = test_data),                 
+    predict(rf_fit_sul, new_data = test_data, type = "prob")   
   )
 
 conf_mat(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
@@ -197,12 +193,9 @@ spec(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
 accuracy(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
 precision(test_pred_sul, truth = Sulfonamide, estimate = .pred_class)
 f_meas(test_pred_sul, truth = Sulfonamide, estimate = .pred_class) 
-
 roc_curve(test_pred_sul, truth = Sulfonamide, .pred_1) %>%
   autoplot()
-
 roc_auc(test_pred_sul, truth = Sulfonamide, .pred_1)
-
 ggplot(test_pred_sul, aes(x = .pred_1, fill = Sulfonamide)) +
   geom_density(alpha = 0.5) +
   theme_bw()
@@ -225,8 +218,8 @@ rf_fit_bet
 
 test_pred_bet <- test_data %>%
   bind_cols(
-    predict(rf_fit_bet, new_data = test_data),                 # class
-    predict(rf_fit_bet, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_bet, new_data = test_data),                 
+    predict(rf_fit_bet, new_data = test_data, type = "prob")   
   )
 
 conf_mat(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
@@ -235,12 +228,9 @@ spec(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
 accuracy(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
 precision(test_pred_bet, truth = Beta_lactam, estimate = .pred_class)
 f_meas(test_pred_bet, truth = Beta_lactam, estimate = .pred_class) 
-
 roc_curve(test_pred_bet, truth = Beta_lactam, .pred_1) %>%
   autoplot()
-
 roc_auc(test_pred_bet, truth = Beta_lactam, .pred_1)
-
 ggplot(test_pred_bet, aes(x = .pred_1, fill = Beta_lactam)) +
   geom_density(alpha = 0.5) +
   theme_bw()
@@ -263,8 +253,8 @@ rf_fit_phe
 
 test_pred_phe <- test_data %>%
   bind_cols(
-    predict(rf_fit_phe, new_data = test_data),                 # class
-    predict(rf_fit_phe, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_phe, new_data = test_data),                 
+    predict(rf_fit_phe, new_data = test_data, type = "prob")   
   )
 
 conf_mat(test_pred_phe, truth = Phenicol, estimate = .pred_class)
@@ -273,12 +263,9 @@ spec(test_pred_phe, truth = Phenicol, estimate = .pred_class)
 accuracy(test_pred_phe, truth = Phenicol, estimate = .pred_class)
 precision(test_pred_phe, truth = Phenicol, estimate = .pred_class)
 f_meas(test_pred_phe, truth = Phenicol, estimate = .pred_class) 
-
 roc_curve(test_pred_phe, truth = Phenicol, .pred_1) %>%
   autoplot()
-
 roc_auc(test_pred_phe, truth = Phenicol, .pred_1)
-
 ggplot(test_pred_phe, aes(x = .pred_1, fill = Phenicol)) +
   geom_density(alpha = 0.5) +
   theme_bw()
@@ -301,8 +288,8 @@ rf_fit_amr
 
 test_pred5 <- test_data %>%
   bind_cols(
-    predict(rf_fit_amr, new_data = test_data),                 # class
-    predict(rf_fit_amr, new_data = test_data, type = "prob")   # probabilities
+    predict(rf_fit_amr, new_data = test_data),                 
+    predict(rf_fit_amr, new_data = test_data, type = "prob")   
   )
 
 conf_mat(test_pred5, truth = amr_prevalence, estimate = .pred_class)
@@ -311,12 +298,9 @@ spec(test_pred5, truth = amr_prevalence, estimate = .pred_class)
 accuracy(test_pred5, truth = amr_prevalence, estimate = .pred_class)
 precision(test_pred5, truth = amr_prevalence, estimate = .pred_class)
 f_meas(test_pred5, truth = amr_prevalence, estimate = .pred_class) 
-
 roc_curve(test_pred5, truth = amr_prevalence, .pred_1) %>%
   autoplot()
-
 roc_auc(test_pred5, truth = amr_prevalence, .pred_1)
-
 ggplot(test_pred5, aes(x = .pred_1, fill = amr_prevalence)) +
   geom_density(alpha = 0.5) +
   theme_bw()
@@ -328,3 +312,52 @@ rf_fit_amr %>%
   theme_bw() +
   labs(title = "Variable Importance for AMR Prediction")
 ```
+
+
+```{r}
+# Create a function to extract metrics from each prediction object
+get_metrics <- function(pred_df, truth_col, model_name) {
+  list(
+    sens(pred_df, truth = !!sym(truth_col), estimate = .pred_class),
+    spec(pred_df, truth = !!sym(truth_col), estimate = .pred_class),
+    accuracy(pred_df, truth = !!sym(truth_col), estimate = .pred_class),
+    precision(pred_df, truth = !!sym(truth_col), estimate = .pred_class),
+    roc_auc(pred_df, truth = !!sym(truth_col), .pred_1)
+  ) %>%
+    map_df(bind_rows) %>%
+    select(.metric, .estimate) %>%
+    pivot_wider(names_from = .metric, values_from = .estimate) %>%
+    mutate(Model = model_name)
+}
+
+# Combine all model results
+all_results <- bind_rows(
+  get_metrics(test_pred_tet, "Tetracycline", "Tetracycline"),
+  get_metrics(test_pred_ami, "Aminoglycoside", "Aminoglycoside"),
+  get_metrics(test_pred_sul, "Sulfonamide", "Sulfonamide"),
+  get_metrics(test_pred_bet, "Beta_lactam", "Beta-lactam"),
+  get_metrics(test_pred_phe, "Phenicol", "Phenicol"),
+  get_metrics(test_pred5, "amr_prevalence", "General AMR")
+) %>%
+  select(Model, roc_auc, sens, spec, accuracy, precision)
+
+# Create the GT Table
+all_results %>%
+  gt() %>%
+  tab_header(
+    title = "Random Forest Model Performance",
+    subtitle = "Predicting AMR Classes from Metadata"
+  ) %>%
+  fmt_number(columns = 2:6, decimals = 3) %>%
+  cols_label(
+    Model = "Resistance Class",
+    roc_auc = "ROC AUC",
+    sens = "Sensitivity",
+    spec = "Specificity",
+    accuracy = "Accuracy",
+    precision = "Precision"
+  ) %>%
+  data_color(columns = roc_auc, palette = "Blues") %>%
+  gtsave(here("results/tables/amr_model_performance.html"))  
+```
+

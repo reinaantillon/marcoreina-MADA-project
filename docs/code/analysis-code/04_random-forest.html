@@ -142,6 +142,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Random Forest</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="../../code/analysis-code/05_cross-validation.html"> 
+<span class="menu-text">Cross Validation</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../products/manuscript/Manuscript.docx"> 
 <span class="menu-text">Manuscript</span></a>
   </li>  
@@ -172,8 +176,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="random-forest-approach" class="level1">
 <h1>RANDOM FOREST APPROACH</h1>
-<section id="after-creating-a-model-that-can-determine-the-amount-of-protein-coding-genes-i-wanted-to-go-for-a-different-approach-for-something-that-does-not-have-a-linear-relationship.-for-that-i-wanted-to-approach-to-predict-amr-based-on-metadata-like-serotype-source-type-and-even-month-of-the-year." class="level4">
-<h4 class="anchored" data-anchor-id="after-creating-a-model-that-can-determine-the-amount-of-protein-coding-genes-i-wanted-to-go-for-a-different-approach-for-something-that-does-not-have-a-linear-relationship.-for-that-i-wanted-to-approach-to-predict-amr-based-on-metadata-like-serotype-source-type-and-even-month-of-the-year.">After creating a model that can determine the amount of protein coding genes, I wanted to go for a different approach for something that does not have a linear relationship. For that I wanted to approach to predict AMR based on metadata like serotype, source type, and even month of the year.</h4>
+<section id="i-wanted-to-go-for-a-different-approach-for-something-that-does-not-have-a-linear-relationship.-for-that-i-wanted-to-approach-to-predict-amr-based-on-metadata-like-serotype-source-type-and-even-month-of-the-year." class="level4">
+<h4 class="anchored" data-anchor-id="i-wanted-to-go-for-a-different-approach-for-something-that-does-not-have-a-linear-relationship.-for-that-i-wanted-to-approach-to-predict-amr-based-on-metadata-like-serotype-source-type-and-even-month-of-the-year.">I wanted to go for a different approach for something that does not have a linear relationship. For that I wanted to approach to predict AMR based on metadata like serotype, source type, and even month of the year.</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
@@ -229,8 +233,10 @@ The following object is masked from 'package:utils':
 
     vi</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read data</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>amr_long_rf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/processed-data/amr_long.csv"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read data</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>amr_long_rf <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/processed-data/amr_long.csv"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 688980 Columns: 10
 ── Column specification ────────────────────────────────────────────────────────
@@ -357,8 +363,8 @@ OOB prediction error (Brier s.):  0.07110536 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>test_pred_tet <span class="ot">&lt;-</span> test_data <span class="sc">%&gt;%</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_tet, <span class="at">new_data =</span> test_data),                 <span class="co"># class</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_tet, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   <span class="co"># probabilities</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_tet, <span class="at">new_data =</span> test_data),                </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_tet, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   </span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(test_pred_tet, <span class="at">truth =</span> Tetracycline, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -473,8 +479,8 @@ OOB prediction error (Brier s.):  0.06655703 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>test_pred_ami <span class="ot">&lt;-</span> test_data <span class="sc">%&gt;%</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_ami, <span class="at">new_data =</span> test_data),                 <span class="co"># class</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_ami, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   <span class="co"># probabilities</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_ami, <span class="at">new_data =</span> test_data),                </span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_ami, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   </span>
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(test_pred_ami, <span class="at">truth =</span> Aminoglycoside, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -588,8 +594,8 @@ OOB prediction error (Brier s.):  0.05868647 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>test_pred_sul <span class="ot">&lt;-</span> test_data <span class="sc">%&gt;%</span></span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_sul, <span class="at">new_data =</span> test_data),                 <span class="co"># class</span></span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_sul, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   <span class="co"># probabilities</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_sul, <span class="at">new_data =</span> test_data),                 </span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_sul, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   </span>
 <span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(test_pred_sul, <span class="at">truth =</span> Sulfonamide, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -704,8 +710,8 @@ OOB prediction error (Brier s.):  0.05363896 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>test_pred_bet <span class="ot">&lt;-</span> test_data <span class="sc">%&gt;%</span></span>
 <span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_bet, <span class="at">new_data =</span> test_data),                 <span class="co"># class</span></span>
-<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_bet, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   <span class="co"># probabilities</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_bet, <span class="at">new_data =</span> test_data),                 </span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_bet, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   </span>
 <span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(test_pred_bet, <span class="at">truth =</span> Beta_lactam, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -820,8 +826,8 @@ OOB prediction error (Brier s.):  0.03730023 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>test_pred_phe <span class="ot">&lt;-</span> test_data <span class="sc">%&gt;%</span></span>
 <span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_phe, <span class="at">new_data =</span> test_data),                 <span class="co"># class</span></span>
-<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_phe, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   <span class="co"># probabilities</span></span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_phe, <span class="at">new_data =</span> test_data),                 </span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_phe, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   </span>
 <span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(test_pred_phe, <span class="at">truth =</span> Phenicol, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -936,8 +942,8 @@ OOB prediction error (Brier s.):  0.09430651 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>test_pred5 <span class="ot">&lt;-</span> test_data <span class="sc">%&gt;%</span></span>
 <span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
-<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_amr, <span class="at">new_data =</span> test_data),                 <span class="co"># class</span></span>
-<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_amr, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   <span class="co"># probabilities</span></span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_amr, <span class="at">new_data =</span> test_data),                 </span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(rf_fit_amr, <span class="at">new_data =</span> test_data, <span class="at">type =</span> <span class="st">"prob"</span>)   </span>
 <span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb128-7"><a href="#cb128-7" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(test_pred5, <span class="at">truth =</span> amr_prevalence, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1021,6 +1027,52 @@ Prediction     1     0
 </figure>
 </div>
 </div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a function to extract metrics from each prediction object</span></span>
+<span id="cb145-2"><a href="#cb145-2" aria-hidden="true" tabindex="-1"></a>get_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(pred_df, truth_col, model_name) {</span>
+<span id="cb145-3"><a href="#cb145-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb145-4"><a href="#cb145-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sens</span>(pred_df, <span class="at">truth =</span> <span class="sc">!!</span><span class="fu">sym</span>(truth_col), <span class="at">estimate =</span> .pred_class),</span>
+<span id="cb145-5"><a href="#cb145-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">spec</span>(pred_df, <span class="at">truth =</span> <span class="sc">!!</span><span class="fu">sym</span>(truth_col), <span class="at">estimate =</span> .pred_class),</span>
+<span id="cb145-6"><a href="#cb145-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">accuracy</span>(pred_df, <span class="at">truth =</span> <span class="sc">!!</span><span class="fu">sym</span>(truth_col), <span class="at">estimate =</span> .pred_class),</span>
+<span id="cb145-7"><a href="#cb145-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">precision</span>(pred_df, <span class="at">truth =</span> <span class="sc">!!</span><span class="fu">sym</span>(truth_col), <span class="at">estimate =</span> .pred_class),</span>
+<span id="cb145-8"><a href="#cb145-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">roc_auc</span>(pred_df, <span class="at">truth =</span> <span class="sc">!!</span><span class="fu">sym</span>(truth_col), .pred_1)</span>
+<span id="cb145-9"><a href="#cb145-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb145-10"><a href="#cb145-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_df</span>(bind_rows) <span class="sc">%&gt;%</span></span>
+<span id="cb145-11"><a href="#cb145-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(.metric, .estimate) <span class="sc">%&gt;%</span></span>
+<span id="cb145-12"><a href="#cb145-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">%&gt;%</span></span>
+<span id="cb145-13"><a href="#cb145-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Model =</span> model_name)</span>
+<span id="cb145-14"><a href="#cb145-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb145-15"><a href="#cb145-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb145-16"><a href="#cb145-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine all model results</span></span>
+<span id="cb145-17"><a href="#cb145-17" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb145-18"><a href="#cb145-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_metrics</span>(test_pred_tet, <span class="st">"Tetracycline"</span>, <span class="st">"Tetracycline"</span>),</span>
+<span id="cb145-19"><a href="#cb145-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_metrics</span>(test_pred_ami, <span class="st">"Aminoglycoside"</span>, <span class="st">"Aminoglycoside"</span>),</span>
+<span id="cb145-20"><a href="#cb145-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_metrics</span>(test_pred_sul, <span class="st">"Sulfonamide"</span>, <span class="st">"Sulfonamide"</span>),</span>
+<span id="cb145-21"><a href="#cb145-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_metrics</span>(test_pred_bet, <span class="st">"Beta_lactam"</span>, <span class="st">"Beta-lactam"</span>),</span>
+<span id="cb145-22"><a href="#cb145-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_metrics</span>(test_pred_phe, <span class="st">"Phenicol"</span>, <span class="st">"Phenicol"</span>),</span>
+<span id="cb145-23"><a href="#cb145-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_metrics</span>(test_pred5, <span class="st">"amr_prevalence"</span>, <span class="st">"General AMR"</span>)</span>
+<span id="cb145-24"><a href="#cb145-24" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb145-25"><a href="#cb145-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Model, roc_auc, sens, spec, accuracy, precision)</span>
+<span id="cb145-26"><a href="#cb145-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb145-27"><a href="#cb145-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the GT Table</span></span>
+<span id="cb145-28"><a href="#cb145-28" aria-hidden="true" tabindex="-1"></a>all_results <span class="sc">%&gt;%</span></span>
+<span id="cb145-29"><a href="#cb145-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb145-30"><a href="#cb145-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb145-31"><a href="#cb145-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Random Forest Model Performance"</span>,</span>
+<span id="cb145-32"><a href="#cb145-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Predicting AMR Classes from Metadata"</span></span>
+<span id="cb145-33"><a href="#cb145-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb145-34"><a href="#cb145-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">decimals =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb145-35"><a href="#cb145-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb145-36"><a href="#cb145-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">Model =</span> <span class="st">"Resistance Class"</span>,</span>
+<span id="cb145-37"><a href="#cb145-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">roc_auc =</span> <span class="st">"ROC AUC"</span>,</span>
+<span id="cb145-38"><a href="#cb145-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">sens =</span> <span class="st">"Sensitivity"</span>,</span>
+<span id="cb145-39"><a href="#cb145-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">spec =</span> <span class="st">"Specificity"</span>,</span>
+<span id="cb145-40"><a href="#cb145-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">accuracy =</span> <span class="st">"Accuracy"</span>,</span>
+<span id="cb145-41"><a href="#cb145-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">precision =</span> <span class="st">"Precision"</span></span>
+<span id="cb145-42"><a href="#cb145-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb145-43"><a href="#cb145-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data_color</span>(<span class="at">columns =</span> roc_auc, <span class="at">palette =</span> <span class="st">"Blues"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb145-44"><a href="#cb145-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gtsave</span>(<span class="fu">here</span>(<span class="st">"results/tables/amr_model_performance.html"</span>))  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
