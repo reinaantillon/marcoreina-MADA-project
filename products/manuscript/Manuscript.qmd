@@ -192,7 +192,7 @@ The predictive performance of the Random Forest models was evaluated using metad
 knitr::include_graphics(here("results/tables/amr_model_performance.PNG"))
 ```
 
-This chart ranks metadata variables based on their contribution to the model's predictive accuracy. It shows that Serotype is the most influential predictor, followed by Isolation Source, confirming that specific bacterial lineages and their environments are the primary drivers of antimicrobial resistance patterns in your dataset.
+This chart ranks metadata variables based on their contribution to the model's predictive accuracy. It shows that Serotype is the most influential predictor, followed by Isolation Source, confirming that specific bacterial lineages and their environments are the primary drivers of antimicrobial resistance patterns in this dataset.
 
 ```{r}
 #| label: fig-amr_vip
