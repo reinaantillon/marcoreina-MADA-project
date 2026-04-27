@@ -187,13 +187,20 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#author" id="toc-author" class="nav-link active" data-scroll-target="#author">Author</a>
+  <li><a href="#project-info" id="toc-project-info" class="nav-link active" data-scroll-target="#project-info">Project info</a>
   <ul class="collapse">
   <li><a href="#identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning" id="toc-identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning" class="nav-link" data-scroll-target="#identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning">Identifying Key Metadata Predictors of <em>Salmonella</em> AMR Genotypes through Machine Learning</a></li>
   </ul></li>
   <li><a href="#summaryabstract" id="toc-summaryabstract" class="nav-link" data-scroll-target="#summaryabstract">Summary/Abstract</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#key-metadata-variables-isolates-dataset" id="toc-key-metadata-variables-isolates-dataset" class="nav-link" data-scroll-target="#key-metadata-variables-isolates-dataset">Key metadata variables: Isolates dataset</a></li>
+  <li><a href="#key-metadata-variables-genomes-dataset" id="toc-key-metadata-variables-genomes-dataset" class="nav-link" data-scroll-target="#key-metadata-variables-genomes-dataset">Key metadata variables: Genomes dataset</a></li>
+  </ul></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#data-preparation-and-splitting" id="toc-data-preparation-and-splitting" class="nav-link" data-scroll-target="#data-preparation-and-splitting">Data Preparation and Splitting</a></li>
+  </ul></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
   <ul class="collapse">
   <li><a href="#descriptive-analysis" id="toc-descriptive-analysis" class="nav-link" data-scroll-target="#descriptive-analysis">Descriptive analysis</a></li>
@@ -211,8 +218,8 @@ window.Quarto = {
 
 
 
-<section id="author" class="level1">
-<h1>Author</h1>
+<section id="project-info" class="level1">
+<h1>Project info</h1>
 <section id="identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning" class="level2">
 <h2 class="anchored" data-anchor-id="identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning">Identifying Key Metadata Predictors of <em>Salmonella</em> AMR Genotypes through Machine Learning</h2>
 <p><strong>Author</strong></p>
@@ -230,79 +237,95 @@ window.Quarto = {
 </section>
 <section id="summaryabstract" class="level1">
 <h1>Summary/Abstract</h1>
-<p>In the United States, nontyphoidal <em>Salmonella</em> causes an estimated 1.35 million infections annually, with resistant strains associated with increased hospitalization rates and adverse clinical outcomes. Surveillance systems such as the National Antimicrobial Resistance Monitoring System (NARMS) and NCBI Pathogen Detection generate large-scale genomic and metadata resources that enable data-driven approaches to AMR risk prediction. This project leverages machine learning to predict AMR prevalence in <em>Salmonella</em> isolates using readily available metadata, which included isolation source, serotype, and temporal variables. This approach is helpful because expedites the analysis and offers a first quick screening before obtaining the whole-genome sequencing data. Using a curated dataset of 688,980 isolates from the NCBI Pathogen Detection repository, a binary outcome variable model was engineered, which helps indicating presence or absence of resistance to at least one antimicrobial class. A random forest classifier was implemented via the tidymodels framework (Kuhn &amp; Wickham, 2020), with model performance evaluated through 10-fold cross-validation and a held-out test set. Results indicate strong discriminative ability (ROC AUC = 0.825), high specificity (97.7%), and moderate sensitivity (35.2%), reflecting the inherent class imbalance in surveillance data where non-resistant isolates predominate. Variable importance analyses identified isolation source and top-20 serovars (e.g., I 4,[5],12:i:-, Infantis, Typhimurium) as key predictors of AMR status. These findings support the feasibility of using metadata-driven models for rapid, scalable AMR risk stratification in food safety and public health surveillance contexts.</p>
-<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/">Complete iterative process available here</a></p>
+<p>In the United States, nontyphoidal <em>Salmonella</em> causes an estimated 1.35 million infections annually, with resistant strains associated with increased hospitalization rates and adverse clinical outcomes. Surveillance systems such as the National Antimicrobial Resistance Monitoring System (NARMS) and NCBI Pathogen Detection generate large-scale genomic and metadata resources that enable data-driven approaches to AMR risk prediction. This project leverages machine learning to predict AMR prevalence in <em>Salmonella</em> isolates using readily available metadata, which included isolation source, serotype, and temporal variables. This approach is helpful because expedites the analysis and offers a first quick screening before obtaining the whole-genome sequencing data. Using a curated dataset of 245,772 isolates from the NCBI Pathogen Detection repository, a binary outcome variable model was engineered, which helps indicating presence or absence of resistance to at least one antimicrobial class. A random forest classifier was implemented via the tidymodels framework, with model performance evaluated through 10-fold cross-validation and a held-out test set. Results indicate strong discriminative ability (ROC AUC = 0.825), high specificity (97.7%), and moderate sensitivity (35.2%), reflecting the inherent class imbalance in surveillance data where non-resistant isolates predominate. Variable importance analyses identified isolation source and top-20 serovars (e.g., I 4,[5],12:i:-, Infantis, Typhimurium) as key predictors of AMR status. These findings support the feasibility of using metadata-driven models for rapid, scalable AMR risk stratification in food safety and public health surveillance contexts.</p>
+<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/">SUPPLEMENT: Complete iterative process of the project available here</a></p>
 <div style="page-break-after: always;"></div>
 </section>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>Antimicrobial resistance (AMR) is a escalating global public health threat, projected to contribute to 10 million deaths annually by 2050 if current trends continue (O’Neill, 2016; World Health Organization, 2024). Foodborne pathogens, particularly nontyphoidal <em>Salmonella</em>, which plays a central role in the transmission of resistant bacteria from agricultural and environmental reservoirs to human populations (CDC, 2024). In the United States alone, it is estimated that <em>Salmonella</em> causes around 1.35 million illnesses each year, and infections involving resistant strains are associated with longer durations of illness, higher rates of hospitalization, and increased treatment complexity (CDC, 2024; WHO, 2022).</p>
-<p>Large-scale surveillance initiatives, like the National Antimicrobial Resistance Monitoring System (NARMS) and the NCBI Pathogen Detection project have generated extensive repositories of bacterial isolate metadata, including source of isolation, serotype, collection date, and geographic origin (CDC, 2026; NCBI, 2026). While whole-genome sequencing offers high-resolution insights into resistance mechanisms, genomic data are not always available in real-time surveillance or resource-limited settings. Metadata, by contrast, are routinely collected, standardized, and immediately accessible. This raises an important question: Can readily available isolate metadata alone support accurate, scalable prediction of AMR status to inform proactive public health interventions?</p>
-<p>The objective of this project is to develop and evaluate a machine learning model that predicts antimicrobial resistance prevalence in <em>Salmonella</em> isolates using only metadata variables, specifically isolation source, top serovars, and temporal indicators. By leveraging a random forest classifier within the tidymodels framework (Kuhn &amp; Wickham, 2020), this work aims to demonstrate the feasibility of metadata-driven risk stratification as a complementary tool for food safety surveillance and early-warning systems.</p>
+<p>Antimicrobial resistance (AMR) is an escalating global public health threat, projected to contribute to 10 million deaths annually by 2050 if current trends continue (O’Neill, 2016; WHO, 2024). Foodborne pathogens, particularly nontyphoidal <em>Salmonella</em>, play a central in harboring and dissimination of resistant genes from agricultural and environmental reservoirs, allowing <em>Salmonella</em> successfully reach human populations (CDC, 2024). In the United States alone, it is estimated that <em>Salmonella</em> causes around 1.35 million illnesses each year, and infections involving resistant strains are associated with longer durations of illness, higher rates of hospitalization, and increased treatment complexity (CDC, 2024; WHO, 2022).</p>
+<p>Large-scale surveillance initiatives, like the National Antimicrobial Resistance Monitoring System (NARMS) and the NCBI Pathogen Detection project have generated extensive repositories of bacterial isolate metadata, including source of isolation, serotype, collection date, and geographic origin (CDC, 2026; NCBI, 2026). While whole-genome sequencing offers high-resolution insights into resistance mechanisms, genomic data are not always available in real-time surveillance or resource-limited settings. In contrast, metadata like source and month of collection are routinely collected and immediately accessible. Additionally, serovar could be determine through different faster methods like serovar-specific qPCR screening, allowing this additional variable to be available before obatining the computed serovar preduiction by whole genome sequencing. This raises an important question: Can readily available isolate metadata alone support accurate, scalable prediction of AMR status to inform proactive public health interventions?</p>
+<p>The objective of this project is to develop and evaluate a machine learning model that predicts antimicrobial resistance prevalence in <em>Salmonella</em> isolates using only metadata variables, specifically isolation source, top serovars, and temporal indicators, like collection month. By developing a random forest classifier within the tidymodels framework (Kuhn &amp; Wickham, 2020), this work aims to demonstrate the feasibility of metadata-driven risk stratification as a complementary tool for food safety surveillance and early-warning systems.</p>
 <section id="general-background-information" class="level4">
 <h4 class="anchored" data-anchor-id="general-background-information">General Background Information</h4>
 <p>Antimicrobial resistance in <em>Salmonella</em> most frequently involves five clinically important drug classes: β-lactams (including extended-spectrum cephalosporins), fluoroquinolones, aminoglycosides, tetracyclines, and sulfonamides/trimethoprim. Resistance to β-lactams is primarily mediated by β-lactamase enzymes (e.g., TEM, SHV, CTX-M, and carbapenemases like KPC), with over 1,170 distinct genes identified to date. Fluoroquinolone resistance typically arises from chromosomal mutations in gyrA and parC or plasmid-mediated qnr genes. Aminoglycoside resistance commonly involves enzymatic modification via aminoglycoside-modifying enzymes (e.g., aac, aph, aad genes). Tetracycline resistance is frequently conferred by efflux pumps (tetA, tetB) or ribosomal protection proteins (tetM).</p>
-<p>Multidrug resistance (MDR), which is defined as non-susceptibility to ≥3 antimicrobial classes, is increasingly prevalent in nontyphoidal <em>Salmonella</em> and poses significant treatment challenges. MDR often arises through co-selection mechanisms, where resistance genes cluster on mobile genetic elements (plasmids, integrons, transposons), enabling simultaneous acquisition of resistance to multiple drug classes. Cross-resistance occurs when a single mechanism confers resistance to multiple antimicrobials within or across classes; for example, efflux pumps like AcrAB-TolC can export diverse compounds including fluoroquinolones, β-lactams, and biocides. The emergence of extensively drug-resistant (XDR) strains (resistant to ≥5 classes) has been documented in serovars such as Typhimurium and Infantis, often linked to plasmid acquisition.</p>
-<p>Serovar and isolation source are consistently among the strongest predictors of AMR status in <em>Salmonella</em> surveillance data. Certain serovars exhibit characteristic resistance profiles: for instance, S. Typhimurium and S. 4,[5],12:i:- are frequently associated with the ACSSuT MDR phenotype (ampicillin, chloramphenicol, streptomycin, sulfonamides, tetracycline), while Heidelberg and Infantis increasingly harbor extended-spectrum cephalosporin resistance. Isolation source further refines risk prediction: isolates from poultry and retail meats show higher odds of resistance to tetracyclines and aminoglycosides compared to human clinical isolates, reflecting antimicrobial use patterns in agricultural settings. Metadata capturing serovar and source therefore provide actionable, low-cost proxies for AMR risk stratification in surveillance contexts.</p>
-<p>Serovar Infantis has emerged as a globally disseminated, multidrug-resistant clone of particular concern in poultry production systems. Its success is largely attributed to the pESI (p_Salmonella_ Infantis) megaplasmid (~280 kb), a conjugative plasmid that carries multiple resistance determinants (e.g., bla<sub>CTX-M-65</sub>, tetA, sul1, dfrA14), virulence factors (iroN, iss), and heavy-metal resistance genes. Strains harboring pESI exhibit significantly higher resistance to ampicillin, cefazolin, gentamicin, nalidixic acid, trimethoprim-sulfamethoxazole, and tetracycline compared to pESI-negative isolates. Critically, pESI is highly stable and transferable across <em>Salmonella</em> serovars, facilitating rapid dissemination of MDR traits across reservoirs. The global expansion of pESI-positive S. Infantis underscores the importance of metadata-driven surveillance to detect and track high-risk clones before they cause widespread outbreaks.</p>
+<p>However, <em>Salmonella</em> could be resistant to more than one drug. Multidrug resistance (MDR), which is defined as non-susceptibility to ≥3 antimicrobial classes, is increasingly prevalent in nontyphoidal <em>Salmonella</em> and poses significant treatment challenges. MDR often arises through co-selection mechanisms, where resistance genes cluster on mobile genetic elements (plasmids, integrons, transposons), enabling simultaneous acquisition of resistance to multiple drug classes. Cross-resistance occurs when a single mechanism confers resistance to multiple antimicrobials within or across classes; for example, efflux pumps like AcrAB-TolC can export diverse compounds including fluoroquinolones, β-lactams, and biocides. The emergence of extensively drug-resistant (XDR) strains (resistant to ≥5 classes) has been documented in serovars such as Typhimurium and Infantis, often linked to plasmid acquisition.</p>
+<p>Serovar and isolation source are considered among the strongest predictors of AMR status in <em>Salmonella</em> surveillance data. Certain serovars exhibit characteristic resistance profiles: for instance, Typhimurium and 4,[5],12:i:- are frequently associated with the ACSSuT MDR phenotype (ampicillin, chloramphenicol, streptomycin, sulfonamides, tetracycline), while Heidelberg and Infantis increasingly harbor extended-spectrum cephalosporin resistance. Isolation source further refines risk prediction: isolates from poultry and retail meats show higher odds of resistance to tetracyclines and aminoglycosides compared to human clinical isolates, reflecting antimicrobial use patterns in agricultural settings. Metadata capturing serovar and source therefore provide actionable, low-cost proxies for AMR risk stratification in surveillance contexts.</p>
+<p>A particular concern has emerged from serovar Infantis, because it has a multidrug-resistant clone of particular concern in poultry production systems has been dissiminated globally. The success of serovar Infantis is largely attributed to the pESI (p_Salmonella_ Infantis) megaplasmid (~280 kb), a conjugative plasmid that carries multiple resistance determinants (e.g., bla<sub>CTX-M-65</sub>, tetA, sul1, dfrA14), virulence factors (iroN, iss), and heavy-metal resistance genes. Strains harboring pESI exhibit significantly higher resistance to ampicillin, cefazolin, gentamicin, nalidixic acid, trimethoprim-sulfamethoxazole, and tetracycline compared to pESI-negative isolates. Critically, pESI is highly stable and transferable across <em>Salmonella</em> serovars, facilitating rapid dissemination of MDR traits across reservoirs. The global expansion of pESI-positive Infantis underscores the importance of metadata-driven surveillance to detect and track high-risk clones before they cause widespread outbreaks.</p>
 </section>
 <section id="description-of-data-and-data-source" class="level4">
 <h4 class="anchored" data-anchor-id="description-of-data-and-data-source">Description of Data and Data Source</h4>
-<p>This project utilizes isolate-level metadata and antimicrobial resistance (AMR) phenotype data from the NCBI Pathogen Detection repository, a centralized platform that integrates genomic sequences, standardized metadata, and AMR annotations from surveillance initiatives including NARMS, GenomeTrakr, and international partners. The analytical dataset comprises 688,980 <em>Salmonella</em> enterica isolates collected from human clinical cases, food animals, retail meats, and environmental sources across the United States between 2010–2024.</p>
+<p>This project utilizes isolate-level metadata and antimicrobial resistance (AMR) phenotype data from the NCBI Pathogen Detection repository, a centralized platform that integrates genomic sequences, standardized metadata, and AMR annotations from surveillance initiatives including NARMS, GenomeTrakr, and international partners. The complete analytical dataset that it was downloaded, it originally comprised 688,980 <em>Salmonella</em> enterica isolates collected from human clinical cases, food animals, retail meats, and environmental sources across the United States between 2010–2024. For this project this first dataset was labeled as <strong>“isolates dataset”</strong>.</p>
+<p>In addition to isolate dataset, this project incorporates genomic structural data from the NCBI Bacterial Genomes database. While the Pathogen Detection repository focus on surveillance and AMR phenotypes, the Genomes dataset provides a detailed characterization of the physical assembly and annotation metrics for selected <em>Salmonella</em> isolates. This dataset is used to explore the relationship between genome architecture features, and included 33,867 genome. For this project this second dataset was labeled as <strong>“genomes dataset”</strong>.</p>
 </section>
-<section id="key-metadata-variables-include" class="level4">
-<h4 class="anchored" data-anchor-id="key-metadata-variables-include">Key metadata variables include:</h4>
-<p>Isolation source (e.g., human, food, animal, or environmental) Serovar Collection date (year and month) Geographic origin (state/country) Antimicrobial susceptibility testing (AST) results for 14+ antimicrobials, interpreted using Clinical and Laboratory Standards Institute (CLSI) breakpoints</p>
-<p>AMR status was operationalized as a binary outcome: an isolate was classified as “resistant” if it exhibited non-susceptibility to ≥1 antimicrobial class; otherwise, it was classified as “susceptible.” This definition aligns with public health priorities for early detection of any resistance emergence. Data preprocessing included removal of isolates with missing source or serovar information, deduplication of genetically identical isolates from the same source/date, and harmonization of serovar nomenclature. All analyses were conducted using de-identified, publicly available data in NCBI data.</p>
+<section id="key-metadata-variables-isolates-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="key-metadata-variables-isolates-dataset">Key metadata variables: Isolates dataset</h2>
+<ul>
+<li>Isolation source (e.g., human, food, animal, or environmental)</li>
+<li>Collection date (day, month, and year)</li>
+<li>Geographic origin (country)</li>
+<li>Computed antimicrobial resistance genotypes</li>
+</ul>
+<p>AMR status was operationalized as a binary outcome: an isolate was classified as “resistant” if it exhibited non-susceptibility to ≥1 antimicrobial class; otherwise, it was classified as “susceptible.” This definition aligns with public health priorities for early detection of any resistance emergence. Data preprocessing included removal of isolates with missing source or serovar information, deduplication of genetically identical isolates from the same source/date, and harmonization of serovar nomenclature.</p>
 </section>
+<section id="key-metadata-variables-genomes-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="key-metadata-variables-genomes-dataset">Key metadata variables: Genomes dataset</h2>
+<ul>
+<li>Assembly Stats: Total sequence length and number of contigs (to assess assembly quality and genome size).</li>
+<li>Annotation Metrics: Total gene count, protein-coding gene count, and pseudogene count.</li>
+<li>Assembly Level: Classification of the assembly (e.g., “Complete Genome” vs.&nbsp;“Scaffold”).</li>
+<li>Release Date: The date the genomic annotation was finalized or updated.</li>
+</ul>
 <section id="questionshypotheses-to-be-addressed" class="level4">
 <h4 class="anchored" data-anchor-id="questionshypotheses-to-be-addressed">Questions/Hypotheses to be addressed</h4>
-<p>Can readily available metadata variables (isolation source, serovar, and collection timing) predict antimicrobial resistance status in <em>Salmonella</em> isolates before obtaining the whole-genome sequencing results?</p>
+<p>Can readily available metadata variables (isolation source, serovar, and collection month) predict antimicrobial resistance status in <em>Salmonella</em> isolates before obtaining the whole-genome sequencing results?</p>
+</section>
 </section>
 </section>
 <section id="methods" class="level1">
 <h1>Methods</h1>
-<section id="data-preparation-and-splitting" class="level4">
-<h4 class="anchored" data-anchor-id="data-preparation-and-splitting">Data Preparation and Splitting</h4>
-<p>Isolate-level metadata and antimicrobial susceptibility data were extracted from the NCBI Pathogen Detection repository. Following quality control, the dataset was partitioned into training (75%) and testing (25%) subsets using stratified random sampling to preserve the original class distribution of antimicrobial resistance (AMR) status. All analyses were conducted on publicly available data in accordance with NCBI data use policies.</p>
-</section>
+<section id="data-preparation-and-splitting" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation-and-splitting">Data Preparation and Splitting</h2>
+<p>To prepare the isolates dataset for a final paper-ready version, the raw data from the NCBI Pathogen Detection database was subjected to a rigorous cleaning and filtration pipeline. Initially, the dataset was reduced by removing non-essential technical metadata, such as sequencing platform details and internal laboratory identifiers, to streamline the analysis. The cohort was then geographically and temporally refined using the countries library to standardize locations to ISO3 codes, specifically filtering for isolates originating in the United States between 2021 and 2025. To ensure the study focused on relevant transmission routes, the data was restricted to four primary source categories: animal, environmental, food, and human. A total of 245,772 isolates were obtained after preprocessing. Following data preparation, the dataset was partitioned into training (75%) and testing (25%) subsets using stratified random sampling to preserve the original class distribution of antimicrobial resistance (AMR) status.</p>
+<p>In parallel with the isolates dataset, a secondary dataset was curated from the NIH Bacterial Genomes database (“genomes dataset”) to evaluate structural genomic features and their relationship with AMR. The genomic records were filtered to include only the <em>Salmonella</em> genus and streamlined to retain essential structural variables, including total sequence length, contig count, and the counts of total, protein-coding, and pseudogenes. A total of 33,867 genomes of <em>Salmonella enterica</em> were obtained.These records were then intersected with the NCBI Pathogen Detection database using the BioSample ID as a unique key, with a de-duplication step ensuring only the most recent Annotation Release Date was retained for each isolate. To ensure high-resolution structural integrity for the Descriptive Analysis, the final cohort was restricted to isolates designated as “Complete Genomes.” Although this resulted in a high-quality subset of 214 genomes, the extreme reduction in sample size led to the exclusion of these genomic variables from the final Random Forest models to prioritize broader population generalizability.</p>
 <section id="feature-engineering-and-preprocessing" class="level4">
 <h4 class="anchored" data-anchor-id="feature-engineering-and-preprocessing">Feature Engineering and Preprocessing</h4>
-<p>The outcome variable amr_prevalence was constructed as a binary factor, where “1” indicated resistance to ≥1 antimicrobial class and “0” indicated full susceptibility. Predictor variables were limited to routinely collected metadata: isolation source (Source.type), the 20 most prevalent serovars (top_20, with all others collapsed into an “Other” category), and collection month (sample_month). Categorical predictors were converted to factor type to enable appropriate encoding within the modeling workflow. No additional scaling or transformation was applied.</p>
+<p>The outcome variable <strong>amr_prevalence</strong> was constructed as a binary factor, where “1” indicated resistance to ≥1 antimicrobial class and “0” indicated full susceptibility. Predictor variables were limited to routinely collected metadata: isolation source (Source.type), the 20 most prevalent serovars (top_20, with all others collapsed into an “Other” category), and collection month (sample_month). Categorical predictors were converted to factor type to enable appropriate encoding within the modeling workflow. No additional scaling or transformation was applied.</p>
 </section>
 <section id="model-specification-and-training" class="level4">
 <h4 class="anchored" data-anchor-id="model-specification-and-training">Model Specification and Training</h4>
-<p>A random forest classifier was implemented using the ranger engine within the tidymodels framework. The model specification (rf_spec) was defined in classification mode and combined with the preprocessing formula into a unified workflow() object: <em>amr_prevalence ~ Source.type + top_20 + sample_month</em>. The final model was trained on the complete training dataset, while cross-validated performance was estimated using fit_resamples(). Hyperparameters (e.g., number of trees, mtry, minimum node size) were evaluated at predefined values.</p>
+<p>A random forest classifier was implemented using the ranger engine within the tidymodels framework. The model specification (rf_spec) was defined in classification mode and combined with the preprocessing formula into a unified workflow() object: <strong>amr_prevalence ~ Source.type + top_20 + sample_month</strong>. The final model was trained on the complete training dataset, while cross-validated performance was estimated using fit_resamples(). Hyperparameters (e.g., number of trees, mtry, minimum node size) were evaluated at predefined values.</p>
 </section>
 <section id="performance-evaluation" class="level4">
 <h4 class="anchored" data-anchor-id="performance-evaluation">Performance Evaluation</h4>
-<p>Model performance was evaluated on both the cross-validation resamples and the independent held-out test set using the yardstick package. Primary evaluation relied on the receiver operating characteristic area under the curve (ROC AUC), which measures discriminative ability across all probability thresholds and is robust to class imbalance. Secondary metrics included accuracy, sensitivity, specificity, and precision, calculated at the default 0.5 probability cutoff. Predicted class labels and probability scores were extracted via predict() with type = “class” and type = “prob”, respectively. A confusion matrix was generated to visualize true/false positive and negative classifications.</p>
+<p>Primary evaluation relied on the receiver operating characteristic area under the curve (ROC AUC), which measures discriminative ability across all probability thresholds and is robust to class imbalance. Secondary metrics included accuracy, sensitivity, specificity, and precision, calculated at the default 0.5 probability cutoff. Predicted class labels and probability scores were extracted via predict() with type = “class” and type = “prob”, respectively. A confusion matrix was generated to visualize true/false positive and negative classifications.</p>
 </section>
 <section id="cross-validation" class="level4">
 <h4 class="anchored" data-anchor-id="cross-validation">Cross-Validation</h4>
-<p>To assess model generalizability and mitigate overfitting, 10-fold cross-validation was applied exclusively to the training set. Folds were generated using vfold_cv(v = 10), which randomly partitions the training data into 10 equally sized, non-overlapping subsets. During resampling, 9 folds were used for model training while the remaining fold served as a validation set. This process was iterated 10 times so that each observation was used exactly once for validation. Performance metrics were aggregated across all resamples to estimate out-of-sample predictive ability.</p>
+<p>To evaluate model generalizability and mitigate overfitting, 10-fold cross-validation was performed on the training set using the vfold_cv function. This procedure partitioned the data into ten distinct, non-overlapping subsets to provide a robust estimate of out-of-sample predictive performance. Beyond cross-validation, an honest assessment was conducted using a held-out test set (comprising 25% of the total data) which remained entirely unseen during the model training to ensure an unbiased evaluation of the final model’s accuracy.</p>
 </section>
 <section id="software-and-reproducibility" class="level4">
 <h4 class="anchored" data-anchor-id="software-and-reproducibility">Software and Reproducibility</h4>
-<p>All data manipulation, modeling, and evaluation were performed in R (v4.x) using the tidymodels collection (v1.2.0), including rsample for resampling, workflows for pipeline integration, parsnip for model specification, ranger (v0.16.0) for random forest computation, and yardstick for metric calculation. A fixed random seed (set.seed()) was applied prior to data splitting, fold generation, and model training to ensure complete reproducibility. Analysis code and outputs are version-controlled and publicly accessible via the project repository.</p>
+<p>All data manipulation, modeling, and evaluation were performed in R (v4.4.3) using the tidymodels collection (v1.2.0), including rsample for resampling, workflows for pipeline integration, parsnip for model specification, ranger (v0.16.0) for random forest computation, and yardstick for metric calculation. A fixed random seed (set.seed(1234)) was applied prior to data splitting, fold generation, and model training to ensure complete reproducibility. Analysis code and outputs are version-controlled and publicly accessible via the project repository.</p>
+</section>
 </section>
 </section>
 <section id="results" class="level1">
 <h1>Results</h1>
 <section id="exploratory-data-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h4>
-<p>We conducted an exploratory analysis of over 100,000 <em>Salmonella</em> isolates and a high-quality genomic subset (<span class="math inline">\(n=214\)</span>) to characterize trends in antimicrobial resistance (AMR) and genomic architecture. The most critical descriptive results are summarized below.</p>
-<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/eda-code/01_eda.html">Complete EDA analysis here</a></p>
+<p>We conducted an exploratory analysis of 245,772 <em>Salmonella</em> isolates to characterize trends in antimicrobial resistance (AMR) and genomic architecture. The most critical exploratory results are summarized below.</p>
+<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/eda-code/01_eda.html">SUPPLEMENT: Complete EDA analysis here</a></p>
 </section>
 <section id="isolate-trends-and-source-distribution" class="level4">
 <h4 class="anchored" data-anchor-id="isolate-trends-and-source-distribution">Isolate Trends and Source Distribution</h4>
-<p>The vast majority of isolates in this dataset originate from human clinical cases, representing a significant focus on clinical surveillance. As shown in <strong>?@tbl-summarytable</strong>, while clinical samples consistently dominate the dataset, there was a notable increase in food-related isolates during 2023 and 2024.</p>
-<div id="tbl-cor-matrix" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<p>The vast majority of isolates in this dataset originate from human clinical cases, representing a significant focus on clinical surveillance. As shown in <a href="#tbl-summarytable" class="quarto-xref">Table&nbsp;1</a>, while clinical samples consistently dominate the dataset, there was a notable increase in food-related isolates during 2023 and 2024.</p>
+<div id="tbl-summarytable" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-cor-matrix-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-summarytable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1
 </figcaption>
-<div aria-describedby="tbl-cor-matrix-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="tbl-summarytable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div>
 
 </div>
@@ -843,9 +866,9 @@ Yearly Distribution [Count (%)]
 
 
 </section>
-<section id="visualizing-amr-and-source-dynamics" class="level4">
-<h4 class="anchored" data-anchor-id="visualizing-amr-and-source-dynamics">Visualizing AMR and Source Dynamics</h4>
-<p>The temporal distribution of isolates across different sources is visualized in <a href="#fig-isolates-trends" class="quarto-xref">Figure&nbsp;1</a>. While raw counts are highest in human sources, <a href="#fig-isolates-trends" class="quarto-xref">Figure&nbsp;1</a> reveals that the predicted AMR prevalence remains remarkably high (approximately 97.3%) across all categories, including environmental and animal sources.</p>
+<section id="visualizing-source-dynamics" class="level4">
+<h4 class="anchored" data-anchor-id="visualizing-source-dynamics">Visualizing Source Dynamics</h4>
+<p>The temporal distribution of isolates across different sources is visualized in <a href="#fig-isolates-trends" class="quarto-xref">Figure&nbsp;1</a>. While raw counts are highest in human sources, the data reveals a significant class imbalance across all categories. This distribution underscores a challenge for the predictive model, as the majority of samples are collected through routine clinical surveillance.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-isolates-trends" class="quarto-float quarto-figure quarto-figure-center anchored" width="1200">
@@ -861,8 +884,27 @@ Figure&nbsp;1
 </div>
 </div>
 </section>
+<section id="visualizing-amr-dynamics-per-source" class="level4">
+<h4 class="anchored" data-anchor-id="visualizing-amr-dynamics-per-source">Visualizing AMR Dynamics per source</h4>
+<p>The analysis of <em>Salmonella</em> isolates reveals a consistent presence of predicted antimicrobial resistance genes across all investigated categories. As shown in <a href="#fig-amr-sources" class="quarto-xref">Figure&nbsp;2</a>, while the dataset is heavily weighted toward human clinical samples (comprising over 90% of the total isolates), the proportion of isolates with predicted AMR remains remarkably high, approximately 97.3%, regardless of the source. However, in consequent steps, this trend is shown to be mostly led by Efflux pumps, that were excluded from this analysis due to it’s high prevalence.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-amr-sources" class="quarto-float quarto-figure quarto-figure-center anchored" width="1500">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-amr-sources-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../results/figures/isolatesgraph2_pub.png" id="fig-amr-sources" class="img-fluid figure-img" width="1500">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-amr-sources-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
 <section id="genomic-structure-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="genomic-structure-analysis">Genomic Structure Analysis</h4>
+<p>In addition to the primary metadata analysis, a secondary dataset comprising high-quality Salmonella genomes was initially processed to evaluate structural features such as genome length, contig counts, and protein-coding genes. However, this dataset was ultimately excluded from the final predictive modeling phase. The decision to omit these genomic dataset was driven by the significant reduction in sample size that occurred during the intersection of the two databases, which would have compromised the model’s ability to generalize across the broader population. Consequently, this study focused exclusively on the metadata features available from the “isolates dataset” to ensure a robust and scalable assessment of AMR trends.</p>
 <p>Our Exploratory Analysis confirmed a strong correlation (<span class="math inline">\(r \approx 0.90\)</span>) between genome length and protein-coding genes, while pseudogene counts appeared to be independent of these structural metrics.</p>
 <div id="tbl-cor-matrix" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1409,8 +1451,8 @@ Table&nbsp;2
 <h2 class="anchored" data-anchor-id="descriptive-analysis">Descriptive analysis</h2>
 <section id="patterns-of-amr-class-prevalence-and-co-occurrence" class="level4">
 <h4 class="anchored" data-anchor-id="patterns-of-amr-class-prevalence-and-co-occurrence">Patterns of AMR Class Prevalence and Co-occurrence</h4>
-<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/02_descriptive-analysis.html">Complete Descriptive analysis here</a></p>
-<p>A critical step in our descriptive analysis was the characterization of clinically relevant resistance classes. As noted in our Descriptive Analysis Script, multidrug efflux pumps were excluded from this specific characterization due to their ubiquitous presence (&gt;96% prevalence) across the dataset, which tends to obscure phenotypic resistance trends.</p>
+<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/02_descriptive-analysis.html">SUPPLEMENT: Complete Descriptive analysis here</a></p>
+<p>A critical step in our descriptive analysis was the characterization of clinically relevant resistance classes. As noted in our Complete Descriptive analysis (supplement), multidrug efflux pumps were excluded from this specific characterization due to their ubiquitous presence (&gt;96% prevalence) across the dataset, which tends to obscure phenotypic resistance trends.</p>
 </section>
 <section id="predominant-resistance-classes" class="level4">
 <h4 class="anchored" data-anchor-id="predominant-resistance-classes">Predominant Resistance Classes</h4>
@@ -1990,7 +2032,7 @@ Table&nbsp;3
 </section>
 <section id="multidrug-resistance-mdr-by-source" class="level4">
 <h4 class="anchored" data-anchor-id="multidrug-resistance-mdr-by-source">Multidrug Resistance (MDR) by Source</h4>
-<p>The distribution of multidrug resistance (defined here as resistance to 3 or more classes) showed distinct patterns across isolation sources (<a href="#fig-mdr" class="quarto-xref">Figure&nbsp;2</a>). While the raw volume of isolates is highest in human clinical samples, a higher proportion of MDR isolates was observed in animal and food-related sources. This suggests that while human surveillance captures more total resistance, the complexity of resistance profiles may be more pronounced in agricultural and production environments.</p>
+<p>The distribution of multidrug resistance (defined here as resistance to 3 or more classes) showed distinct patterns across isolation sources (<a href="#fig-mdr" class="quarto-xref">Figure&nbsp;3</a>). While the raw volume of isolates is highest in human clinical samples, a higher proportion of MDR isolates was observed in animal and food-related sources. This suggests that while human surveillance captures more total resistance, the complexity of resistance profiles may be more pronounced in agricultural and production environments.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-mdr" class="quarto-float quarto-figure quarto-figure-center anchored" width="1200">
@@ -1999,16 +2041,16 @@ Table&nbsp;3
 <img src="../../results/figures/amr_mdr_distribution.png" id="fig-mdr" class="img-fluid figure-img" width="1200">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-mdr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2
+Figure&nbsp;3
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="genomic-co-occurrence-and-correlation" class="level4">
-<h4 class="anchored" data-anchor-id="genomic-co-occurrence-and-correlation">Genomic Co-occurrence and Correlation</h4>
-<p>To understand the underlying structure of these resistance profiles, we calculated the co-occurrence of AMR classes using Pearson correlation (<a href="#fig-heatmap" class="quarto-xref">Figure&nbsp;3</a>). Our results highlight a strong positive correlation between Tetracyclines, Aminoglycosides, and Sulfonamides, likely indicating the presence of linked resistance genes on shared mobile genetic elements (MGEs). Conversely, Quinolone and Fosfomycin resistance showed a negative correlation with most other classes, suggesting that these genotypes may emerge in distinct sub-populations of <em>Salmonella</em>.</p>
+<section id="co-occurrence-and-correlation" class="level4">
+<h4 class="anchored" data-anchor-id="co-occurrence-and-correlation">Co-occurrence and Correlation</h4>
+<p>To understand the underlying structure of these resistance profiles, we calculated the co-occurrence of AMR classes using Pearson correlation (<a href="#fig-heatmap" class="quarto-xref">Figure&nbsp;4</a>). Our results highlight a strong positive correlation between Tetracyclines, Aminoglycosides, and Sulfonamides, likely indicating the presence of linked resistance genes on shared mobile genetic elements (MGEs). Conversely, Quinolone and Fosfomycin resistance showed a negative correlation with most other classes, suggesting that these genotypes may emerge in distinct sub-populations of <em>Salmonella</em>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-heatmap" class="quarto-float quarto-figure quarto-figure-center anchored" width="1350">
@@ -2017,7 +2059,7 @@ Figure&nbsp;2
 <img src="../../results/figures/amr_correlation_heatmap.png" id="fig-heatmap" class="img-fluid figure-img" width="1350">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-heatmap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3
+Figure&nbsp;4
 </figcaption>
 </figure>
 </div>
@@ -2029,8 +2071,8 @@ Figure&nbsp;3
 <h2 class="anchored" data-anchor-id="full-analysis">Full analysis</h2>
 <section id="random-forest-to-determine-amr" class="level4">
 <h4 class="anchored" data-anchor-id="random-forest-to-determine-amr">Random Forest to determine AMR</h4>
-<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/04_random-forest.html">Complete Random Forest analysis here</a></p>
-<p>The predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. This selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often rare phenotypes. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (&gt;0.97) paired with lower Sensitivity, establishing a high threshold for “false alarms” that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.</p>
+<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/04_random-forest.html">SUPPLEMENT: Complete Random Forest iterations here</a></p>
+<p>The predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. This selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often rare phenotypes. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (&gt;0.97) paired with lower Sensitivity (0.352), establishing a high threshold for “false alarms” that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.</p>
 <div id="tbl-model-performance" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-model-performance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2583,7 +2625,7 @@ Table&nbsp;4
 <img src="../../results/figures/amr_vip_publication.png" id="fig-amr_vip" class="img-fluid figure-img" width="1050">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-amr_vip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4
+Figure&nbsp;5
 </figcaption>
 </figure>
 </div>
@@ -2598,13 +2640,13 @@ Figure&nbsp;4
 <img src="../../results/figures/amr_roc_publication.png" id="fig-amr_roc" class="img-fluid figure-img" width="900">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-amr_roc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5
+Figure&nbsp;6
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>This plot visualizes the distribution of predicted probabilities for both resistant and susceptible classes. The high density of susceptible isolates at very low probability scores explains the model’s exceptional Specificity, while the overlapping region near the center highlights the difficulty in achieving high sensitivity using metadata alone.</p>
+<p>This plot visualizes the distribution of predicted probabilities for both resistant and susceptible classes. The high density of susceptible isolates at very low probability scores explains the model’s exceptional <strong>specificity</strong>, while the overlapping region near the center highlights the difficulty in achieving high sensitivity using metadata alone.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-amr_density" class="quarto-float quarto-figure quarto-figure-center anchored" width="1050">
@@ -2613,7 +2655,7 @@ Figure&nbsp;5
 <img src="../../results/figures/amr_density_publication.png" id="fig-amr_density" class="img-fluid figure-img" width="1050">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-amr_density-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6
+Figure&nbsp;7
 </figcaption>
 </figure>
 </div>
@@ -2622,8 +2664,8 @@ Figure&nbsp;6
 </section>
 <section id="quality-control" class="level4">
 <h4 class="anchored" data-anchor-id="quality-control">Quality Control</h4>
-<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/05_cross-validation.html">Complete Random Forest analysis here</a></p>
-<p>The Random Forest model demonstrated high stability, with 10-fold cross-validation yielding a mean ROC AUC of 0.829 (<span class="math inline">\(\pm 0.001\)</span> SE). During the honest assessment phase, the model maintained this performance on unseen test data, achieving a final ROC AUC of 0.825 and a sensitivity of 0.352 (<a href="#tbl-model-validation" class="quarto-xref">Table&nbsp;5</a>). The confusion matrix (<a href="#tbl-conf-matrix" class="quarto-xref">Table&nbsp;6</a>) illustrates the model’s conservative classification strategy; while it correctly identified over 50,000 susceptible isolates with minimal false positives (1,166), it successfully captured roughly one-third of the resistant population using metadata alone. This confirms that while the model is conservative, the resistance predictions it does make are highly reliable.</p>
+<p><a href="https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/05_cross-validation.html">SUPPLEMENT: Complete Quality Control analysis here</a></p>
+<p>The Random Forest model demonstrated high stability, with 10-fold cross-validation yielding a mean ROC AUC of 0.829 (<span class="math inline">\(\pm 0.001\)</span> SE). During the honest assessment phase, the model maintained this performance on unseen test data, achieving a final ROC AUC of 0.825 and a sensitivity of 0.352 (<a href="#tbl-model-validation" class="quarto-xref">Table&nbsp;5</a>). The confusion matrix (<a href="#tbl-conf-matrix" class="quarto-xref">Table&nbsp;6</a>) illustrates the model’s conservative classification strategy; while it correctly identified 50,650 susceptible isolates with minimal false positives (1,166), it successfully captured roughly one-third of the resistant population using metadata alone. This confirms that while the model is conservative, the resistance predictions it does make are highly reliable.</p>
 <div id="tbl-model-validation" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-model-validation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -3645,14 +3687,14 @@ Reference (Truth)
 <h1>Discussion</h1>
 <section id="summary-and-interpretation" class="level4">
 <h4 class="anchored" data-anchor-id="summary-and-interpretation">Summary and Interpretation</h4>
-<p>In this study, we developed and evaluated a metadata-driven machine learning framework to predict antimicrobial resistance (AMR) in Salmonella enterica using a large-scale dataset derived from the NCBI Pathogen Detection repository. Specifically, we implemented a random forest classifier using routinely available epidemiological metadata (i.e.&nbsp;isolation source, serovar, and temporal variables) to predict whether an isolate exhibited resistance to at least one antimicrobial class.</p>
+<p>In this study, we developed and evaluated a metadata-driven machine learning framework to predict antimicrobial resistance (AMR) in <em>Salmonella enterica</em> using a large-scale dataset derived from the NCBI Pathogen Detection repository. Specifically, we implemented a random forest classifier using routinely available epidemiological metadata (i.e.&nbsp;isolation source, serovar, and temporal variables) to predict whether an isolate could exhibit resistance to at least one antimicrobial class.</p>
 <p>The model demonstrated strong discriminative performance (ROC AUC = 0.825), indicating that metadata alone contains substantial predictive signal for AMR status. However, performance was asymmetrical: the model achieved very high specificity (97.7%) but relatively low sensitivity (35.2%). This reflects the strong class imbalance inherent to surveillance datasets, where susceptible isolates predominate, and suggests that the model is conservative in assigning resistance labels. From a public health standpoint, this behavior implies that while the model may miss a proportion of resistant isolates, the predictions it does make are highly reliable and have low false-positive rates.</p>
-<p>Variable importance analyses revealed that serovar and isolation source were the dominant predictors of AMR status. This finding is consistent with prior epidemiological and genomic studies showing that resistance traits are not randomly distributed but instead cluster within specific lineages and ecological niches (Zhang et al., 2015). For example, well-characterized serovars such as Typhimurium and Infantis are frequently associated with multidrug resistance due to the presence of mobile genetic elements and lineage-specific adaptations (Feldgarden et al., 2019; McDermott et al., 2016). Similarly, the higher prevalence of resistance observed in food and animal sources aligns with documented antimicrobial usage patterns in agricultural systems and their role as reservoirs for resistant strains (WHO, 2022; Van Boeckel et al., 2015).</p>
-<p>Importantly, this study demonstrates that metadata can serve as a scalable and rapid proxy for AMR risk stratification. While whole-genome sequencing remains the gold standard for identifying resistance mechanisms, it is not always available in real-time surveillance contexts (McDermott et al., 2016). Therefore, metadata-driven models such as the one presented here can function as an early-warning or triage tool, prioritizing isolates for further genomic characterization and informing targeted interventions (Aslam et al., 2018).</p>
+<p>Variable importance analyses revealed that serovar and isolation source were the dominant predictors of AMR status. This finding shows that resistance traits are not randomly distributed but instead cluster within specific lineages and ecological niches,and it is consistent with prior epidemiological and genomic studies showing (Zhang et al., 2015). For example, well-characterized serovars such as Typhimurium and Infantis are frequently associated with multidrug resistance due to the presence of mobile genetic elements and lineage-specific adaptations (Feldgarden et al., 2019; McDermott et al., 2016). Similarly, the higher prevalence of resistance observed in food and animal sources aligns with documented antimicrobial usage patterns in agricultural systems and their role as reservoirs for resistant strains (WHO, 2022; Van Boeckel et al., 2015).</p>
+<p>Importantly, this study demonstrates that metadata can serve as a scalable and rapid proxy for AMR risk stratification. While whole-genome sequencing remains the gold standard for identifying resistance mechanisms, it is not always available in real-time surveillance contexts (McDermott et al., 2016). Therefore, metadata-driven models such as the one presented here can function as an early-warning, prioritizing isolates for further genomic characterization and informing targeted interventions (Aslam et al., 2018).</p>
 </section>
 <section id="strengths-and-limitations" class="level4">
 <h4 class="anchored" data-anchor-id="strengths-and-limitations">Strengths and Limitations</h4>
-<p>A major strength of this analysis is the scale and diversity of the dataset, encompassing over 600,000 Salmonella isolates collected across multiple sources, time periods, and geographic locations. This large sample size enhances statistical power, improves model generalizability, and enables the capture of real-world heterogeneity in AMR patterns. Additionally, the use of standardized, publicly available data from surveillance systems such as National Antimicrobial Resistance Monitoring System (NARMS) supports reproducibility and external validity.</p>
+<p>A major strength of this analysis is the scale and diversity of the dataset, encompassing 245,772 Salmonella isolates collected across multiple sources, and time periods. This large sample size enhances statistical power, improves model generalizability, and enables the capture of real-world heterogeneity in AMR patterns. Additionally, the use of standardized, publicly available data from surveillance systems such as National Antimicrobial Resistance Monitoring System (NARMS) supports reproducibility and external validity.</p>
 <p>From a methodological perspective, the use of a random forest algorithm is well-suited for this application due to its ability to model nonlinear relationships and interactions between categorical predictors without requiring extensive preprocessing (Wright &amp; Ziegler, 2017). The implementation within the tidymodels framework, combined with 10-fold cross-validation and a held-out test set, further strengthens the robustness and reproducibility of the findings.</p>
 <p>However, several limitations should be acknowledged. First, the reliance on metadata alone inherently constrains predictive performance, particularly sensitivity. AMR phenotypes are ultimately driven by specific genetic determinants, and the absence of genomic features limits the model’s ability to detect resistance mechanisms that are not strongly associated with serovar or source (McDermott et al., 2016). This likely explains the moderate sensitivity observed and highlights the trade-off between scalability and biological resolution.</p>
 <p>Second, the dataset exhibits substantial class imbalance, with a predominance of susceptible isolates. While ROC AUC is robust to imbalance, threshold-dependent metrics such as sensitivity are adversely affected. Alternative strategies, such as class weighting, resampling techniques, or threshold optimization, could improve detection of resistant isolates in future work.</p>
@@ -3662,7 +3704,7 @@ Reference (Truth)
 </section>
 <section id="conclusions" class="level1">
 <h1>Conclusions</h1>
-<p>This study demonstrates that routinely collected metadata can be effectively leveraged to predict antimicrobial resistance in Salmonella with strong discriminative performance, even in the absence of genomic data. Key predictors such as serovar and isolation source highlight the structured, non-random nature of AMR across ecological and epidemiological contexts. While the model’s high specificity supports its use as a reliable screening or triage tool in surveillance systems, its moderate sensitivity indicates that metadata alone cannot fully capture the complexity of resistance phenotypes. Overall, integrating metadata-driven approaches with genomic data represents a promising path toward more accurate, scalable, and timely AMR risk assessment in food safety and public health.</p>
+<p>This study demonstrates that routinely collected metadata can be effectively leveraged to predict antimicrobial resistance in <em>Salmonella</em> with strong discriminative performance, even in the absence of genomic data. Key predictors such as serovar and isolation source highlight the structured, non-random nature of AMR across ecological and epidemiological contexts. While the model’s high specificity supports its use as a reliable fast screening in surveillance systems, its moderate sensitivity indicates that metadata alone cannot fully capture the complexity of resistance phenotypes. Overall, integrating metadata-driven approaches with genomic data represents a promising path toward more accurate, scalable, and timely AMR risk assessment in food safety and public health.</p>
 <div style="page-break-after: always;"></div>
 </section>
 <section id="references" class="level1">

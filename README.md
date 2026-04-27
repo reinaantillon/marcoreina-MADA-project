@@ -7,5 +7,7 @@ Please execute the files following that sequence (e.g. "01" first, followed by "
 Manuscript available in docx in main page
 Web version manuscript available in the project github pages
 
-[Here is the link to the website for this repository](https://reinaantillon.github.io/marcoreina-MADA-project/)
+[Web manuscript here](https://reinaantillon.github.io/marcoreina-MADA-project/products/manuscript/manuscript-web.html)
+
+
 
