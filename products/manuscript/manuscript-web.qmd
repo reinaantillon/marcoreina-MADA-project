@@ -636,13 +636,7 @@ knitr::include_graphics(here("results/figures/isolatesgraph1_pub.png"))
 
 #### Genomic Structure Analysis
 
-To validate the genomic characteristics of these isolates, we analyzed a subset of 214 complete genomes. As seen in @fig-genomes-source, the distribution of these high-quality genomes spans all major sources. Our Exploratory Analysis confirmed a strong correlation ($r \approx 0.90$) between genome length and protein-coding genes, while pseudogene counts appeared to be independent of these structural metrics.
-
-```{r}
-#| label: fig-genomes-source
-#| echo: FALSE
-knitr::include_graphics(here("results/figures/genomesgraph1_pub.png"))
-```
+Our Exploratory Analysis confirmed a strong correlation ($r \approx 0.90$) between genome length and protein-coding genes, while pseudogene counts appeared to be independent of these structural metrics.
 
 ```{r}
 #| label: tbl-cor-matrix
