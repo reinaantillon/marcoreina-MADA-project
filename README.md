@@ -1,4 +1,4 @@
-# My website and data analysis porproject
+# My website and data analysis project
 [Here is the link to the website for this repository](https://reinaantillon.github.io/marcoreina-MADA-project/)
 
 Each qmd file starts with a number that indicates its sequential order. 
