@@ -1,11 +1,14 @@
-project: 
+project:
   type: website
   output-dir: docs
 
 website:
   title: "Marco Reina MADA Project"
-  navbar:
-    left:
+  sidebar:
+    style: "docked"  
+    background: "light"  
+    search: false 
+    contents:
       - text: "EDA analysis"
         file: code/eda-code/01_eda.html
       - text: "Descriptive Analysis"
@@ -16,14 +19,19 @@ website:
         file: code/analysis-code/04_random-forest.qmd
       - text: "Cross Validation"
         file: code/analysis-code/05_cross-validation.qmd
-      - text: "Manuscript"
+      - text: "Manuscript (web)"
+        file: products/manuscript/manuscript-web.qmd
+      - text: "Manuscript (docx)"
         file: products/manuscript/Manuscript.qmd
-    right:
-      - icon: github 
+      - text: "GitHub"
+        icon: github
         href: https://github.com/reinaantillon/marcoreina-MADA-project
+        target: "_blank"  # Opens link in new tab
+
 format:
   html:
-    theme: lux
+    theme: flatly
     highlight: zenburn
     css: styles.css
-    toc: FALSE
+    toc: true  
+    page-layout: full      

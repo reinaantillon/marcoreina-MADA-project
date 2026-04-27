@@ -113,7 +113,6 @@ rf_fit_amr %>%
   labs(title = "Variable Importance for AMR Prediction")
 ```
 
-
 ```{r}
 set.seed(rngseed)
 
@@ -151,4 +150,57 @@ test_results <- test_data %>%
 # ROC AUC
 test_results %>% roc_auc(truth = amr_prevalence, .pred_1)
 
+```
+
+# Publication ready tables
+
+```{r}
+library(tibble)
+library(gt)
+library(tidyr)
+
+validation_results <- tibble(
+  Phase = c("10-Fold Cross-Validation (Mean)", "Honest Assessment (Test Set)"),
+  `ROC AUC` = c(0.829, 0.825),
+  `Sensitivity` = c(NA, 0.352),
+  `SE (AUC)` = c(0.00145, NA)
+)
+
+validation_results %>%
+  gt() %>%
+  tab_header(title = "Model Stability and Performance") %>%
+  fmt_number(columns = c(`ROC AUC`, `Sensitivity`), decimals = 3) %>%
+  fmt_missing(columns = everything(), missing_text = "---") %>%
+  opt_stylize(style = 1, color = "gray") %>%
+  gtsave(here("results/tables/validation_results.html"))  
+
+# Data from your Cross-Validation results
+conf_matrix_data <- tibble(
+  ` ` = c("Predicted: Resistant", "Predicted: Susceptible"),
+  `Actual: Resistant` = c(3391, 6236),
+  `Actual: Susceptible` = c(1166, 50650)
+)
+
+conf_matrix_data %>%
+  gt() %>%
+  tab_header(
+    title = "Confusion Matrix",
+    subtitle = "Evaluation on unseen test data (n = 61,443)"
+  ) %>%
+  tab_spanner(
+    label = "Reference (Truth)",
+    columns = 2:3
+  ) %>%
+  # Adding color to highlight the correct predictions (the diagonal)
+  tab_style(
+    style = cell_fill(color = "honeydew"),
+    locations = cells_body(rows = 1, columns = 2) 
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "honeydew"),
+    locations = cells_body(rows = 2, columns = 3)
+  ) %>%
+  cols_align(align = "center", columns = 2:3) %>%
+  opt_stylize(style = 1, color = "gray") %>%
+  gtsave(here("results/tables/conf_matrix.html"))  
 ```

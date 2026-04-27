@@ -225,7 +225,7 @@ pairs(genomes1_pairs_comp)
 cor(genomes1_pairs_comp)
 ```
 
-##### As expected, sequence length seems to be highly correlated with total of genes and total of protein coding genes. However, it is interesting to note that pseudogenes are not correlated with sequence length or any other of the tested parameters. This will be further explored in the descriptive analysis. 
+##### As expected, sequence length seems to be highly correlated with total of genes and total of protein coding genes. However, it is interesting to note that pseudogenes are not correlated with sequence length or any other of the tested parameters. This will be further explored later.
 
 ### Merging both dataframes to assign sources, AMR genotype, and computed serovar
 ```{r}
@@ -290,3 +290,150 @@ ggplot(merged_df2, aes(x = Annotation.Count.Gene.Pseudogene)) + geom_histogram()
 ```
 
 ##### 214 genomes are complete and intersect between both datasets. These will be use only to assess genome structure. Isolates1 will be use to assess AMR genotypes.
+
+# Saving tables and figures for manusctript
+
+```{r}
+library(gt)
+
+# Reshape the data to wide format
+isolates_wide <- isolates1_summary_table %>%
+  mutate(display_val = paste0(scales::comma(n), " (", percent, "%)")) %>%
+  select(Source.type, year, display_val) %>%
+  pivot_wider(names_from = year, values_from = display_val)
+
+# Create the table with 'shrink-to-fit' width
+isolates_wide %>%
+  gt() %>%
+  tab_header(
+    title = "Salmonella Isolate Distribution (2021-2025)",
+    subtitle = "Annual counts and relative percentages by source type"
+  ) %>%
+  tab_spanner(
+    label = "Yearly Distribution [Count (%)]",
+    columns = -Source.type
+  ) %>%
+  cols_label(
+    Source.type = "Source Type"
+  ) %>%
+  tab_source_note(
+    source_note = "Data source: NCBI Pathogen Detection Database."
+  ) %>%
+  opt_stylize(style = 1, color = "gray") %>%
+  tab_options(
+    table.width = NULL, 
+    column_labels.font.weight = "bold",
+    table.align = "center" 
+  ) %>%
+  saveRDS(here("results/tables/isolates1_summary_table_wide.rds"))
+
+
+cor_matrix <- cor(genomes1_pairs_comp) %>% 
+  as.data.frame() %>% 
+  mutate(Variable = rownames(.)) %>%
+  select(Variable, everything())
+
+cor_matrix %>%
+  gt() %>%
+  tab_header(
+    title = "Correlation Matrix of Genomic Features",
+    subtitle = "Pearson correlation coefficients (r) for Salmonella genomes"
+  ) %>%
+  fmt_number(columns = -Variable, decimals = 3) %>%
+  data_color(
+    columns = -Variable,
+    palette = "RdBu",       # Changed to Red-Blue to show negative/positive correlations
+    domain = c(-1, 1)       # Expanded domain to catch negative values
+  ) %>%
+  cols_label(
+    Variable = "Genomic Feature",
+    Protein.coding = "Protein Coding",
+    Gene.Total = "Total Genes"
+  ) %>%
+  tab_footnote(
+    footnote = "Note the low correlation between Pseudogenes and other features.",
+    locations = cells_column_labels(columns = Pseudogene)
+  ) %>% # Moved the pipe outside the locations function
+  saveRDS(here("results/tables/cor_matrix.rds"))
+```
+
+```{r}
+library(ggplot2)
+library(here)
+library(scales)
+
+
+# Standardized Theme for all plots
+pub_theme <- theme_bw() + 
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(face = "bold"),
+    strip.background = element_rect(fill = "gray95"),
+    strip.text = element_text(face = "bold")
+  )
+
+# --- ISOLATES GRAPH 1: Distribution by Year and Source ---
+# Using a stacked bar with a clean color palette
+ggplot(isolates1, aes(x = factor(year), fill = Source.type)) +
+  geom_bar(position = "stack") +
+  scale_fill_viridis_d(option = "mako", name = "Source Type") +
+  labs(
+    title = "Salmonella Isolate Trends (2021-2025)",
+    x = "Year of Collection",
+    y = "Number of Isolates"
+  ) +
+  pub_theme -> isolatesgraph1_pub
+
+# --- ISOLATES GRAPH 2: Predicted AMR Faceted by Source ---
+# Using consistent scales to allow for easier comparison
+ggplot(isolates1, aes(x = factor(year), fill = AMR_predicted)) +
+  geom_bar() +
+  facet_wrap(~ Source.type, scales = "free_y", ncol = 2) +
+  scale_fill_manual(values = c("gray70", "#D55E00"), name = "AMR Predicted") +
+  labs(
+    title = "AMR Prediction Across Sources",
+    x = "Year",
+    y = "Isolate Count"
+  ) +
+  pub_theme -> isolatesgraph2_pub
+
+# --- GENOMES GRAPH 1: Summary of Complete Genomes ---
+# Highlighting the specific subset used for structural analysis
+ggplot(merged_df2, aes(x = Source.type, fill = Source.type)) +
+  geom_bar(show.legend = FALSE) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Source Distribution of Complete Genomes",
+    subtitle = "Subset (n=214) used for genomic structure analysis",
+    x = "Source Type",
+    y = "Count"
+  ) +
+  pub_theme -> genomesgraph1_pub
+```
+
+```{r}
+# Saving Isolate Graph 1
+ggsave(
+  filename = "isolatesgraph1_pub.png",
+  plot = isolatesgraph1_pub,
+  path = here("results/figures/"),
+  width = 8, height = 6, dpi = 300
+)
+
+# Saving Isolate Graph 2 (needs more height due to facets)
+ggsave(
+  filename = "isolatesgraph2_pub.png",
+  plot = isolatesgraph2_pub,
+  path = here("results/figures/"),
+  width = 10, height = 8, dpi = 300
+)
+
+# Saving Genome Graph 1
+ggsave(
+  filename = "genomesgraph1_pub.png",
+  plot = genomesgraph1_pub,
+  path = here("results/figures/"),
+  width = 7, height = 5, dpi = 300
+)
+```

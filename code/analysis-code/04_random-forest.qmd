@@ -361,3 +361,71 @@ all_results %>%
   gtsave(here("results/tables/amr_model_performance.html"))  
 ```
 
+# Publication ready tables and figures 
+
+```{r}
+library(vip)
+library(ggplot2)
+library(here)
+
+# 1. Corrected VIP Plot
+amr_vip_pub <- rf_fit_amr %>%
+  extract_fit_engine() %>%
+  # Use vi_get_variable_importance to pull the permutation scores already calculated by ranger
+  vi() %>% 
+  mutate(Variable = case_when(
+    Variable == "top_20" ~ "Serovar (Top 20)",
+    Variable == "Source.type" ~ "Isolation Source",
+    Variable == "sample_month" ~ "Month of Collection",
+    TRUE ~ Variable
+  )) %>%
+  ggplot(aes(x = reorder(Variable, Importance), y = Importance)) +
+  geom_col(fill = "steelblue", width = 0.7) +
+  coord_flip() +
+  theme_bw() +
+  labs(
+    title = "Predictive Power of Metadata Features",
+    subtitle = "Random Forest: General AMR Prevalence",
+    x = NULL,
+    y = "Importance (Permutation Importance)"
+  ) +
+  theme(plot.title = element_text(face = "bold"))
+
+# Save with publication specs
+ggsave(here("results/figures/amr_vip_publication.png"), amr_vip_pub, dpi = 300, width = 7, height = 4)
+
+# 2. ROC Curve Plot (Remains the same, just ensured amr_roc_pub is assigned)
+amr_roc_pub <- test_pred5 %>%
+  roc_curve(truth = amr_prevalence, .pred_1) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_path(color = "darkred", linewidth = 1) +
+  geom_abline(lty = 3, color = "gray50") + 
+  annotate("text", x = 0.75, y = 0.25, label = "AUC = 0.825", size = 5, fontface = "bold") +
+  theme_bw() +
+  coord_equal() +
+  labs(
+    title = "ROC Curve: General AMR Classification",
+    x = "1 - Specificity (False Positive Rate)",
+    y = "Sensitivity (True Positive Rate)"
+  )
+
+ggsave(here("results/figures/amr_roc_publication.png"), amr_roc_pub, dpi = 300, width = 6, height = 6)
+
+# 3. Probability Density Plot
+amr_density_pub <- ggplot(test_pred5, aes(x = .pred_1, fill = amr_prevalence)) +
+  geom_density(alpha = 0.6, color = "white") +
+  scale_fill_manual(values = c("#D55E00", "#56B4E9"), 
+                    labels = c("Resistant", "Susceptible"),
+                    name = "Observed Status") +
+  theme_bw() +
+  labs(
+    title = "Predicted Probability Distribution",
+    subtitle = "Separation of Resistant vs. Susceptible Classes",
+    x = "Predicted Probability of Resistance",
+    y = "Density"
+  ) +
+  theme(legend.position = "bottom")
+
+ggsave(here("results/figures/amr_density_publication.png"), amr_density_pub, dpi = 300, width = 7, height = 5)
+```
+

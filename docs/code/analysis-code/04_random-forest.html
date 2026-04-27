@@ -75,13 +75,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-cc1d64809b8ed731f92ea1275fe9f05b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-de79ae5b3eed7768cb25c5b16daaf0db.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
+  "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
+  "panel-placement": "start",
+  "type": "textbox",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
@@ -108,68 +108,98 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent quarto-light">
+<body class="nav-sidebar docked quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Marco Reina MADA Project</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../code/eda-code/01_eda.html"> 
-<span class="menu-text">EDA analysis</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../code/analysis-code/02_descriptive-analysis.html"> 
-<span class="menu-text">Descriptive Analysis</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../code/analysis-code/03_model-fitting.html"> 
-<span class="menu-text">Linear Model</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="../../code/analysis-code/04_random-forest.html" aria-current="page"> 
-<span class="menu-text">Random Forest</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../code/analysis-code/05_cross-validation.html"> 
-<span class="menu-text">Cross Validation</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../products/manuscript/Manuscript.docx"> 
-<span class="menu-text">Manuscript</span></a>
-  </li>  
-</ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/reinaantillon/marcoreina-MADA-project"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../code/analysis-code/04_random-forest.html">Random Forest</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Marco Reina MADA Project</a> 
+    </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../code/eda-code/01_eda.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EDA analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../code/analysis-code/02_descriptive-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Descriptive Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../code/analysis-code/03_model-fitting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Model</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../code/analysis-code/04_random-forest.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Random Forest</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../code/analysis-code/05_cross-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cross Validation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../products/manuscript/manuscript-web.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Manuscript (web)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../products/manuscript/Manuscript.docx" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Manuscript (docx)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://github.com/reinaantillon/marcoreina-MADA-project" class="sidebar-item-text sidebar-link" target="_blank"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text">GitHub</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#random-forest-approach" id="toc-random-forest-approach" class="nav-link active" data-scroll-target="#random-forest-approach">RANDOM FOREST APPROACH</a></li>
+  <li><a href="#publication-ready-tables-and-figures" id="toc-publication-ready-tables-and-figures" class="nav-link" data-scroll-target="#publication-ready-tables-and-figures">Publication ready tables and figures</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content column-body" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
@@ -1074,9 +1104,77 @@ Prediction     1     0
 <span id="cb145-43"><a href="#cb145-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data_color</span>(<span class="at">columns =</span> roc_auc, <span class="at">palette =</span> <span class="st">"Blues"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb145-44"><a href="#cb145-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gtsave</span>(<span class="fu">here</span>(<span class="st">"results/tables/amr_model_performance.html"</span>))  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-
-
 </section>
+</section>
+<section id="publication-ready-tables-and-figures" class="level1">
+<h1>Publication ready tables and figures</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb146-3"><a href="#cb146-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb146-4"><a href="#cb146-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-5"><a href="#cb146-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Corrected VIP Plot</span></span>
+<span id="cb146-6"><a href="#cb146-6" aria-hidden="true" tabindex="-1"></a>amr_vip_pub <span class="ot">&lt;-</span> rf_fit_amr <span class="sc">%&gt;%</span></span>
+<span id="cb146-7"><a href="#cb146-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb146-8"><a href="#cb146-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Use vi_get_variable_importance to pull the permutation scores already calculated by ranger</span></span>
+<span id="cb146-9"><a href="#cb146-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb146-10"><a href="#cb146-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="fu">case_when</span>(</span>
+<span id="cb146-11"><a href="#cb146-11" aria-hidden="true" tabindex="-1"></a>    Variable <span class="sc">==</span> <span class="st">"top_20"</span> <span class="sc">~</span> <span class="st">"Serovar (Top 20)"</span>,</span>
+<span id="cb146-12"><a href="#cb146-12" aria-hidden="true" tabindex="-1"></a>    Variable <span class="sc">==</span> <span class="st">"Source.type"</span> <span class="sc">~</span> <span class="st">"Isolation Source"</span>,</span>
+<span id="cb146-13"><a href="#cb146-13" aria-hidden="true" tabindex="-1"></a>    Variable <span class="sc">==</span> <span class="st">"sample_month"</span> <span class="sc">~</span> <span class="st">"Month of Collection"</span>,</span>
+<span id="cb146-14"><a href="#cb146-14" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> Variable</span>
+<span id="cb146-15"><a href="#cb146-15" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb146-16"><a href="#cb146-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Variable, Importance), <span class="at">y =</span> Importance)) <span class="sc">+</span></span>
+<span id="cb146-17"><a href="#cb146-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb146-18"><a href="#cb146-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb146-19"><a href="#cb146-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb146-20"><a href="#cb146-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb146-21"><a href="#cb146-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Predictive Power of Metadata Features"</span>,</span>
+<span id="cb146-22"><a href="#cb146-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Random Forest: General AMR Prevalence"</span>,</span>
+<span id="cb146-23"><a href="#cb146-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb146-24"><a href="#cb146-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Importance (Permutation Importance)"</span></span>
+<span id="cb146-25"><a href="#cb146-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb146-26"><a href="#cb146-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>))</span>
+<span id="cb146-27"><a href="#cb146-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-28"><a href="#cb146-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Save with publication specs</span></span>
+<span id="cb146-29"><a href="#cb146-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">here</span>(<span class="st">"results/figures/amr_vip_publication.png"</span>), amr_vip_pub, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">7</span>, <span class="at">height =</span> <span class="dv">4</span>)</span>
+<span id="cb146-30"><a href="#cb146-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-31"><a href="#cb146-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. ROC Curve Plot (Remains the same, just ensured amr_roc_pub is assigned)</span></span>
+<span id="cb146-32"><a href="#cb146-32" aria-hidden="true" tabindex="-1"></a>amr_roc_pub <span class="ot">&lt;-</span> test_pred5 <span class="sc">%&gt;%</span></span>
+<span id="cb146-33"><a href="#cb146-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> amr_prevalence, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb146-34"><a href="#cb146-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span> <span class="sc">-</span> specificity, <span class="at">y =</span> sensitivity)) <span class="sc">+</span></span>
+<span id="cb146-35"><a href="#cb146-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb146-36"><a href="#cb146-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">lty =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"gray50"</span>) <span class="sc">+</span> </span>
+<span id="cb146-37"><a href="#cb146-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">0.75</span>, <span class="at">y =</span> <span class="fl">0.25</span>, <span class="at">label =</span> <span class="st">"AUC = 0.825"</span>, <span class="at">size =</span> <span class="dv">5</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb146-38"><a href="#cb146-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb146-39"><a href="#cb146-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb146-40"><a href="#cb146-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb146-41"><a href="#cb146-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"ROC Curve: General AMR Classification"</span>,</span>
+<span id="cb146-42"><a href="#cb146-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"1 - Specificity (False Positive Rate)"</span>,</span>
+<span id="cb146-43"><a href="#cb146-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Sensitivity (True Positive Rate)"</span></span>
+<span id="cb146-44"><a href="#cb146-44" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb146-45"><a href="#cb146-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-46"><a href="#cb146-46" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">here</span>(<span class="st">"results/figures/amr_roc_publication.png"</span>), amr_roc_pub, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">6</span>, <span class="at">height =</span> <span class="dv">6</span>)</span>
+<span id="cb146-47"><a href="#cb146-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-48"><a href="#cb146-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Probability Density Plot</span></span>
+<span id="cb146-49"><a href="#cb146-49" aria-hidden="true" tabindex="-1"></a>amr_density_pub <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(test_pred5, <span class="fu">aes</span>(<span class="at">x =</span> .pred_1, <span class="at">fill =</span> amr_prevalence)) <span class="sc">+</span></span>
+<span id="cb146-50"><a href="#cb146-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb146-51"><a href="#cb146-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D55E00"</span>, <span class="st">"#56B4E9"</span>), </span>
+<span id="cb146-52"><a href="#cb146-52" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Resistant"</span>, <span class="st">"Susceptible"</span>),</span>
+<span id="cb146-53"><a href="#cb146-53" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Observed Status"</span>) <span class="sc">+</span></span>
+<span id="cb146-54"><a href="#cb146-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb146-55"><a href="#cb146-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb146-56"><a href="#cb146-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Predicted Probability Distribution"</span>,</span>
+<span id="cb146-57"><a href="#cb146-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Separation of Resistant vs. Susceptible Classes"</span>,</span>
+<span id="cb146-58"><a href="#cb146-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Predicted Probability of Resistance"</span>,</span>
+<span id="cb146-59"><a href="#cb146-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span></span>
+<span id="cb146-60"><a href="#cb146-60" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb146-61"><a href="#cb146-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb146-62"><a href="#cb146-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-63"><a href="#cb146-63" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">here</span>(<span class="st">"results/figures/amr_density_publication.png"</span>), amr_density_pub, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">7</span>, <span class="at">height =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->

@@ -1,0 +1,3359 @@
+
+```{r, echo=FALSE, message=FALSE}
+# load a few R packages
+library(here)
+library(knitr)
+```
+
+# Author 
+## Identifying Key Metadata Predictors of _Salmonella_ AMR Genotypes through Machine Learning
+
+**Author**
+
+-   Marco Reina$^{1}$
+
+
+**Author affiliations**
+
+1.  Department of Poultry Science, University of Georgia, Athens, GA, USA.
+
+$\land$ Corresponding author: marco.reinaantillon\@uga.edu
+
+$\dagger$ The author utilized AI tools, specifically Qween and Gemini, for code troubleshooting; and the use of Copilot to refine the English writing.
+
+{{< pagebreak >}}
+
+# Summary/Abstract
+
+In the United States, nontyphoidal *Salmonella* causes an estimated 1.35 million infections annually, with resistant strains associated with increased hospitalization rates and adverse clinical outcomes. Surveillance systems such as the National Antimicrobial Resistance Monitoring System (NARMS) and NCBI Pathogen Detection generate large-scale genomic and metadata resources that enable data-driven approaches to AMR risk prediction. This project leverages machine learning to predict AMR prevalence in *Salmonella* isolates using readily available metadata, which included isolation source, serotype, and temporal variables. This approach is helpful because expedites the analysis and offers a first quick screening before obtaining the whole-genome sequencing data. Using a curated dataset of 688,980 isolates from the NCBI Pathogen Detection repository, a binary outcome variable model was engineered, which helps indicating presence or absence of resistance to at least one antimicrobial class. A random forest classifier was implemented via the tidymodels framework (Kuhn & Wickham, 2020), with model performance evaluated through 10-fold cross-validation and a held-out test set. Results indicate strong discriminative ability (ROC AUC = 0.825), high specificity (97.7%), and moderate sensitivity (35.2%), reflecting the inherent class imbalance in surveillance data where non-resistant isolates predominate. Variable importance analyses identified isolation source and top-20 serovars (e.g., I 4,\[5\],12:i:-, Infantis, Typhimurium) as key predictors of AMR status. These findings support the feasibility of using metadata-driven models for rapid, scalable AMR risk stratification in food safety and public health surveillance contexts.
+
+[Complete iterative process available here](https://reinaantillon.github.io/marcoreina-MADA-project/)
+
+{{< pagebreak >}}
+
+# Introduction
+
+Antimicrobial resistance (AMR) is a escalating global public health threat, projected to contribute to 10 million deaths annually by 2050 if current trends continue (O'Neill, 2016; World Health Organization, 2024). Foodborne pathogens, particularly nontyphoidal *Salmonella*, which plays a central role in the transmission of resistant bacteria from agricultural and environmental reservoirs to human populations (CDC, 2024). In the United States alone, it is estimated that *Salmonella* causes around 1.35 million illnesses each year, and infections involving resistant strains are associated with longer durations of illness, higher rates of hospitalization, and increased treatment complexity (CDC, 2024; WHO, 2022).
+
+Large-scale surveillance initiatives, like the National Antimicrobial Resistance Monitoring System (NARMS) and the NCBI Pathogen Detection project have generated extensive repositories of bacterial isolate metadata, including source of isolation, serotype, collection date, and geographic origin (CDC, 2026; NCBI, 2026). While whole-genome sequencing offers high-resolution insights into resistance mechanisms, genomic data are not always available in real-time surveillance or resource-limited settings. Metadata, by contrast, are routinely collected, standardized, and immediately accessible. This raises an important question: Can readily available isolate metadata alone support accurate, scalable prediction of AMR status to inform proactive public health interventions?
+
+The objective of this project is to develop and evaluate a machine learning model that predicts antimicrobial resistance prevalence in *Salmonella* isolates using only metadata variables, specifically isolation source, top serovars, and temporal indicators. By leveraging a random forest classifier within the tidymodels framework (Kuhn & Wickham, 2020), this work aims to demonstrate the feasibility of metadata-driven risk stratification as a complementary tool for food safety surveillance and early-warning systems.
+
+#### General Background Information
+
+Antimicrobial resistance in *Salmonella* most frequently involves five clinically important drug classes: β-lactams (including extended-spectrum cephalosporins), fluoroquinolones, aminoglycosides, tetracyclines, and sulfonamides/trimethoprim. Resistance to β-lactams is primarily mediated by β-lactamase enzymes (e.g., TEM, SHV, CTX-M, and carbapenemases like KPC), with over 1,170 distinct genes identified to date. Fluoroquinolone resistance typically arises from chromosomal mutations in gyrA and parC or plasmid-mediated qnr genes. Aminoglycoside resistance commonly involves enzymatic modification via aminoglycoside-modifying enzymes (e.g., aac, aph, aad genes). Tetracycline resistance is frequently conferred by efflux pumps (tetA, tetB) or ribosomal protection proteins (tetM).
+
+Multidrug resistance (MDR), which is defined as non-susceptibility to ≥3 antimicrobial classes, is increasingly prevalent in nontyphoidal *Salmonella* and poses significant treatment challenges. MDR often arises through co-selection mechanisms, where resistance genes cluster on mobile genetic elements (plasmids, integrons, transposons), enabling simultaneous acquisition of resistance to multiple drug classes. Cross-resistance occurs when a single mechanism confers resistance to multiple antimicrobials within or across classes; for example, efflux pumps like AcrAB-TolC can export diverse compounds including fluoroquinolones, β-lactams, and biocides. The emergence of extensively drug-resistant (XDR) strains (resistant to ≥5 classes) has been documented in serovars such as Typhimurium and Infantis, often linked to plasmid acquisition.
+
+Serovar and isolation source are consistently among the strongest predictors of AMR status in *Salmonella* surveillance data. Certain serovars exhibit characteristic resistance profiles: for instance, S. Typhimurium and S. 4,\[5\],12:i:- are frequently associated with the ACSSuT MDR phenotype (ampicillin, chloramphenicol, streptomycin, sulfonamides, tetracycline), while Heidelberg and Infantis increasingly harbor extended-spectrum cephalosporin resistance. Isolation source further refines risk prediction: isolates from poultry and retail meats show higher odds of resistance to tetracyclines and aminoglycosides compared to human clinical isolates, reflecting antimicrobial use patterns in agricultural settings. Metadata capturing serovar and source therefore provide actionable, low-cost proxies for AMR risk stratification in surveillance contexts.
+
+Serovar Infantis has emerged as a globally disseminated, multidrug-resistant clone of particular concern in poultry production systems. Its success is largely attributed to the pESI (p_Salmonella\_ Infantis) megaplasmid (\~280 kb), a conjugative plasmid that carries multiple resistance determinants (e.g., bla<sub>CTX-M-65</sub>, tetA, sul1, dfrA14), virulence factors (iroN, iss), and heavy-metal resistance genes. Strains harboring pESI exhibit significantly higher resistance to ampicillin, cefazolin, gentamicin, nalidixic acid, trimethoprim-sulfamethoxazole, and tetracycline compared to pESI-negative isolates. Critically, pESI is highly stable and transferable across _Salmonella_ serovars, facilitating rapid dissemination of MDR traits across reservoirs. The global expansion of pESI-positive S. Infantis underscores the importance of metadata-driven surveillance to detect and track high-risk clones before they cause widespread outbreaks.
+
+#### Description of Data and Data Source
+
+This project utilizes isolate-level metadata and antimicrobial resistance (AMR) phenotype data from the NCBI Pathogen Detection repository, a centralized platform that integrates genomic sequences, standardized metadata, and AMR annotations from surveillance initiatives including NARMS, GenomeTrakr, and international partners. The analytical dataset comprises 688,980 _Salmonella_ enterica isolates collected from human clinical cases, food animals, retail meats, and environmental sources across the United States between 2010–2024.
+
+#### Key metadata variables include:
+
+Isolation source (e.g., human, food, animal, or environmental) Serovar Collection date (year and month) Geographic origin (state/country) Antimicrobial susceptibility testing (AST) results for 14+ antimicrobials, interpreted using Clinical and Laboratory Standards Institute (CLSI) breakpoints
+
+AMR status was operationalized as a binary outcome: an isolate was classified as "resistant" if it exhibited non-susceptibility to ≥1 antimicrobial class; otherwise, it was classified as "susceptible." This definition aligns with public health priorities for early detection of any resistance emergence. Data preprocessing included removal of isolates with missing source or serovar information, deduplication of genetically identical isolates from the same source/date, and harmonization of serovar nomenclature. All analyses were conducted using de-identified, publicly available data in NCBI data.
+
+#### Questions/Hypotheses to be addressed
+
+Can readily available metadata variables (isolation source, serovar, and collection timing) predict antimicrobial resistance status in _Salmonella_ isolates before obtaining the whole-genome sequencing results?
+
+# Methods
+
+#### Data Preparation and Splitting
+
+Isolate-level metadata and antimicrobial susceptibility data were extracted from the NCBI Pathogen Detection repository. Following quality control, the dataset was partitioned into training (75%) and testing (25%) subsets using stratified random sampling to preserve the original class distribution of antimicrobial resistance (AMR) status. All analyses were conducted on publicly available data in accordance with NCBI data use policies.
+
+#### Feature Engineering and Preprocessing
+
+The outcome variable amr_prevalence was constructed as a binary factor, where "1" indicated resistance to ≥1 antimicrobial class and "0" indicated full susceptibility. Predictor variables were limited to routinely collected metadata: isolation source (Source.type), the 20 most prevalent serovars (top_20, with all others collapsed into an "Other" category), and collection month (sample_month). Categorical predictors were converted to factor type to enable appropriate encoding within the modeling workflow. No additional scaling or transformation was applied.
+
+#### Model Specification and Training
+
+A random forest classifier was implemented using the ranger engine within the tidymodels framework. The model specification (rf_spec) was defined in classification mode and combined with the preprocessing formula into a unified workflow() object: *amr_prevalence \~ Source.type + top_20 + sample_month*. The final model was trained on the complete training dataset, while cross-validated performance was estimated using fit_resamples(). Hyperparameters (e.g., number of trees, mtry, minimum node size) were evaluated at predefined values.
+
+#### Performance Evaluation
+
+Model performance was evaluated on both the cross-validation resamples and the independent held-out test set using the yardstick package. Primary evaluation relied on the receiver operating characteristic area under the curve (ROC AUC), which measures discriminative ability across all probability thresholds and is robust to class imbalance. Secondary metrics included accuracy, sensitivity, specificity, and precision, calculated at the default 0.5 probability cutoff. Predicted class labels and probability scores were extracted via predict() with type = "class" and type = "prob", respectively. A confusion matrix was generated to visualize true/false positive and negative classifications.
+
+#### Cross-Validation
+
+To assess model generalizability and mitigate overfitting, 10-fold cross-validation was applied exclusively to the training set. Folds were generated using vfold_cv(v = 10), which randomly partitions the training data into 10 equally sized, non-overlapping subsets. During resampling, 9 folds were used for model training while the remaining fold served as a validation set. This process was iterated 10 times so that each observation was used exactly once for validation. Performance metrics were aggregated across all resamples to estimate out-of-sample predictive ability.
+
+#### Software and Reproducibility
+
+All data manipulation, modeling, and evaluation were performed in R (v4.x) using the tidymodels collection (v1.2.0), including rsample for resampling, workflows for pipeline integration, parsnip for model specification, ranger (v0.16.0) for random forest computation, and yardstick for metric calculation. A fixed random seed (set.seed()) was applied prior to data splitting, fold generation, and model training to ensure complete reproducibility. Analysis code and outputs are version-controlled and publicly accessible via the project repository.
+
+# Results
+
+#### Exploratory Data Analysis
+
+We conducted an exploratory analysis of over 100,000 _Salmonella_ isolates and a high-quality genomic subset ($n=214$) to characterize trends in antimicrobial resistance (AMR) and genomic architecture. The most critical descriptive results are summarized below.
+
+[Complete EDA analysis here](https://reinaantillon.github.io/marcoreina-MADA-project/code/eda-code/01_eda.html)
+
+#### Isolate Trends and Source Distribution
+
+The vast majority of isolates in this dataset originate from human clinical cases, representing a significant focus on clinical surveillance. As shown in @tbl-summarytable, while clinical samples consistently dominate the dataset, there was a notable increase in food-related isolates during 2023 and 2024.
+
+```{r}
+#| label: tbl-cor-matrix
+#| echo: FALSE
+```
+
+```{=html}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="qhxfsqjatk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>#qhxfsqjatk table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#qhxfsqjatk thead, #qhxfsqjatk tbody, #qhxfsqjatk tfoot, #qhxfsqjatk tr, #qhxfsqjatk td, #qhxfsqjatk th {
+  border-style: none;
+}
+
+#qhxfsqjatk p {
+  margin: 0;
+  padding: 0;
+}
+
+#qhxfsqjatk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#qhxfsqjatk .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#qhxfsqjatk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#qhxfsqjatk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#qhxfsqjatk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qhxfsqjatk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#qhxfsqjatk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qhxfsqjatk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#qhxfsqjatk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#qhxfsqjatk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#qhxfsqjatk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#qhxfsqjatk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#qhxfsqjatk .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#qhxfsqjatk .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#qhxfsqjatk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#qhxfsqjatk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#qhxfsqjatk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#qhxfsqjatk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#qhxfsqjatk .gt_stub {
+  color: #FFFFFF;
+  background-color: #5F5F5F;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #5F5F5F;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qhxfsqjatk .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#qhxfsqjatk .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#qhxfsqjatk .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#qhxfsqjatk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qhxfsqjatk .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#qhxfsqjatk .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#qhxfsqjatk .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#qhxfsqjatk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qhxfsqjatk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#qhxfsqjatk .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#qhxfsqjatk .gt_striped {
+  background-color: #F4F4F4;
+}
+
+#qhxfsqjatk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#qhxfsqjatk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qhxfsqjatk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qhxfsqjatk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qhxfsqjatk .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qhxfsqjatk .gt_left {
+  text-align: left;
+}
+
+#qhxfsqjatk .gt_center {
+  text-align: center;
+}
+
+#qhxfsqjatk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#qhxfsqjatk .gt_font_normal {
+  font-weight: normal;
+}
+
+#qhxfsqjatk .gt_font_bold {
+  font-weight: bold;
+}
+
+#qhxfsqjatk .gt_font_italic {
+  font-style: italic;
+}
+
+#qhxfsqjatk .gt_super {
+  font-size: 65%;
+}
+
+#qhxfsqjatk .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#qhxfsqjatk .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#qhxfsqjatk .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#qhxfsqjatk .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#qhxfsqjatk .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#qhxfsqjatk .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#qhxfsqjatk .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#qhxfsqjatk .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#qhxfsqjatk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="6" class="gt_heading gt_title gt_font_normal" style>Salmonella Isolate Distribution (2021-2025)</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Annual counts and relative percentages by source type</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="Source.type">Source Type</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="5" scope="colgroup" id="Yearly Distribution [Count (%)]">
+        <div class="gt_column_spanner">Yearly Distribution [Count (%)]</div>
+      </th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="a2021">2021</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="a2022">2022</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="a2023">2023</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="a2024">2024</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="a2025">2025</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Source.type" class="gt_row gt_left">animal</td>
+<td headers="2021" class="gt_row gt_right">1,209 (2.7%)</td>
+<td headers="2022" class="gt_row gt_right">1,149 (2.4%)</td>
+<td headers="2023" class="gt_row gt_right">1,187 (2.5%)</td>
+<td headers="2024" class="gt_row gt_right">2,071 (4.7%)</td>
+<td headers="2025" class="gt_row gt_right">977 (1.6%)</td></tr>
+    <tr><td headers="Source.type" class="gt_row gt_left gt_striped">environmental</td>
+<td headers="2021" class="gt_row gt_right gt_striped">825 (1.8%)</td>
+<td headers="2022" class="gt_row gt_right gt_striped">938 (2%)</td>
+<td headers="2023" class="gt_row gt_right gt_striped">975 (2.1%)</td>
+<td headers="2024" class="gt_row gt_right gt_striped">791 (1.8%)</td>
+<td headers="2025" class="gt_row gt_right gt_striped">1,326 (2.1%)</td></tr>
+    <tr><td headers="Source.type" class="gt_row gt_left">food</td>
+<td headers="2021" class="gt_row gt_right">938 (2.1%)</td>
+<td headers="2022" class="gt_row gt_right">833 (1.8%)</td>
+<td headers="2023" class="gt_row gt_right">2,275 (4.9%)</td>
+<td headers="2024" class="gt_row gt_right">4,359 (9.8%)</td>
+<td headers="2025" class="gt_row gt_right">1,500 (2.4%)</td></tr>
+    <tr><td headers="Source.type" class="gt_row gt_left gt_striped">human</td>
+<td headers="2021" class="gt_row gt_right gt_striped">42,314 (93.4%)</td>
+<td headers="2022" class="gt_row gt_right gt_striped">44,015 (93.8%)</td>
+<td headers="2023" class="gt_row gt_right gt_striped">42,417 (90.5%)</td>
+<td headers="2024" class="gt_row gt_right gt_striped">37,171 (83.7%)</td>
+<td headers="2025" class="gt_row gt_right gt_striped">58,502 (93.9%)</td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_sourcenotes">
+      <td class="gt_sourcenote" colspan="6">Data source: NCBI Pathogen Detection Database.</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</body>
+</html>
+```
+
+#### Visualizing AMR and Source Dynamics
+
+The temporal distribution of isolates across different sources is visualized in @fig-isolates-trends. While raw counts are highest in human sources, @fig-isolates-trends reveals that the predicted AMR prevalence remains remarkably high (approximately 97.3%) across all categories, including environmental and animal sources.
+
+```{r}
+#| label: fig-isolates-trends
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/isolatesgraph1_pub.png"))
+```
+
+#### Genomic Structure Analysis
+
+To validate the genomic characteristics of these isolates, we analyzed a subset of 214 complete genomes. As seen in @fig-genomes-source, the distribution of these high-quality genomes spans all major sources. Our Exploratory Analysis confirmed a strong correlation ($r \approx 0.90$) between genome length and protein-coding genes, while pseudogene counts appeared to be independent of these structural metrics.
+
+```{r}
+#| label: fig-genomes-source
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/genomesgraph1_pub.png"))
+```
+
+```{r}
+#| label: tbl-cor-matrix
+#| echo: FALSE
+```
+
+```{=html}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="fulzjjnrrm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>#fulzjjnrrm table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#fulzjjnrrm thead, #fulzjjnrrm tbody, #fulzjjnrrm tfoot, #fulzjjnrrm tr, #fulzjjnrrm td, #fulzjjnrrm th {
+  border-style: none;
+}
+
+#fulzjjnrrm p {
+  margin: 0;
+  padding: 0;
+}
+
+#fulzjjnrrm .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#fulzjjnrrm .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#fulzjjnrrm .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#fulzjjnrrm .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#fulzjjnrrm .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#fulzjjnrrm .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#fulzjjnrrm .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#fulzjjnrrm .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#fulzjjnrrm .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#fulzjjnrrm .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#fulzjjnrrm .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#fulzjjnrrm .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#fulzjjnrrm .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#fulzjjnrrm .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#fulzjjnrrm .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fulzjjnrrm .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#fulzjjnrrm .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#fulzjjnrrm .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#fulzjjnrrm .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fulzjjnrrm .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#fulzjjnrrm .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fulzjjnrrm .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#fulzjjnrrm .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fulzjjnrrm .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#fulzjjnrrm .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fulzjjnrrm .gt_left {
+  text-align: left;
+}
+
+#fulzjjnrrm .gt_center {
+  text-align: center;
+}
+
+#fulzjjnrrm .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#fulzjjnrrm .gt_font_normal {
+  font-weight: normal;
+}
+
+#fulzjjnrrm .gt_font_bold {
+  font-weight: bold;
+}
+
+#fulzjjnrrm .gt_font_italic {
+  font-style: italic;
+}
+
+#fulzjjnrrm .gt_super {
+  font-size: 65%;
+}
+
+#fulzjjnrrm .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#fulzjjnrrm .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#fulzjjnrrm .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#fulzjjnrrm .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#fulzjjnrrm .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#fulzjjnrrm .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#fulzjjnrrm .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#fulzjjnrrm .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#fulzjjnrrm div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="6" class="gt_heading gt_title gt_font_normal" style>Correlation Matrix of Genomic Features</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Pearson correlation coefficients (r) for Salmonella genomes</td>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Variable">Genomic Feature</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Length">Length</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Contigs">Contigs</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Gene.Total">Total Genes</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Protein.coding">Protein Coding</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Pseudogene">Pseudogene<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Variable" class="gt_row gt_left">Length</td>
+<td headers="Length" class="gt_row gt_right" style="background-color: #053061; color: #FFFFFF;">1.000</td>
+<td headers="Contigs" class="gt_row gt_right" style="background-color: #D5E7F1; color: #000000;">0.180</td>
+<td headers="Gene.Total" class="gt_row gt_right" style="background-color: #144B87; color: #FFFFFF;">0.896</td>
+<td headers="Protein.coding" class="gt_row gt_right" style="background-color: #195696; color: #FFFFFF;">0.858</td>
+<td headers="Pseudogene" class="gt_row gt_right" style="background-color: #F2F5F6; color: #000000;">0.026</td></tr>
+    <tr><td headers="Variable" class="gt_row gt_left">Contigs</td>
+<td headers="Length" class="gt_row gt_right" style="background-color: #D5E7F1; color: #000000;">0.180</td>
+<td headers="Contigs" class="gt_row gt_right" style="background-color: #053061; color: #FFFFFF;">1.000</td>
+<td headers="Gene.Total" class="gt_row gt_right" style="background-color: #90C3DD; color: #000000;">0.406</td>
+<td headers="Protein.coding" class="gt_row gt_right" style="background-color: #B0D4E6; color: #000000;">0.306</td>
+<td headers="Pseudogene" class="gt_row gt_right" style="background-color: #C9E1EE; color: #000000;">0.226</td></tr>
+    <tr><td headers="Variable" class="gt_row gt_left">Gene.Total</td>
+<td headers="Length" class="gt_row gt_right" style="background-color: #144B87; color: #FFFFFF;">0.896</td>
+<td headers="Contigs" class="gt_row gt_right" style="background-color: #90C3DD; color: #000000;">0.406</td>
+<td headers="Gene.Total" class="gt_row gt_right" style="background-color: #053061; color: #FFFFFF;">1.000</td>
+<td headers="Protein.coding" class="gt_row gt_right" style="background-color: #134B86; color: #FFFFFF;">0.898</td>
+<td headers="Pseudogene" class="gt_row gt_right" style="background-color: #D7E8F1; color: #000000;">0.171</td></tr>
+    <tr><td headers="Variable" class="gt_row gt_left">Protein.coding</td>
+<td headers="Length" class="gt_row gt_right" style="background-color: #195696; color: #FFFFFF;">0.858</td>
+<td headers="Contigs" class="gt_row gt_right" style="background-color: #B0D4E6; color: #000000;">0.306</td>
+<td headers="Gene.Total" class="gt_row gt_right" style="background-color: #134B86; color: #FFFFFF;">0.898</td>
+<td headers="Protein.coding" class="gt_row gt_right" style="background-color: #053061; color: #FFFFFF;">1.000</td>
+<td headers="Pseudogene" class="gt_row gt_right" style="background-color: #FBC7AD; color: #000000;">−0.273</td></tr>
+    <tr><td headers="Variable" class="gt_row gt_left">Pseudogene</td>
+<td headers="Length" class="gt_row gt_right" style="background-color: #F2F5F6; color: #000000;">0.026</td>
+<td headers="Contigs" class="gt_row gt_right" style="background-color: #C9E1EE; color: #000000;">0.226</td>
+<td headers="Gene.Total" class="gt_row gt_right" style="background-color: #D7E8F1; color: #000000;">0.171</td>
+<td headers="Protein.coding" class="gt_row gt_right" style="background-color: #FBC7AD; color: #000000;">−0.273</td>
+<td headers="Pseudogene" class="gt_row gt_right" style="background-color: #053061; color: #FFFFFF;">1.000</td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="6"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Note the low correlation between Pseudogenes and other features.</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</body>
+</html>
+
+```
+
+## Descriptive analysis
+
+#### Patterns of AMR Class Prevalence and Co-occurrence
+
+[Complete Descriptive analysis here](https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/02_descriptive-analysis.html)
+
+A critical step in our descriptive analysis was the characterization of clinically relevant resistance classes. As noted in our Descriptive Analysis Script, multidrug efflux pumps were excluded from this specific characterization due to their ubiquitous presence (>96% prevalence) across the dataset, which tends to obscure phenotypic resistance trends.
+
+#### Predominant Resistance Classes
+
+Beyond efflux-mediated mechanisms, Tetracycline, Aminoglycoside, and Sulfonamide resistance emerged as the most prevalent classes (@tbl-class-prev). These three classes alone account for the majority of the non-intrinsic resistance detected, suggesting a stable reservoir of these genotypes within the _Salmonella_ population.
+
+```{r}
+#| label: tbl-class-prev
+#| echo: FALSE
+```
+
+```{=html}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="bodazlptar" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>#bodazlptar table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#bodazlptar thead, #bodazlptar tbody, #bodazlptar tfoot, #bodazlptar tr, #bodazlptar td, #bodazlptar th {
+  border-style: none;
+}
+
+#bodazlptar p {
+  margin: 0;
+  padding: 0;
+}
+
+#bodazlptar .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#bodazlptar .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#bodazlptar .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#bodazlptar .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#bodazlptar .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bodazlptar .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#bodazlptar .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bodazlptar .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#bodazlptar .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#bodazlptar .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#bodazlptar .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#bodazlptar .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#bodazlptar .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#bodazlptar .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#bodazlptar .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#bodazlptar .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#bodazlptar .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#bodazlptar .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#bodazlptar .gt_stub {
+  color: #FFFFFF;
+  background-color: #5F5F5F;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #5F5F5F;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bodazlptar .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#bodazlptar .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#bodazlptar .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#bodazlptar .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bodazlptar .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#bodazlptar .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#bodazlptar .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#bodazlptar .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bodazlptar .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#bodazlptar .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#bodazlptar .gt_striped {
+  background-color: #F4F4F4;
+}
+
+#bodazlptar .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#bodazlptar .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bodazlptar .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bodazlptar .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bodazlptar .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bodazlptar .gt_left {
+  text-align: left;
+}
+
+#bodazlptar .gt_center {
+  text-align: center;
+}
+
+#bodazlptar .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#bodazlptar .gt_font_normal {
+  font-weight: normal;
+}
+
+#bodazlptar .gt_font_bold {
+  font-weight: bold;
+}
+
+#bodazlptar .gt_font_italic {
+  font-style: italic;
+}
+
+#bodazlptar .gt_super {
+  font-size: 65%;
+}
+
+#bodazlptar .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#bodazlptar .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#bodazlptar .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#bodazlptar .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#bodazlptar .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#bodazlptar .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#bodazlptar .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#bodazlptar .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#bodazlptar div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="3" class="gt_heading gt_title gt_font_normal" style>Prevalence of Clinically Relevant AMR Classes</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Excluding Efflux Pumps; (n = 245,772 isolates)</td>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="AMR_class">Antimicrobial Class</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="n">Isolate Count</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Percentage">Prevalence (%)</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="AMR_class" class="gt_row gt_left">Tetracycline</td>
+<td headers="n" class="gt_row gt_right">26,572</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #B10026; color: #FFFFFF;">10.8</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Aminoglycoside</td>
+<td headers="n" class="gt_row gt_right gt_striped">24,171</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #CF0D22; color: #FFFFFF;">9.8</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Sulfonamide</td>
+<td headers="n" class="gt_row gt_right">20,618</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #ED3321; color: #FFFFFF;">8.4</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Beta_lactam</td>
+<td headers="n" class="gt_row gt_right gt_striped">17,522</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FD612F; color: #FFFFFF;">7.1</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Phenicol</td>
+<td headers="n" class="gt_row gt_right">10,132</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #FEBC57; color: #000000;">4.1</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Quinolone</td>
+<td headers="n" class="gt_row gt_right gt_striped">8,535</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FFCC68; color: #000000;">3.5</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Trimethoprim</td>
+<td headers="n" class="gt_row gt_right">8,131</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #FED16E; color: #000000;">3.3</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Fosfomycin</td>
+<td headers="n" class="gt_row gt_right gt_striped">6,015</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FFE187; color: #000000;">2.4</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Macrolide</td>
+<td headers="n" class="gt_row gt_right">3,377</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #FFEEA3; color: #000000;">1.4</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Lincosamide</td>
+<td headers="n" class="gt_row gt_right gt_striped">653</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FFFBC3; color: #000000;">0.3</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Rifamycin</td>
+<td headers="n" class="gt_row gt_right">556</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #FFFDC6; color: #000000;">0.2</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Bleomycin</td>
+<td headers="n" class="gt_row gt_right gt_striped">542</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FFFDC6; color: #000000;">0.2</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Colistin</td>
+<td headers="n" class="gt_row gt_right">485</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #FFFDC6; color: #000000;">0.2</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Gentamicin</td>
+<td headers="n" class="gt_row gt_right gt_striped">53</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FFFFCC; color: #000000;">0.0</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left">Streptothricin</td>
+<td headers="n" class="gt_row gt_right">33</td>
+<td headers="Percentage" class="gt_row gt_right" style="background-color: #FFFFCC; color: #000000;">0.0</td></tr>
+    <tr><td headers="AMR_class" class="gt_row gt_left gt_striped">Glycopeptide</td>
+<td headers="n" class="gt_row gt_right gt_striped">1</td>
+<td headers="Percentage" class="gt_row gt_right gt_striped" style="background-color: #FFFFCC; color: #000000;">0.0</td></tr>
+  </tbody>
+  
+</table>
+</div>
+</body>
+</html>
+
+```
+
+#### Multidrug Resistance (MDR) by Source
+
+The distribution of multidrug resistance (defined here as resistance to 3 or more classes) showed distinct patterns across isolation sources (@fig-mdr). While the raw volume of isolates is highest in human clinical samples, a higher proportion of MDR isolates was observed in animal and food-related sources. This suggests that while human surveillance captures more total resistance, the complexity of resistance profiles may be more pronounced in agricultural and production environments.
+
+```{r}
+#| label: fig-mdr
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/amr_mdr_distribution.png"))
+```
+
+#### Genomic Co-occurrence and Correlation
+
+To understand the underlying structure of these resistance profiles, we calculated the co-occurrence of AMR classes using Pearson correlation (@fig-heatmap). Our results highlight a strong positive correlation between Tetracyclines, Aminoglycosides, and Sulfonamides, likely indicating the presence of linked resistance genes on shared mobile genetic elements (MGEs). Conversely, Quinolone and Fosfomycin resistance showed a negative correlation with most other classes, suggesting that these genotypes may emerge in distinct sub-populations of _Salmonella_.
+
+```{r}
+#| label: fig-heatmap
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/amr_correlation_heatmap.png"))
+```
+
+## Full analysis
+
+#### Random Forest to determine AMR
+
+[Complete Random Forest analysis here](https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/04_random-forest.html)
+
+The predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. This selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often rare phenotypes. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (>0.97) paired with lower Sensitivity, establishing a high threshold for "false alarms" that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.
+
+```{r}
+#| label: tbl-model-performance
+#| echo: FALSE
+```
+
+```{=html}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="efpdbgvzfo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>#efpdbgvzfo table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#efpdbgvzfo thead, #efpdbgvzfo tbody, #efpdbgvzfo tfoot, #efpdbgvzfo tr, #efpdbgvzfo td, #efpdbgvzfo th {
+  border-style: none;
+}
+
+#efpdbgvzfo p {
+  margin: 0;
+  padding: 0;
+}
+
+#efpdbgvzfo .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#efpdbgvzfo .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#efpdbgvzfo .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#efpdbgvzfo .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#efpdbgvzfo .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#efpdbgvzfo .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#efpdbgvzfo .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#efpdbgvzfo .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#efpdbgvzfo .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#efpdbgvzfo .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#efpdbgvzfo .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#efpdbgvzfo .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#efpdbgvzfo .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#efpdbgvzfo .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#efpdbgvzfo .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#efpdbgvzfo .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#efpdbgvzfo .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#efpdbgvzfo .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#efpdbgvzfo .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#efpdbgvzfo .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#efpdbgvzfo .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#efpdbgvzfo .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#efpdbgvzfo .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#efpdbgvzfo .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#efpdbgvzfo .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#efpdbgvzfo .gt_left {
+  text-align: left;
+}
+
+#efpdbgvzfo .gt_center {
+  text-align: center;
+}
+
+#efpdbgvzfo .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#efpdbgvzfo .gt_font_normal {
+  font-weight: normal;
+}
+
+#efpdbgvzfo .gt_font_bold {
+  font-weight: bold;
+}
+
+#efpdbgvzfo .gt_font_italic {
+  font-style: italic;
+}
+
+#efpdbgvzfo .gt_super {
+  font-size: 65%;
+}
+
+#efpdbgvzfo .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#efpdbgvzfo .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#efpdbgvzfo .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#efpdbgvzfo .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#efpdbgvzfo .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#efpdbgvzfo .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#efpdbgvzfo .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#efpdbgvzfo .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#efpdbgvzfo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="6" class="gt_heading gt_title gt_font_normal" style>Random Forest Model Performance</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Predicting AMR Classes from Metadata</td>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Model">Resistance Class</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="roc_auc">ROC AUC</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="sens">Sensitivity</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="spec">Specificity</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="accuracy">Accuracy</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="precision">Precision</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Model" class="gt_row gt_left">Tetracycline</td>
+<td headers="roc_auc" class="gt_row gt_right" style="background-color: #307EBC; color: #FFFFFF;">0.837</td>
+<td headers="sens" class="gt_row gt_right">0.354</td>
+<td headers="spec" class="gt_row gt_right">0.976</td>
+<td headers="accuracy" class="gt_row gt_right">0.908</td>
+<td headers="precision" class="gt_row gt_right">0.642</td></tr>
+    <tr><td headers="Model" class="gt_row gt_left">Aminoglycoside</td>
+<td headers="roc_auc" class="gt_row gt_right" style="background-color: #09458B; color: #FFFFFF;">0.847</td>
+<td headers="sens" class="gt_row gt_right">0.343</td>
+<td headers="spec" class="gt_row gt_right">0.977</td>
+<td headers="accuracy" class="gt_row gt_right">0.914</td>
+<td headers="precision" class="gt_row gt_right">0.614</td></tr>
+    <tr><td headers="Model" class="gt_row gt_left">Sulfonamide</td>
+<td headers="roc_auc" class="gt_row gt_right" style="background-color: #08306B; color: #FFFFFF;">0.850</td>
+<td headers="sens" class="gt_row gt_right">0.336</td>
+<td headers="spec" class="gt_row gt_right">0.977</td>
+<td headers="accuracy" class="gt_row gt_right">0.923</td>
+<td headers="precision" class="gt_row gt_right">0.574</td></tr>
+    <tr><td headers="Model" class="gt_row gt_left">Beta-lactam</td>
+<td headers="roc_auc" class="gt_row gt_right" style="background-color: #E6F0F9; color: #000000;">0.812</td>
+<td headers="sens" class="gt_row gt_right">0.289</td>
+<td headers="spec" class="gt_row gt_right">0.982</td>
+<td headers="accuracy" class="gt_row gt_right">0.933</td>
+<td headers="precision" class="gt_row gt_right">0.557</td></tr>
+    <tr><td headers="Model" class="gt_row gt_left">Phenicol</td>
+<td headers="roc_auc" class="gt_row gt_right" style="background-color: #F7FBFF; color: #000000;">0.808</td>
+<td headers="sens" class="gt_row gt_right">0.002</td>
+<td headers="spec" class="gt_row gt_right">1.000</td>
+<td headers="accuracy" class="gt_row gt_right">0.959</td>
+<td headers="precision" class="gt_row gt_right">0.444</td></tr>
+    <tr><td headers="Model" class="gt_row gt_left">General AMR</td>
+<td headers="roc_auc" class="gt_row gt_right" style="background-color: #90C2DE; color: #000000;">0.825</td>
+<td headers="sens" class="gt_row gt_right">0.352</td>
+<td headers="spec" class="gt_row gt_right">0.977</td>
+<td headers="accuracy" class="gt_row gt_right">0.880</td>
+<td headers="precision" class="gt_row gt_right">0.744</td></tr>
+  </tbody>
+  
+</table>
+</div>
+</body>
+</html>
+
+```
+
+This chart ranks metadata variables based on their contribution to the model's predictive accuracy. It shows that Serotype is the most influential predictor, followed by Isolation Source, confirming that specific bacterial lineages and their environments are the primary drivers of antimicrobial resistance patterns in your dataset.
+
+```{r}
+#| label: fig-amr_vip
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/amr_vip_publication.png"))
+```
+
+The Receiver Operating Characteristic (ROC) curve illustrates the model's ability to distinguish between resistant and susceptible isolates across various probability thresholds. With an AUC of 0.825, the curve demonstrates strong discriminative performance, significantly outperforming a random classifier (represented by the diagonal line).
+
+```{r}
+#| label: fig-amr_roc
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/amr_roc_publication.png"))
+```
+
+This plot visualizes the distribution of predicted probabilities for both resistant and susceptible classes. The high density of susceptible isolates at very low probability scores explains the model's exceptional Specificity, while the overlapping region near the center highlights the difficulty in achieving high sensitivity using metadata alone.
+
+```{r}
+#| label: fig-amr_density
+#| echo: FALSE
+knitr::include_graphics(here("results/figures/amr_density_publication.png"))
+```
+
+#### Quality Control
+
+[Complete Random Forest analysis here](https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/05_cross-validation.html)
+
+The Random Forest model demonstrated high stability, with 10-fold cross-validation yielding a mean ROC AUC of 0.829 ($\pm 0.001$ SE). During the honest assessment phase, the model maintained this performance on unseen test data, achieving a final ROC AUC of 0.825 and a sensitivity of 0.352 (@tbl-model-validation). The confusion matrix (@tbl-conf-matrix) illustrates the model's conservative classification strategy; while it correctly identified over 50,000 susceptible isolates with minimal false positives (1,166), it successfully captured roughly one-third of the resistant population using metadata alone. This confirms that while the model is conservative, the resistance predictions it does make are highly reliable.
+
+```{r}
+#| label: tbl-model-validation
+#| echo: FALSE
+```
+
+```{=html}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="haqeipogzr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>#haqeipogzr table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#haqeipogzr thead, #haqeipogzr tbody, #haqeipogzr tfoot, #haqeipogzr tr, #haqeipogzr td, #haqeipogzr th {
+  border-style: none;
+}
+
+#haqeipogzr p {
+  margin: 0;
+  padding: 0;
+}
+
+#haqeipogzr .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#haqeipogzr .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#haqeipogzr .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#haqeipogzr .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#haqeipogzr .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#haqeipogzr .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#haqeipogzr .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#haqeipogzr .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#haqeipogzr .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#haqeipogzr .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#haqeipogzr .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#haqeipogzr .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#haqeipogzr .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#haqeipogzr .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#haqeipogzr .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#haqeipogzr .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#haqeipogzr .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#haqeipogzr .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#haqeipogzr .gt_stub {
+  color: #FFFFFF;
+  background-color: #5F5F5F;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #5F5F5F;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#haqeipogzr .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#haqeipogzr .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#haqeipogzr .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#haqeipogzr .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#haqeipogzr .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#haqeipogzr .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#haqeipogzr .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#haqeipogzr .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#haqeipogzr .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#haqeipogzr .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#haqeipogzr .gt_striped {
+  background-color: #F4F4F4;
+}
+
+#haqeipogzr .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#haqeipogzr .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#haqeipogzr .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#haqeipogzr .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#haqeipogzr .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#haqeipogzr .gt_left {
+  text-align: left;
+}
+
+#haqeipogzr .gt_center {
+  text-align: center;
+}
+
+#haqeipogzr .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#haqeipogzr .gt_font_normal {
+  font-weight: normal;
+}
+
+#haqeipogzr .gt_font_bold {
+  font-weight: bold;
+}
+
+#haqeipogzr .gt_font_italic {
+  font-style: italic;
+}
+
+#haqeipogzr .gt_super {
+  font-size: 65%;
+}
+
+#haqeipogzr .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#haqeipogzr .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#haqeipogzr .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#haqeipogzr .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#haqeipogzr .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#haqeipogzr .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#haqeipogzr .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#haqeipogzr .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#haqeipogzr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border" style>Model Stability and Performance</td>
+    </tr>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Phase">Phase</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="ROC-AUC">ROC AUC</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Sensitivity">Sensitivity</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="SE-(AUC)">SE (AUC)</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Phase" class="gt_row gt_left">10-Fold Cross-Validation (Mean)</td>
+<td headers="ROC AUC" class="gt_row gt_right">0.829</td>
+<td headers="Sensitivity" class="gt_row gt_right">—</td>
+<td headers="SE (AUC)" class="gt_row gt_right">0.00145</td></tr>
+    <tr><td headers="Phase" class="gt_row gt_left gt_striped">Honest Assessment (Test Set)</td>
+<td headers="ROC AUC" class="gt_row gt_right gt_striped">0.825</td>
+<td headers="Sensitivity" class="gt_row gt_right gt_striped">0.352</td>
+<td headers="SE (AUC)" class="gt_row gt_right gt_striped">—</td></tr>
+  </tbody>
+  
+</table>
+</div>
+</body>
+</html>
+
+```
+
+```{r}
+#| label: tbl-conf-matrix
+#| echo: FALSE
+```
+
+```{=html}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+<div id="arbrirrssg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+  <style>#arbrirrssg table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#arbrirrssg thead, #arbrirrssg tbody, #arbrirrssg tfoot, #arbrirrssg tr, #arbrirrssg td, #arbrirrssg th {
+  border-style: none;
+}
+
+#arbrirrssg p {
+  margin: 0;
+  padding: 0;
+}
+
+#arbrirrssg .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #000000;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #000000;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#arbrirrssg .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#arbrirrssg .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#arbrirrssg .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#arbrirrssg .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#arbrirrssg .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#arbrirrssg .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#arbrirrssg .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#arbrirrssg .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#arbrirrssg .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#arbrirrssg .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#arbrirrssg .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#arbrirrssg .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#arbrirrssg .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#arbrirrssg .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+  vertical-align: middle;
+}
+
+#arbrirrssg .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#arbrirrssg .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#arbrirrssg .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D5D5D5;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D5D5D5;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D5D5D5;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#arbrirrssg .gt_stub {
+  color: #FFFFFF;
+  background-color: #5F5F5F;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #5F5F5F;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#arbrirrssg .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#arbrirrssg .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#arbrirrssg .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#arbrirrssg .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#arbrirrssg .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #5F5F5F;
+}
+
+#arbrirrssg .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#arbrirrssg .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#arbrirrssg .gt_grand_summary_row {
+  color: #333333;
+  background-color: #D5D5D5;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#arbrirrssg .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #5F5F5F;
+}
+
+#arbrirrssg .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #5F5F5F;
+}
+
+#arbrirrssg .gt_striped {
+  background-color: #F4F4F4;
+}
+
+#arbrirrssg .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #5F5F5F;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #5F5F5F;
+}
+
+#arbrirrssg .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#arbrirrssg .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#arbrirrssg .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#arbrirrssg .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#arbrirrssg .gt_left {
+  text-align: left;
+}
+
+#arbrirrssg .gt_center {
+  text-align: center;
+}
+
+#arbrirrssg .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#arbrirrssg .gt_font_normal {
+  font-weight: normal;
+}
+
+#arbrirrssg .gt_font_bold {
+  font-weight: bold;
+}
+
+#arbrirrssg .gt_font_italic {
+  font-style: italic;
+}
+
+#arbrirrssg .gt_super {
+  font-size: 65%;
+}
+
+#arbrirrssg .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#arbrirrssg .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#arbrirrssg .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#arbrirrssg .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#arbrirrssg .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#arbrirrssg .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#arbrirrssg .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#arbrirrssg .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#arbrirrssg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+  <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="3" class="gt_heading gt_title gt_font_normal" style>Confusion Matrix</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Evaluation on unseen test data (n = 61,443)</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="a-"> </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="Reference (Truth)">
+        <div class="gt_column_spanner">Reference (Truth)</div>
+      </th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Actual:-Resistant">Actual: Resistant</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Actual:-Susceptible">Actual: Susceptible</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers=" " class="gt_row gt_left">Predicted: Resistant</td>
+<td headers="Actual: Resistant" class="gt_row gt_center" style="background-color: #F0FFF0;">3391</td>
+<td headers="Actual: Susceptible" class="gt_row gt_center">1166</td></tr>
+    <tr><td headers=" " class="gt_row gt_left gt_striped">Predicted: Susceptible</td>
+<td headers="Actual: Resistant" class="gt_row gt_center gt_striped">6236</td>
+<td headers="Actual: Susceptible" class="gt_row gt_center gt_striped" style="background-color: #F0FFF0;">50650</td></tr>
+  </tbody>
+  
+</table>
+</div>
+</body>
+</html>
+
+```
+
+# Discussion
+
+#### Summary and Interpretation
+
+In this study, we developed and evaluated a metadata-driven machine learning framework to predict antimicrobial resistance (AMR) in Salmonella enterica using a large-scale dataset derived from the NCBI Pathogen Detection repository. Specifically, we implemented a random forest classifier using routinely available epidemiological metadata (i.e. isolation source, serovar, and temporal variables) to predict whether an isolate exhibited resistance to at least one antimicrobial class.
+
+The model demonstrated strong discriminative performance (ROC AUC = 0.825), indicating that metadata alone contains substantial predictive signal for AMR status. However, performance was asymmetrical: the model achieved very high specificity (97.7%) but relatively low sensitivity (35.2%). This reflects the strong class imbalance inherent to surveillance datasets, where susceptible isolates predominate, and suggests that the model is conservative in assigning resistance labels. From a public health standpoint, this behavior implies that while the model may miss a proportion of resistant isolates, the predictions it does make are highly reliable and have low false-positive rates.
+
+Variable importance analyses revealed that serovar and isolation source were the dominant predictors of AMR status. This finding is consistent with prior epidemiological and genomic studies showing that resistance traits are not randomly distributed but instead cluster within specific lineages and ecological niches (Zhang et al., 2015). For example, well-characterized serovars such as Typhimurium and Infantis are frequently associated with multidrug resistance due to the presence of mobile genetic elements and lineage-specific adaptations (Feldgarden et al., 2019; McDermott et al., 2016). Similarly, the higher prevalence of resistance observed in food and animal sources aligns with documented antimicrobial usage patterns in agricultural systems and their role as reservoirs for resistant strains (WHO, 2022; Van Boeckel et al., 2015).
+
+Importantly, this study demonstrates that metadata can serve as a scalable and rapid proxy for AMR risk stratification. While whole-genome sequencing remains the gold standard for identifying resistance mechanisms, it is not always available in real-time surveillance contexts (McDermott et al., 2016). Therefore, metadata-driven models such as the one presented here can function as an early-warning or triage tool, prioritizing isolates for further genomic characterization and informing targeted interventions (Aslam et al., 2018).
+
+#### Strengths and Limitations
+
+A major strength of this analysis is the scale and diversity of the dataset, encompassing over 600,000 Salmonella isolates collected across multiple sources, time periods, and geographic locations. This large sample size enhances statistical power, improves model generalizability, and enables the capture of real-world heterogeneity in AMR patterns. Additionally, the use of standardized, publicly available data from surveillance systems such as National Antimicrobial Resistance Monitoring System (NARMS) supports reproducibility and external validity.
+
+From a methodological perspective, the use of a random forest algorithm is well-suited for this application due to its ability to model nonlinear relationships and interactions between categorical predictors without requiring extensive preprocessing (Wright & Ziegler, 2017). The implementation within the tidymodels framework, combined with 10-fold cross-validation and a held-out test set, further strengthens the robustness and reproducibility of the findings.
+
+However, several limitations should be acknowledged. First, the reliance on metadata alone inherently constrains predictive performance, particularly sensitivity. AMR phenotypes are ultimately driven by specific genetic determinants, and the absence of genomic features limits the model’s ability to detect resistance mechanisms that are not strongly associated with serovar or source (McDermott et al., 2016). This likely explains the moderate sensitivity observed and highlights the trade-off between scalability and biological resolution.
+
+Second, the dataset exhibits substantial class imbalance, with a predominance of susceptible isolates. While ROC AUC is robust to imbalance, threshold-dependent metrics such as sensitivity are adversely affected. Alternative strategies, such as class weighting, resampling techniques, or threshold optimization, could improve detection of resistant isolates in future work.
+
+Third, potential biases in surveillance data may influence the results. For example, overrepresentation of human clinical isolates and underrepresentation of certain environmental or animal sources could skew both descriptive patterns and model learning. Additionally, metadata variables such as “isolation source” may be inconsistently reported or lack granularity, introducing noise into the predictors.
+
+Finally, the binary definition of AMR (resistant vs. susceptible to ≥1 class) simplifies a complex phenotype. While appropriate for public health screening, this approach does not capture the spectrum of resistance, including multidrug resistance (MDR) or clinically critical resistance profiles (Aslam et al., 2018). Future models could incorporate more nuanced outcome definitions to better reflect clinical risk.
+
+# Conclusions
+
+This study demonstrates that routinely collected metadata can be effectively leveraged to predict antimicrobial resistance in Salmonella with strong discriminative performance, even in the absence of genomic data. Key predictors such as serovar and isolation source highlight the structured, non-random nature of AMR across ecological and epidemiological contexts. While the model’s high specificity supports its use as a reliable screening or triage tool in surveillance systems, its moderate sensitivity indicates that metadata alone cannot fully capture the complexity of resistance phenotypes. Overall, integrating metadata-driven approaches with genomic data represents a promising path toward more accurate, scalable, and timely AMR risk assessment in food safety and public health.
+
+{{< pagebreak >}}
+
+# References
+
+Aslam, B., Wang, W., Arshad, M. I., Khurshid, M., Muzammil, S., Rasool, M. H., Nisar, M. A., Alvi, R. F., Aslam, M. A., Qamar, M. U., Salamat, M. K. F., & Baloch, Z. (2018). Antibiotic resistance: a rundown of a global crisis. Infection and Drug Resistance, 11, 1645–1658. https://doi.org/10.2147/IDR.S173867 
+
+Centers for Disease Control and Prevention. (2024). Clinical overview of Salmonellosis. https://www.cdc.gov/salmonella/hcp/clinical-overview/index.html
+
+Centers for Disease Control and Prevention. (2026). Data and reports \| NARMS. https://www.cdc.gov/narms/data/index.html
+
+Feldgarden, M., Brover, V., Haft, D. H., Prasad, A. B., Slotta, D. J., Tolstoy, I., Tyson, G. H., Zhao, S., Hsu, C.-H., McDermott, P. F., Tadesse, D. A., Morales, C., Simmons, B., Tillman, G., Wasilenko, J., Folster, J. P., & Klimke, W. (2019). Validating the AMRFinder tool and resistance gene database by using antimicrobial resistance genotype-phenotype correlations in a collection of isolates. Antimicrobial Agents and Chemotherapy, 63(11), e00483-19. https://doi.org/10.1128/AAC.00483-19
+
+Kuhn, M., & Wickham, H. (2020). Tidymodels: A collection of packages for modeling and machine learning using tidyverse principles. https://www.tidymodels.org
+
+McDermott, P. F., Tyson, G. H., Kabera, C., Chen, Y., Li, C., Folster, J. P., Ayers, S. L., Lam, C., Tate, H., & Zhao, S. (2016). Whole-genome sequencing for detecting antimicrobial resistance in nontyphoidal Salmonella. Antimicrobial Agents and Chemotherapy, 60(9), 5515–5520. https://doi.org/10.1128/AAC.01030-16
+
+National Center for Biotechnology Information. (2026). Pathogen Detection. Retrieved April 27, 2026, from https://www.ncbi.nlm.nih.gov/pathogens/
+
+O'Neill, J. (2016). Tackling drug-resistant infections globally: Final report and recommendations. Review on Antimicrobial Resistance. https://amr-review.org
+
+R Core Team. (2024). R: A language and environment for statistical computing (Version 4.4.x) \[Computer software\]. R Foundation for Statistical Computing. https://www.r-project.org
+
+Van Boeckel, T. P., Brower, C., Gilbert, M., Grenfell, B. T., Levin, S. A., Robinson, T. P., Teillant, A., & Laxminarayan, R. (2015). Global trends in antimicrobial use in food animals. Proceedings of the National Academy of Sciences, 112(18), 5649–5654. https://doi.org/10.1073/pnas.1503141112
+
+World Health Organization. (2022). Global antimicrobial resistance and use surveillance system (GLASS) report: 2022. https://www.who.int/publications/i/item/9789240062702
+
+World Health Organization. (2024). Antimicrobial resistance. https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance
+
+Wright, M. N., & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. Journal of Statistical Software, 77(1), 1–17. https://doi.org/10.18637/jss.v077.i01
+
+Zhang, S., Yin, Y., Jones, M. B., Zhang, Z., Deatherage Kaiser, B. L., Dinsmore, B. A., Fitzgerald, C., Fields, P. I., Deng, X., & Salmonella Working Group. (2015). Salmonella serotype determination utilizing high-throughput genome sequencing data. Journal of Clinical Microbiology, 53(5), 1685–1692. https://doi.org/10.1128/JCM.00323-15
