@@ -419,5 +419,103 @@
     "title": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning",
     "section": "Key metadata variables: Genomes dataset",
     "text": "Key metadata variables: Genomes dataset\n\nAssembly Stats: Total sequence length and number of contigs (to assess assembly quality and genome size).\nAnnotation Metrics: Total gene count, protein-coding gene count, and pseudogene count.\nAssembly Level: Classification of the assembly (e.g., “Complete Genome” vs. “Scaffold”).\nRelease Date: The date the genomic annotation was finalized or updated."
+  },
+  {
+    "objectID": "Herber-Review.html",
+    "href": "Herber-Review.html",
+    "title": "Herber Project Review",
+    "section": "",
+    "text": "Title of project:\nIdentifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning\nName of project author(s):\n\nMarco Reina\n\nName of project reviewer:\n\nRiley Herber"
+  },
+  {
+    "objectID": "Herber-Review.html#background-context-and-motivation",
+    "href": "Herber-Review.html#background-context-and-motivation",
+    "title": "Herber Project Review",
+    "section": "3.1 Background, Context and Motivation",
+    "text": "3.1 Background, Context and Motivation\nHow well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n3.1.1 Feedback and Comments\nThe project provides a strong and well-developed background on antimicrobial resistance (AMR), particularly in Salmonella. You effectively connect global public health concerns (e.g., AMR burden projections) with the specific motivation for using metadata-driven approaches. The discussion of surveillance systems like NARMS and NCBI Pathogen Detection is especially helpful in grounding the project in real-world data infrastructure.\n\n\n3.1.2 Summary assessment\n\nstrong contextualization and motivation"
+  },
+  {
+    "objectID": "Herber-Review.html#question-description",
+    "href": "Herber-Review.html#question-description",
+    "title": "Herber Project Review",
+    "section": "3.2 Question description",
+    "text": "3.2 Question description\nHow well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n3.2.1 Feedback and Comments\nI understand you are using metadata predictors to predict AMR status and the ” feasibility of metadata-driven risk stratification,” but what does feasibility mean here? Does it mean the model must preform to a certain standard? Why is it important to eb able to use metadata alone?\n\n\n3.2.2 Summary assessment\n\nquestion/hypotheses somewhat explained"
+  },
+  {
+    "objectID": "Herber-Review.html#data-description",
+    "href": "Herber-Review.html#data-description",
+    "title": "Herber Project Review",
+    "section": "3.3 Data description",
+    "text": "3.3 Data description\nHow well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n3.3.1 Feedback and Comments\nI really appreciated the bulleted list of the key vaariables frome ach dataset. This makes it very easy for the reader to visualize how the data looks and what kind of information is found within each dataset. The data description is detailed and informative, particularly in explaining the data sources (NCBI Pathogen Detection, NARMS), dataset size and filtering steps, and key variables and outcome definition.\n\n\n3.3.2 Summary assessment\n\nsource and overall structure of data well explained"
+  },
+  {
+    "objectID": "Herber-Review.html#data-wrangling-and-exploratory-analysis",
+    "href": "Herber-Review.html#data-wrangling-and-exploratory-analysis",
+    "title": "Herber Project Review",
+    "section": "3.4 Data wrangling and exploratory analysis",
+    "text": "3.4 Data wrangling and exploratory analysis\nHow well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n3.4.1 Feedback and Comments\nThe data wrangling process is thorough and well thought out. You explain each step of the data cleaning process, whichout getting to technical.\nI like how you organized your EDA section becasue this is an area I often find difficult to summarize. I like that you linked your full EDA analysis, but only chose a few for the manuscript and described each figure and what information was learned from each. ### Summary assessment\n\nessentially no weaknesses in wrangling and exploratory component"
+  },
+  {
+    "objectID": "Herber-Review.html#appropriateness-of-analysis",
+    "href": "Herber-Review.html#appropriateness-of-analysis",
+    "title": "Herber Project Review",
+    "section": "3.5 Appropriateness of Analysis",
+    "text": "3.5 Appropriateness of Analysis\nWere the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n3.5.1 Feedback and Comments\nYou do a great job of walking your reader through your analysis and explain each step and figure along the way. You explain why a random forest classifier was selected. You also break down the most important predictors within this RF model and how it preformed. These inclusions make it very easy for the reader to undertad the line of logic for your study.\n\n\n3.5.2 Summary assessment\n\nstrong and reasonable analysis"
+  },
+  {
+    "objectID": "Herber-Review.html#presentation",
+    "href": "Herber-Review.html#presentation",
+    "title": "Herber Project Review",
+    "section": "3.6 Presentation",
+    "text": "3.6 Presentation\nHow well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n3.6.1 Feedback and Comments\nYour figures were very well presented and professionally done, all of which had descriptive names and links to them in the paragraph where they are discussed, which makes it very easy to understand the interpretations of each figure.\n\n\n3.6.2 Summary assessment\n\nresults are very well presented"
+  },
+  {
+    "objectID": "Herber-Review.html#discussionconclusions",
+    "href": "Herber-Review.html#discussionconclusions",
+    "title": "Herber Project Review",
+    "section": "3.7 Discussion/Conclusions",
+    "text": "3.7 Discussion/Conclusions\nAre the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n3.7.1 Feedback and Comments\nThe discussion is very strong. It effectivey contextualizes your main results, interprets model performance in a public health context, and explains the trade-off between sensitivity and specificity.\nThe strengths and limitations are also well thoughtout.\n\n\n3.7.2 Summary assessment\n\nstrong, complete and clear discussion"
+  },
+  {
+    "objectID": "Herber-Review.html#further-comments",
+    "href": "Herber-Review.html#further-comments",
+    "title": "Herber Project Review",
+    "section": "3.8 Further comments",
+    "text": "3.8 Further comments\nI really liked how you made your manuscript a navigable web site, where you can click to each step of the pipeline. I found this very intuitive, and it allowed easy access to all steps of your workflow while reading your manuscipt, if I wanted more information on the process. This is something I am interested in doing for my own future projects."
+  },
+  {
+    "objectID": "Herber-Review.html#structure",
+    "href": "Herber-Review.html#structure",
+    "title": "Herber Project Review",
+    "section": "4.1 Structure",
+    "text": "4.1 Structure\nIs the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all “junk” files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?\n\n4.1.1 Feedback and Comments\nThough you had a rendered webpage linked in your GitHub, I still ran each part of the workflow on my own to make sure everything worked. Everything pahted to the correct location and having your scripts numbered in order made the workflow very easy to follow.\n\n\n4.1.2 Summary assessment\n\nwell structured"
+  },
+  {
+    "objectID": "Herber-Review.html#documentation",
+    "href": "Herber-Review.html#documentation",
+    "title": "Herber Project Review",
+    "section": "4.2 Documentation",
+    "text": "4.2 Documentation\nHow well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?\n\n4.2.1 Feedback and Comments\nYour code doesnt have many comments and each supplementary script doesn’t have much information on what it is doing. Your readme files also have minimal detail about what is in each folder. The steps mentioned in your manuscript, though, are very easy to follow. ### Summary assessment\n\nfully and well documented"
+  },
+  {
+    "objectID": "Herber-Review.html#reproducibility",
+    "href": "Herber-Review.html#reproducibility",
+    "title": "Herber Project Review",
+    "section": "4.3 Reproducibility",
+    "text": "4.3 Reproducibility\nAre all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?\n\n4.3.1 Feedback and Comments\nI did not have any issues rerendering all your scripts and manuscript.\n\n\n4.3.2 Summary assessment\n\nfully reproducible without issues"
+  },
+  {
+    "objectID": "Herber-Review.html#thoroughness",
+    "href": "Herber-Review.html#thoroughness",
+    "title": "Herber Project Review",
+    "section": "4.4 Thoroughness",
+    "text": "4.4 Thoroughness\nHow thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?\n\n4.4.1 Feedback and Comments\nThis study was very thoughtout and there was no lines of logic or context that I felt weren’t explained.\n\n\n4.4.2 Summary assessment\n\nstrong level of thorougness"
+  },
+  {
+    "objectID": "Herber-Review.html#further-comments-1",
+    "href": "Herber-Review.html#further-comments-1",
+    "title": "Herber Project Review",
+    "section": "4.5 Further comments",
+    "text": "4.5 Further comments\nI wish I had more detailed critiques to offer, but I genuinely found very few areas that needed improvement. This project feels like a practically finished product. Everything is clearly presented and well thought out. Great job!"
   }
 ]
