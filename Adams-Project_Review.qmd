@@ -1,0 +1,126 @@
+---
+title: Elle Adams Project Review
+author: Elle Adams
+date: 2026-05-05
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+Title of project: Identifying Key Metadata Predictors of _Salmonella_ AMR Genotypes through Machine Learning
+Name of project author(s): Marco Reina
+Name of project reviewer: Elle Adams
+
+## Background, Context and Motivation
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+Very clear on the problem of antimicrobial resistance, and the limited access to whole genome sequencing tools as opposed to metadata. Sets you up really well for your question/hypothesis. 
+
+### Summary assessment (PICK ONE, DELETE THE OTHERS)
+* strong contextualization and motivation
+
+## Question description
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+### Feedback and Comments
+Can metadata alone be used to predict AMR in *Salmonella* spp. Designing a machine learning model 
+
+### Summary assessment
+* question/hypotheses fully clear
+
+## Data description
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+### Feedback and Comments
+Well explained, no notes
+
+### Summary assessment
+* source and overall structure of data well explained
+
+## Data wrangling and exploratory analysis
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+Looking at yours makes me feel like I should go back and add to mine and explain my process more. Very thorough. 
+
+### Summary assessment
+* essentially no weaknesses in wrangling and exploratory component
+
+## Appropriateness of Analysis
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+Your random forest models are well done and well defended in your manuscript, and you do mention toward the end why you chose to go with random forest. I wonder if you tested any other models anywhere else - only because Prof Handel has talked before about trying multiple and justifying. Not a deal breaker, just wanted to mention. 
+
+### Summary assessment
+* strong and reasonable analysis
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+Very nice
+
+### Summary assessment
+* results are very well presented
+
+## Discussion/Conclusions
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+Really well done
+
+### Summary assessment
+* strong, complete and clear discussion
+
+## Further comments
+Side note: When running your code, I got this warning: Warning message:
+Since gt v0.6.0 `fmt_missing()` is deprecated and will soon be removed.
+ℹ Use `sub_missing()` instead.
+You might want to make this substiution to maintain reproducibility for the the future. 
+
+# Overall project content evaluation
+Evaluate overall features of the project  by filling in the sections below.
+
+## Structure
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+Initially confused where the processing-code.qmd was, but I see you've included what you did in eda.qmd. So no problem. 
+
+### Summary assessment
+* well structured
+
+## Documentation 
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+### Feedback and Comments
+Lots of descriptions of what the code does throughout
+
+### Summary assessment
+* fully and well documented
+
+## Reproducibility
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+I was able to perfectly rerun, the only thing I had to do was install some packages, which is nothing. 
+
+### Summary assessment 
+* fully reproducible without issues
+
+## Thoroughness
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+Extremely thorough, again makes me doubt mine. 
+
+### Summary assessment
+* strong level of thorougness
+
+## Further comments
+N/A
