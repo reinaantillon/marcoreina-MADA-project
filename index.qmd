@@ -1,7 +1,23 @@
 ---
-title: "My website and data analysis project"
+title: "Identifying Key Metadata Predictors of *Salmonella* AMR Genotypes through Machine Learning"
 ---
 
-# Hello I am Marco Reina and you are visiting my project! 
+> **MADA Course Project** | [University of Georgia, Department of Poultry Science](https://poultry.caes.uga.edu/)  
+> 👤 [Marco Reina](https://github.com/reinaantillon) • 📅 Spring 2026
+
+[Web manuscript available here](https://reinaantillon.github.io/marcoreina-MADA-project/products/manuscript/manuscript-web.html)
+
+# Project Overview
+
+This project applies machine learning techniques to identify key metadata predictors associated with antimicrobial resistance (AMR) genotypes in *Salmonella* isolates from poultry sources. Understanding these predictors supports food safety surveillance and targeted intervention strategies in poultry production systems.
+
+# Research Question
+1. Which metadata features (e.g., source, geography, year, serotype) best predict AMR genotypes in *Salmonella*?
+
+# Contributing & Peer Reviews
+This project was developed as part of the MADA course with peer feedback: \
+- Riley Herber\
+- Elle Adams\
+- Sarra Aljawad\
 
 

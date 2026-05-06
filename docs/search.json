@@ -2,16 +2,16 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "My website and data analysis project",
+    "title": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning",
     "section": "",
-    "text": "Hello I am Marco Reina and you are visiting my project!"
+    "text": "MADA Course Project | University of Georgia, Department of Poultry Science\n👤 Marco Reina • 📅 Spring 2026\n\nWeb manuscript available here\n\nProject Overview\nThis project applies machine learning techniques to identify key metadata predictors associated with antimicrobial resistance (AMR) genotypes in Salmonella isolates from poultry sources. Understanding these predictors supports food safety surveillance and targeted intervention strategies in poultry production systems.\n\n\nResearch Question\n\nWhich metadata features (e.g., source, geography, year, serotype) best predict AMR genotypes in Salmonella?\n\n\n\nContributing & Peer Reviews\nThis project was developed as part of the MADA course with peer feedback:\n- Riley Herber\n- Elle Adams\n- Sarra Aljawad"
   },
   {
     "objectID": "products/manuscript/readme.html",
     "href": "products/manuscript/readme.html",
-    "title": "Marco Reina MADA Project",
+    "title": "Manuscript Directory",
     "section": "",
-    "text": "This folder contains a template for an academic manuscript. The content of the template is structured as a report for a class, but you can easily replace it with whatever structure you need.\nMost manuscripts these days have supplementary material, place those into the supplement folder. (You can have the supplement inside the manuscript folder or next to it, whatever is better for your setup).\nFigures/tables/etc. should be pulled from their respective locations by code, as shown in the example.\nBased on what most journals want, it is generally best to have the main manuscript render to a Word file, and the supplement to a PDF. Deviations might be necessary, based on specific circumstances."
+    "text": "Manuscript Directory\nThis folder contains the source files and rendered outputs for the project manuscript: “Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning.”"
   },
   {
     "objectID": "data/processed-data/readme.html",
@@ -947,5 +947,19 @@
     "crumbs": [
       "Logistic Regression Model"
     ]
+  },
+  {
+    "objectID": "index.html#project-overview",
+    "href": "index.html#project-overview",
+    "title": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning",
+    "section": "Project Overview",
+    "text": "Project Overview\nThis project applies machine learning techniques to identify key metadata predictors associated with antimicrobial resistance (AMR) genotypes in Salmonella isolates from poultry sources. Understanding these predictors supports food safety surveillance and targeted intervention strategies in poultry production systems.\n\nResearch Question\n\nWhich metadata features (e.g., source, geography, year, serotype) best predict AMR genotypes in Salmonella?"
+  },
+  {
+    "objectID": "index.html#repository-structure",
+    "href": "index.html#repository-structure",
+    "title": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning",
+    "section": "",
+    "text": "Each qmd file starts with a number that indicates its sequential order.  Please execute the files following that sequence (e.g. “01” first, followed by “02”, etc.)\n\nMain structure\n├── code/ # Analysis scripts and workflows (ordered)\n│ ├── eda-code/ # Exploratory data analysis scripts\n│ │ └── 01_eda\n│ ├── analysis-code/ # Descriptive + modeling analysis\n│ │ └── 02_descriptive-analysis\n│ │ └── 03_model-fitting\n│ │ └── 04_random-forest\n│ │ └── 05_cross-validation\n│ │ └── 06_logistic-regression\n│\n├── data/ # Project datasets\n│ ├── raw/ # Original data (unaltered)\n│ └── processed/ # Cleaned and analysis-ready datasets\n│\n├── docs/ # Rendered Quarto website files (auto-generated)\n│\n├── results/ # Outputs from analysis\n│ ├── figures/ # Plots and visualizations\n│ ├── tables/ # Summary tables\n│\n├── products/ # Final project deliverables\n│ └── manuscript/ # Manuscript outputs"
   }
 ]
