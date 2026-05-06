@@ -44,7 +44,7 @@ Antimicrobial resistance (AMR) is an escalating global public health threat, pro
 
 Large-scale surveillance initiatives, like the National Antimicrobial Resistance Monitoring System (NARMS) and the NCBI Pathogen Detection project have generated extensive repositories of bacterial isolate metadata, including source of isolation, serotype, collection date, and geographic origin (CDC, 2026; NCBI, 2026). While whole-genome sequencing offers high-resolution insights into resistance mechanisms, genomic data are not always available in real-time surveillance or resource-limited settings. In contrast, metadata like source and month of collection are routinely collected and immediately accessible. Additionally, serovar could be determine through different faster methods like serovar-specific qPCR screening, allowing this additional variable to be available before obatining the computed serovar preduiction by whole genome sequencing. This raises an important question: Can readily available isolate metadata alone support accurate, scalable prediction of AMR status to inform proactive public health interventions?
 
-The objective of this project is to develop and evaluate a machine learning model that predicts antimicrobial resistance prevalence in *Salmonella* isolates using only metadata variables, specifically isolation source, top serovars, and temporal indicators, like collection month. By developing a random forest classifier within the tidymodels framework (Kuhn & Wickham, 2020), this work aims to demonstrate the feasibility of metadata-driven risk stratification as a complementary tool for food safety surveillance and early-warning systems.
+The objective of this project is to develop and evaluate a machine learning model that predicts antimicrobial resistance prevalence in *Salmonella* isolates using only metadata variables, specifically isolation source, top serovars, and temporal indicators, like collection month. By developing a random forest classifier within the tidymodels framework (Kuhn & Wickham, 2020), this work aims to demonstrate the feasibility of metadata-driven risk stratification as a complementary tool for food safety surveillance and early-warning systems. We define the "feasibility" of this as the model's capacity to provide a rapid and lower cost screening with high specificity (the ability to accurately classify isolates as resistant or susceptible >95% of the time).
 
 ## General Background Information
 
@@ -81,6 +81,8 @@ AMR status was operationalized as a binary outcome: an isolate was classified as
 ## Questions/Hypotheses to be addressed
 
 Can readily available metadata variables (isolation source, serovar, and collection month) predict antimicrobial resistance status in _Salmonella_ isolates before obtaining the whole-genome sequencing results?
+
+The central aim of this study is to determine if routinely collected metadata can serve as a reliable proxy for antimicrobial resistance (AMR) status in _Salmonella_ before whole-genome sequencing results are available. The utility of this approach lies not in replacing genomic analysis, but in providing a rapid, lower cost triage mechanism that catches a significant portion of resistant strains days before laboratory confirmation (the ability to accurately "rule-in" resistant cases). This could allow labs to fast-track those specific isolates for immediate phenotypic testing or deeper sequencing, rather than waiting for the entire batch to be processed. It is hypothesized that specific metadata features, such as serotype and isolation source, contain a sufficient biological "signal" to achieve a level of discriminative performance (ROC AUC > 0.80) that could be useful for early risk stratification and laboratory prioritization.
 
 # Methods
 
@@ -150,7 +152,7 @@ knitr::include_graphics(here("results/figures/isolatesgraph2_pub.png"))
 
 ### Genomic Structure Analysis
 
-In addition to the primary metadata analysis, a secondary dataset comprising high-quality Salmonella genomes was initially processed to evaluate structural features such as genome length, contig counts, and protein-coding genes. However, this dataset was ultimately excluded from the final predictive modeling phase. The decision to omit these genomic dataset was driven by the significant reduction in sample size that occurred during the intersection of the two databases, which would have compromised the model's ability to generalize across the broader population. Consequently, this study focused exclusively on the metadata features available from the "isolates dataset" to ensure a robust and scalable assessment of AMR trends.
+In addition to the primary metadata analysis, a secondary dataset comprising high-quality _Salmonella_ genomes was initially processed to evaluate structural features such as genome length, contig counts, and protein-coding genes. However, this dataset was ultimately excluded from the final predictive modeling phase. The decision to omit these genomic dataset was driven by the significant reduction in sample size that occurred during the intersection of the two databases, which would have compromised the model's ability to generalize across the broader population. Consequently, this study focused exclusively on the metadata features available from the "isolates dataset" to ensure a robust and scalable assessment of AMR trends.
 
 Our Exploratory Analysis confirmed a strong correlation ($r \approx 0.90$) between genome length and protein-coding genes, while pseudogene counts appeared to be independent of these structural metrics. 
 
@@ -200,11 +202,21 @@ knitr::include_graphics(here("results/figures/amr_correlation_heatmap.png"))
 
 ## Full analysis
 
+First, a Linear Model was constructed to understand genome structure using the dataset "genomes". Nonetheless, this line of analysis was not incorporated in the manuscript due to overfitting and possible leakage in the model. The linear model analysis is included in the project website as supplementary material.
+
+[SUPPLEMENT: Linear model here](https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/03_model-fitting.html)
+
+Second, a baseline Logistic Regression model was constructed and achieved comparable predictive performance (AUC = 0.822) to the Random Forest approach. However, Random Forest was selected as the primary model for two key reasons:
+- Non-linear interaction capture: Random Forests naturally model complex, non-additive relationships between predictors (e.g., isolation source × serotype) without requiring manual specification of interaction terms.
+- Robustness to feature expansion: As additional metadata variables are incorporated, Random Forest provide greater resistance to overfitting and more stable predictions compared to Logistic Regression.
+
+[SUPPLEMENT: Logistic Regression model here](https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/06_logistic-regression.html)
+
 ### Random Forest to determine AMR
 
 [SUPPLEMENT: Complete Random Forest iterations here](https://reinaantillon.github.io/marcoreina-MADA-project/code/analysis-code/04_random-forest.html)
 
-The predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. This selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often mutually exlusive phenotypes as observed in the heatmap. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (>0.97) paired with lower Sensitivity (0.352), establishing a high threshold for "false alarms" that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.
+The predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. Again, this selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often mutually exlusive phenotypes as observed in the heatmap. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (>0.97) paired with lower Sensitivity (0.352), establishing a high threshold for "false alarms" that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.
 
 ```{r}
 #| label: tbl-model-performance
@@ -268,7 +280,7 @@ Importantly, this study demonstrates that metadata can serve as a scalable and r
 
 ## Strengths and Limitations
 
-A major strength of this analysis is the scale and diversity of the dataset, encompassing 245,772 Salmonella isolates collected across multiple sources, and time periods. This large sample size enhances statistical power, improves model generalizability, and enables the capture of real-world heterogeneity in AMR patterns. Additionally, the use of standardized, publicly available data from surveillance systems such as National Antimicrobial Resistance Monitoring System (NARMS) supports reproducibility and external validity.
+A major strength of this analysis is the scale and diversity of the dataset, encompassing 245,772 _Salmonella_ isolates collected across multiple sources, and time periods. This large sample size enhances statistical power, improves model generalizability, and enables the capture of real-world heterogeneity in AMR patterns. Additionally, the use of standardized, publicly available data from surveillance systems such as National Antimicrobial Resistance Monitoring System (NARMS) supports reproducibility and external validity.
 
 From a methodological perspective, the use of a random forest algorithm is well-suited for this application due to its ability to model nonlinear relationships and interactions between categorical predictors without requiring extensive preprocessing (Wright & Ziegler, 2017). The implementation within the tidymodels framework, combined with 10-fold cross-validation and a held-out test set, further strengthens the robustness and reproducibility of the findings.
 
@@ -314,4 +326,4 @@ World Health Organization. (2024). Antimicrobial resistance. https://www.who.int
 
 Wright, M. N., & Ziegler, A. (2017). ranger: A fast implementation of random forests for high dimensional data in C++ and R. Journal of Statistical Software, 77(1), 1–17. https://doi.org/10.18637/jss.v077.i01
 
-Zhang, S., Yin, Y., Jones, M. B., Zhang, Z., Deatherage Kaiser, B. L., Dinsmore, B. A., Fitzgerald, C., Fields, P. I., Deng, X., & Salmonella Working Group. (2015). Salmonella serotype determination utilizing high-throughput genome sequencing data. Journal of Clinical Microbiology, 53(5), 1685–1692. https://doi.org/10.1128/JCM.00323-15
+Zhang, S., Yin, Y., Jones, M. B., Zhang, Z., Deatherage Kaiser, B. L., Dinsmore, B. A., Fitzgerald, C., Fields, P. I., Deng, X., & _Salmonella_ Working Group. (2015). _Salmonella_ serotype determination utilizing high-throughput genome sequencing data. Journal of Clinical Microbiology, 53(5), 1685–1692. https://doi.org/10.1128/JCM.00323-15
