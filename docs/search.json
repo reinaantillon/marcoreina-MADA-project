@@ -18,7 +18,7 @@
     "href": "data/processed-data/readme.html",
     "title": "processed-data",
     "section": "",
-    "text": "processed-data\nThis folder contains data that has been processed and cleaned by code.\nAny files located in here are based on the raw data and can be re-created running the various processing/cleaning code scripts in the code folder.\nYou could add a codebook here, but you could also just provide enough comments in the code that produces the content in this folder for users to understand what is saved in this location."
+    "text": "processed-data\nThis folder contains the original, unaltered data files used for the Salmonella AMR Genotypes Machine Learning project. In accordance with best practices for reproducible research, these files should never be edited directly. All cleaning and preprocessing are handled via scripts in the /code directory.\n\nUsage & Processing\nTo maintain data integrity:\n\nDo Not Modify: Any changes to these files will break the reproducibility of the analysis.\nCleaning: All raw data is imported and cleaned using the project’s R/Quarto scripts.\nOutput: Processed versions of these files are saved in the ../processed-data/ directory."
   },
   {
     "objectID": "code/eda-code/01_eda.html",
@@ -142,7 +142,7 @@
     "href": "products/manuscript/Manuscript.html#full-analysis",
     "title": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning",
     "section": "Full analysis",
-    "text": "Full analysis\n\nRandom Forest to determine AMR\nSUPPLEMENT: Complete Random Forest iterations here\nThe predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. This selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often mutually exlusive phenotypes as observed in the heatmap. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (&gt;0.97) paired with lower Sensitivity (0.352), establishing a high threshold for “false alarms” that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.\n\n\n\n\nTable 4\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis chart ranks metadata variables based on their contribution to the model’s predictive accuracy. It shows that Serotype is the most influential predictor, followed by Isolation Source, confirming that specific bacterial lineages and their environments are the primary drivers of antimicrobial resistance patterns in this dataset.\n\n\n\n\n\n\n\n\nFigure 5\n\n\n\n\n\nThe Receiver Operating Characteristic (ROC) curve illustrates the model’s ability to distinguish between resistant and susceptible isolates across various probability thresholds. With an AUC of 0.825, the curve demonstrates strong discriminative performance, significantly outperforming a random classifier (represented by the diagonal line).\n\n\n\n\n\n\n\n\nFigure 6\n\n\n\n\n\nThis plot visualizes the distribution of predicted probabilities for both resistant and susceptible classes. The high density of susceptible isolates at very low probability scores explains the model’s exceptional specificity, while the overlapping region near the center highlights the difficulty in achieving high sensitivity using metadata alone.\n\n\n\n\n\n\n\n\nFigure 7\n\n\n\n\n\n\n\nQuality Control\nSUPPLEMENT: Complete Quality Control analysis here\nThe Random Forest model demonstrated high stability, with 10-fold cross-validation yielding a mean ROC AUC of 0.829 (\\(\\pm 0.001\\) SE). During the honest assessment phase, the model maintained this performance on unseen test data, achieving a final ROC AUC of 0.825 and a sensitivity of 0.352 (Table 5). The confusion matrix (Table 6) illustrates the model’s conservative classification strategy; while it correctly identified 50,650 susceptible isolates with minimal false positives (1,166), it successfully captured roughly one-third of the resistant population using metadata alone. This confirms that while the model is conservative, the resistance predictions it does make are highly reliable.\n\n\n\n\nTable 5\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTable 6"
+    "text": "Full analysis\nFirst, a Linear Model was constructed to understand genome structure using the dataset “genomes”. Nonetheless, this line of analysis was not incorporated in the manuscript due to overfitting and possible leakage in the model. The linear model analysis is included in the project website as supplementary material.\nSUPPLEMENT: Linear model here\nSecond, a baseline Logistic Regression model was constructed and achieved comparable predictive performance (AUC = 0.822) to the Random Forest approach. However, Random Forest was selected as the primary model for two key reasons: - Non-linear interaction capture: Random Forests naturally model complex, non-additive relationships between predictors (e.g., isolation source × serotype) without requiring manual specification of interaction terms. - Robustness to feature expansion: As additional metadata variables are incorporated, Random Forest provide greater resistance to overfitting and more stable predictions compared to Logistic Regression.\nSUPPLEMENT: Logistic Regression model here\n\nRandom Forest to determine AMR\nSUPPLEMENT: Complete Random Forest iterations here\nThe predictive performance of the Random Forest models was evaluated using metadata-only features, including isolation source, top 20 serotypes, and temporal data (month of collection). While individual resistance classes were modeled, the General AMR prevalence model was selected as the primary representative framework for this study. Again, this selection is driven by several key technical and biological considerations. From a public health perspective, predicting overall antimicrobial prevalence offers a more realistic reflection of surveillance goals by accounting for the cumulative resistance burden rather than focusing on isolated, often mutually exlusive phenotypes as observed in the heatmap. This approach also ensures model stability; for example, specific classes like Phenicol yielded extremely poor sensitivity (0.002) due to severe class imbalance, whereas the general model provides a more robust evaluation of the metadata’s predictive signals. Furthermore, the model exhibits a conservative classification profile characterized by high Specificity (&gt;0.97) paired with lower Sensitivity (0.352), establishing a high threshold for “false alarms” that is advantageous for clinical decision-making. Ultimately, a strong ROC AUC of 0.825 confirms that metadata features (such as isolation source, serotype, and temporal data) contain sufficient diagnostic signal to distinguish between resistant and susceptible isolates even in the absence of genomic sequence data.\n\n\n\n\nTable 4\n\n\n\n\n\n\n\n\n\n\n\n\n\nThis chart ranks metadata variables based on their contribution to the model’s predictive accuracy. It shows that Serotype is the most influential predictor, followed by Isolation Source, confirming that specific bacterial lineages and their environments are the primary drivers of antimicrobial resistance patterns in this dataset.\n\n\n\n\n\n\n\n\nFigure 5\n\n\n\n\n\nThe Receiver Operating Characteristic (ROC) curve illustrates the model’s ability to distinguish between resistant and susceptible isolates across various probability thresholds. With an AUC of 0.825, the curve demonstrates strong discriminative performance, significantly outperforming a random classifier (represented by the diagonal line).\n\n\n\n\n\n\n\n\nFigure 6\n\n\n\n\n\nThis plot visualizes the distribution of predicted probabilities for both resistant and susceptible classes. The high density of susceptible isolates at very low probability scores explains the model’s exceptional specificity, while the overlapping region near the center highlights the difficulty in achieving high sensitivity using metadata alone.\n\n\n\n\n\n\n\n\nFigure 7\n\n\n\n\n\n\n\nQuality Control\nSUPPLEMENT: Complete Quality Control analysis here\nThe Random Forest model demonstrated high stability, with 10-fold cross-validation yielding a mean ROC AUC of 0.829 (\\(\\pm 0.001\\) SE). During the honest assessment phase, the model maintained this performance on unseen test data, achieving a final ROC AUC of 0.825 and a sensitivity of 0.352 (Table 5). The confusion matrix (Table 6) illustrates the model’s conservative classification strategy; while it correctly identified 50,650 susceptible isolates with minimal false positives (1,166), it successfully captured roughly one-third of the resistant population using metadata alone. This confirms that while the model is conservative, the resistance predictions it does make are highly reliable.\n\n\n\n\nTable 5\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTable 6"
   },
   {
     "objectID": "products/manuscript/Manuscript.html#summary-and-interpretation",
@@ -517,5 +517,435 @@
     "title": "Herber Project Review",
     "section": "4.5 Further comments",
     "text": "4.5 Further comments\nI wish I had more detailed critiques to offer, but I genuinely found very few areas that needed improvement. This project feels like a practically finished product. Everything is clearly presented and well thought out. Great job!"
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html",
+    "href": "reviews/Adams-Project_Review.html",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Title of project: Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning Name of project author(s): Marco Reina Name of project reviewer: Elle Adams\n\n\nHow well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n\nVery clear on the problem of antimicrobial resistance, and the limited access to whole genome sequencing tools as opposed to metadata. Sets you up really well for your question/hypothesis.\n\n\n\n\nstrong contextualization and motivation\n\n\n\n\n\nHow well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n\nCan metadata alone be used to predict AMR in Salmonella spp. Designing a machine learning model\n\n\n\n\nquestion/hypotheses fully clear\n\n\n\n\n\nHow well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n\nWell explained, no notes\n\n\n\n\nsource and overall structure of data well explained\n\n\n\n\n\nHow well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n\nLooking at yours makes me feel like I should go back and add to mine and explain my process more. Very thorough.\n\n\n\n\nessentially no weaknesses in wrangling and exploratory component\n\n\n\n\n\nWere the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n\nYour random forest models are well done and well defended in your manuscript, and you do mention toward the end why you chose to go with random forest. I wonder if you tested any other models anywhere else - only because Prof Handel has talked before about trying multiple and justifying. Not a deal breaker, just wanted to mention.\n\n\n\n\nstrong and reasonable analysis\n\n\n\n\n\nHow well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n\nVery nice\n\n\n\n\nresults are very well presented\n\n\n\n\n\nAre the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n\nReally well done\n\n\n\n\nstrong, complete and clear discussion\n\n\n\n\n\nSide note: When running your code, I got this warning: Warning message: Since gt v0.6.0 fmt_missing() is deprecated and will soon be removed. ℹ Use sub_missing() instead. You might want to make this substiution to maintain reproducibility for the the future.",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#background-context-and-motivation",
+    "href": "reviews/Adams-Project_Review.html#background-context-and-motivation",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n\nVery clear on the problem of antimicrobial resistance, and the limited access to whole genome sequencing tools as opposed to metadata. Sets you up really well for your question/hypothesis.\n\n\n\n\nstrong contextualization and motivation",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#question-description",
+    "href": "reviews/Adams-Project_Review.html#question-description",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n\nCan metadata alone be used to predict AMR in Salmonella spp. Designing a machine learning model\n\n\n\n\nquestion/hypotheses fully clear",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#data-description",
+    "href": "reviews/Adams-Project_Review.html#data-description",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n\nWell explained, no notes\n\n\n\n\nsource and overall structure of data well explained",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "href": "reviews/Adams-Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n\nLooking at yours makes me feel like I should go back and add to mine and explain my process more. Very thorough.\n\n\n\n\nessentially no weaknesses in wrangling and exploratory component",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#appropriateness-of-analysis",
+    "href": "reviews/Adams-Project_Review.html#appropriateness-of-analysis",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n\nYour random forest models are well done and well defended in your manuscript, and you do mention toward the end why you chose to go with random forest. I wonder if you tested any other models anywhere else - only because Prof Handel has talked before about trying multiple and justifying. Not a deal breaker, just wanted to mention.\n\n\n\n\nstrong and reasonable analysis",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#presentation",
+    "href": "reviews/Adams-Project_Review.html#presentation",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n\nVery nice\n\n\n\n\nresults are very well presented",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#discussionconclusions",
+    "href": "reviews/Adams-Project_Review.html#discussionconclusions",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n\nReally well done\n\n\n\n\nstrong, complete and clear discussion",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#further-comments",
+    "href": "reviews/Adams-Project_Review.html#further-comments",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Side note: When running your code, I got this warning: Warning message: Since gt v0.6.0 fmt_missing() is deprecated and will soon be removed. ℹ Use sub_missing() instead. You might want to make this substiution to maintain reproducibility for the the future.",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#structure",
+    "href": "reviews/Adams-Project_Review.html#structure",
+    "title": "Elle Adams Project Review",
+    "section": "2.1 Structure",
+    "text": "2.1 Structure\nIs the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all “junk” files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?\n\n2.1.1 Feedback and Comments\nInitially confused where the processing-code.qmd was, but I see you’ve included what you did in eda.qmd. So no problem.\n\n\n2.1.2 Summary assessment\n\nwell structured",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#documentation",
+    "href": "reviews/Adams-Project_Review.html#documentation",
+    "title": "Elle Adams Project Review",
+    "section": "2.2 Documentation",
+    "text": "2.2 Documentation\nHow well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?\n\n2.2.1 Feedback and Comments\nLots of descriptions of what the code does throughout\n\n\n2.2.2 Summary assessment\n\nfully and well documented",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#reproducibility",
+    "href": "reviews/Adams-Project_Review.html#reproducibility",
+    "title": "Elle Adams Project Review",
+    "section": "2.3 Reproducibility",
+    "text": "2.3 Reproducibility\nAre all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?\n\n2.3.1 Feedback and Comments\nI was able to perfectly rerun, the only thing I had to do was install some packages, which is nothing.\n\n\n2.3.2 Summary assessment\n\nfully reproducible without issues",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#thoroughness",
+    "href": "reviews/Adams-Project_Review.html#thoroughness",
+    "title": "Elle Adams Project Review",
+    "section": "2.4 Thoroughness",
+    "text": "2.4 Thoroughness\nHow thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?\n\n2.4.1 Feedback and Comments\nExtremely thorough, again makes me doubt mine.\n\n\n2.4.2 Summary assessment\n\nstrong level of thorougness",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Adams-Project_Review.html#further-comments-1",
+    "href": "reviews/Adams-Project_Review.html#further-comments-1",
+    "title": "Elle Adams Project Review",
+    "section": "2.5 Further comments",
+    "text": "2.5 Further comments\nN/A",
+    "crumbs": [
+      "Reviewer 1"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html",
+    "href": "reviews/Aljawad_Project_Review.html",
+    "title": "Al Jawad Project review",
+    "section": "",
+    "text": "Title of project:\nIdentifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning\nName of project author(s):\nMarco Reina\nName of project reviewer:\nSaraa Al Jawad",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#background-context-and-motivation",
+    "href": "reviews/Aljawad_Project_Review.html#background-context-and-motivation",
+    "title": "Al Jawad Project review",
+    "section": "3.1 Background, Context and Motivation",
+    "text": "3.1 Background, Context and Motivation\nHow well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n3.1.1 Feedback and Comments\nThe background is comprehensive and demonstrates strong subject knowledge, particularly in explaining antimicrobial resistance mechanisms and their relevance in Salmonella. The manuscript does a good job connecting surveillance systems to the availability of large-scale metadata.\n\n\n3.1.2 Summary assessment (PICK ONE, DELETE THE OTHERS)\n\nstrong contextualization and motivation",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#question-description",
+    "href": "reviews/Aljawad_Project_Review.html#question-description",
+    "title": "Al Jawad Project review",
+    "section": "3.2 Question description",
+    "text": "3.2 Question description\nHow well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n3.2.1 Feedback and Comments\nThe question is clear, but it is not clear what level of performance is considered good enough for the model to be useful.\n\n\n3.2.2 Summary assessment\n\nquestion/hypotheses somewhat explained",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#data-description",
+    "href": "reviews/Aljawad_Project_Review.html#data-description",
+    "title": "Al Jawad Project review",
+    "section": "3.3 Data description",
+    "text": "3.3 Data description\nHow well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n3.3.1 Feedback and Comments\nThe dataset is well described. The explanation of how the binary AMR outcome is constructed is clear and appropriate.\n\n\n3.3.2 Summary assessment\n\nsource and overall structure of data well explained",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "href": "reviews/Aljawad_Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "title": "Al Jawad Project review",
+    "section": "3.4 Data wrangling and exploratory analysis",
+    "text": "3.4 Data wrangling and exploratory analysis\nHow well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n3.4.1 Feedback and Comments\nThe preprocessing steps are logical and well structured. The filtering and cleaning decisions are reasonable and aligned with the study goals.\n\n\n3.4.2 Summary assessment\n\nessentially no weaknesses in wrangling and exploratory component",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#appropriateness-of-analysis",
+    "href": "reviews/Aljawad_Project_Review.html#appropriateness-of-analysis",
+    "title": "Al Jawad Project review",
+    "section": "3.5 Appropriateness of Analysis",
+    "text": "3.5 Appropriateness of Analysis\nWere the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n3.5.1 Feedback and Comments\nThe choice of Random Forest is appropriate given the categorical nature of the predictors and the potential for nonlinear relationships. The evaluation approach (cross-validation + test set) is strong and demonstrates good modeling practice. The analysis could be improved by comparing it with other modeles such as logistic regression or LASSO. This would help show whether the machine learning model provides better performance compared to a baseline method.\n\n\n3.5.2 Summary assessment\n\nstrong and reasonable analysis",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#presentation",
+    "href": "reviews/Aljawad_Project_Review.html#presentation",
+    "title": "Al Jawad Project review",
+    "section": "3.6 Presentation",
+    "text": "3.6 Presentation\nHow well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n3.6.1 Feedback and Comments\nThe presentation is clear and well organized. Figures are readable and support the text effectively. One strength is the logical flow from EDA → modeling → evaluation, which makes the manuscript easy to follow.\n\n\n3.6.2 Summary assessment\n\nresults are very well presented",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#discussionconclusions",
+    "href": "reviews/Aljawad_Project_Review.html#discussionconclusions",
+    "title": "Al Jawad Project review",
+    "section": "3.7 Discussion/Conclusions",
+    "text": "3.7 Discussion/Conclusions\nAre the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n3.7.1 Feedback and Comments\nThe discussion appropriately interprets the results and acknowledges key limitations.\n\n\n3.7.2 Summary assessment\n\nstrong, complete and clear discussion",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#further-comments",
+    "href": "reviews/Aljawad_Project_Review.html#further-comments",
+    "title": "Al Jawad Project review",
+    "section": "3.8 Further comments",
+    "text": "3.8 Further comments\nThe project is very well done overall. The analysis and results are clearly explained and easy to follow. I also like how you presented the project as a web-based format, which makes it easy to navigate and explore.",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#structure",
+    "href": "reviews/Aljawad_Project_Review.html#structure",
+    "title": "Al Jawad Project review",
+    "section": "4.1 Structure",
+    "text": "4.1 Structure\nIs the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all “junk” files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?\n\n4.1.1 Feedback and Comments\nThe repository is well organized, with clearly labeled folders (code, data, results, manuscript). The workflow is easy to follow, and the numbering of scripts improves usability. The structure makes it easy to understand how different components connect.\n\n\n4.1.2 Summary assessment\n\nwell structured",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#documentation",
+    "href": "reviews/Aljawad_Project_Review.html#documentation",
+    "title": "Al Jawad Project review",
+    "section": "4.2 Documentation",
+    "text": "4.2 Documentation\nHow well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?\n\n4.2.1 Feedback and Comments\nThe documentation is clear and easy to follow. The workflow is easy to understand, and I was able to follow the steps without difficulty. Adding a bit more detail in the README file could make it even clearer for new users.\n\n\n4.2.2 Summary assessment\n\nfully and well documented",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#reproducibility",
+    "href": "reviews/Aljawad_Project_Review.html#reproducibility",
+    "title": "Al Jawad Project review",
+    "section": "4.3 Reproducibility",
+    "text": "4.3 Reproducibility\nAre all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?\n\n4.3.1 Feedback and Comments\nThe project appears reproducible, with clear structure and use of consistent tools. I did not encounter issues when reviewing the workflow.\n\n\n4.3.2 Summary assessment\n\nfully reproducible without issues",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#thoroughness",
+    "href": "reviews/Aljawad_Project_Review.html#thoroughness",
+    "title": "Al Jawad Project review",
+    "section": "4.4 Thoroughness",
+    "text": "4.4 Thoroughness\nHow thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?\n\n4.4.1 Feedback and Comments\nThe study is thorough in terms of data processing and modeling workflow.\n\n\n4.4.2 Summary assessment\n\nstrong level of thorougness",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Aljawad_Project_Review.html#further-comments-1",
+    "href": "reviews/Aljawad_Project_Review.html#further-comments-1",
+    "title": "Al Jawad Project review",
+    "section": "4.5 Further comments",
+    "text": "4.5 Further comments\nThis is a strong and well-structured project that demonstrates a solid understanding of both the biological context and machine learning workflow. Great job!",
+    "crumbs": [
+      "Reviewer 2"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html",
+    "href": "reviews/Herber-Review.html",
+    "title": "Herber Project Review",
+    "section": "",
+    "text": "Title of project:\nIdentifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning\nName of project author(s):\n\nMarco Reina\n\nName of project reviewer:\n\nRiley Herber",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#background-context-and-motivation",
+    "href": "reviews/Herber-Review.html#background-context-and-motivation",
+    "title": "Herber Project Review",
+    "section": "3.1 Background, Context and Motivation",
+    "text": "3.1 Background, Context and Motivation\nHow well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n3.1.1 Feedback and Comments\nThe project provides a strong and well-developed background on antimicrobial resistance (AMR), particularly in Salmonella. You effectively connect global public health concerns (e.g., AMR burden projections) with the specific motivation for using metadata-driven approaches. The discussion of surveillance systems like NARMS and NCBI Pathogen Detection is especially helpful in grounding the project in real-world data infrastructure.\n\n\n3.1.2 Summary assessment\n\nstrong contextualization and motivation",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#question-description",
+    "href": "reviews/Herber-Review.html#question-description",
+    "title": "Herber Project Review",
+    "section": "3.2 Question description",
+    "text": "3.2 Question description\nHow well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n3.2.1 Feedback and Comments\nI understand you are using metadata predictors to predict AMR status and the ” feasibility of metadata-driven risk stratification,” but what does feasibility mean here? Does it mean the model must preform to a certain standard? Why is it important to eb able to use metadata alone?\n\n\n3.2.2 Summary assessment\n\nquestion/hypotheses somewhat explained",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#data-description",
+    "href": "reviews/Herber-Review.html#data-description",
+    "title": "Herber Project Review",
+    "section": "3.3 Data description",
+    "text": "3.3 Data description\nHow well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n3.3.1 Feedback and Comments\nI really appreciated the bulleted list of the key vaariables frome ach dataset. This makes it very easy for the reader to visualize how the data looks and what kind of information is found within each dataset. The data description is detailed and informative, particularly in explaining the data sources (NCBI Pathogen Detection, NARMS), dataset size and filtering steps, and key variables and outcome definition.\n\n\n3.3.2 Summary assessment\n\nsource and overall structure of data well explained",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#data-wrangling-and-exploratory-analysis",
+    "href": "reviews/Herber-Review.html#data-wrangling-and-exploratory-analysis",
+    "title": "Herber Project Review",
+    "section": "3.4 Data wrangling and exploratory analysis",
+    "text": "3.4 Data wrangling and exploratory analysis\nHow well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n3.4.1 Feedback and Comments\nThe data wrangling process is thorough and well thought out. You explain each step of the data cleaning process, whichout getting to technical.\nI like how you organized your EDA section becasue this is an area I often find difficult to summarize. I like that you linked your full EDA analysis, but only chose a few for the manuscript and described each figure and what information was learned from each. ### Summary assessment\n\nessentially no weaknesses in wrangling and exploratory component",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#appropriateness-of-analysis",
+    "href": "reviews/Herber-Review.html#appropriateness-of-analysis",
+    "title": "Herber Project Review",
+    "section": "3.5 Appropriateness of Analysis",
+    "text": "3.5 Appropriateness of Analysis\nWere the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n3.5.1 Feedback and Comments\nYou do a great job of walking your reader through your analysis and explain each step and figure along the way. You explain why a random forest classifier was selected. You also break down the most important predictors within this RF model and how it preformed. These inclusions make it very easy for the reader to undertad the line of logic for your study.\n\n\n3.5.2 Summary assessment\n\nstrong and reasonable analysis",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#presentation",
+    "href": "reviews/Herber-Review.html#presentation",
+    "title": "Herber Project Review",
+    "section": "3.6 Presentation",
+    "text": "3.6 Presentation\nHow well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n3.6.1 Feedback and Comments\nYour figures were very well presented and professionally done, all of which had descriptive names and links to them in the paragraph where they are discussed, which makes it very easy to understand the interpretations of each figure.\n\n\n3.6.2 Summary assessment\n\nresults are very well presented",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#discussionconclusions",
+    "href": "reviews/Herber-Review.html#discussionconclusions",
+    "title": "Herber Project Review",
+    "section": "3.7 Discussion/Conclusions",
+    "text": "3.7 Discussion/Conclusions\nAre the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n3.7.1 Feedback and Comments\nThe discussion is very strong. It effectivey contextualizes your main results, interprets model performance in a public health context, and explains the trade-off between sensitivity and specificity.\nThe strengths and limitations are also well thoughtout.\n\n\n3.7.2 Summary assessment\n\nstrong, complete and clear discussion",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#further-comments",
+    "href": "reviews/Herber-Review.html#further-comments",
+    "title": "Herber Project Review",
+    "section": "3.8 Further comments",
+    "text": "3.8 Further comments\nI really liked how you made your manuscript a navigable web site, where you can click to each step of the pipeline. I found this very intuitive, and it allowed easy access to all steps of your workflow while reading your manuscipt, if I wanted more information on the process. This is something I am interested in doing for my own future projects.",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#structure",
+    "href": "reviews/Herber-Review.html#structure",
+    "title": "Herber Project Review",
+    "section": "4.1 Structure",
+    "text": "4.1 Structure\nIs the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all “junk” files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?\n\n4.1.1 Feedback and Comments\nThough you had a rendered webpage linked in your GitHub, I still ran each part of the workflow on my own to make sure everything worked. Everything pahted to the correct location and having your scripts numbered in order made the workflow very easy to follow.\n\n\n4.1.2 Summary assessment\n\nwell structured",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#documentation",
+    "href": "reviews/Herber-Review.html#documentation",
+    "title": "Herber Project Review",
+    "section": "4.2 Documentation",
+    "text": "4.2 Documentation\nHow well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?\n\n4.2.1 Feedback and Comments\nYour code doesnt have many comments and each supplementary script doesn’t have much information on what it is doing. Your readme files also have minimal detail about what is in each folder. The steps mentioned in your manuscript, though, are very easy to follow. ### Summary assessment\n\nfully and well documented",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#reproducibility",
+    "href": "reviews/Herber-Review.html#reproducibility",
+    "title": "Herber Project Review",
+    "section": "4.3 Reproducibility",
+    "text": "4.3 Reproducibility\nAre all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?\n\n4.3.1 Feedback and Comments\nI did not have any issues rerendering all your scripts and manuscript.\n\n\n4.3.2 Summary assessment\n\nfully reproducible without issues",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#thoroughness",
+    "href": "reviews/Herber-Review.html#thoroughness",
+    "title": "Herber Project Review",
+    "section": "4.4 Thoroughness",
+    "text": "4.4 Thoroughness\nHow thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?\n\n4.4.1 Feedback and Comments\nThis study was very thoughtout and there was no lines of logic or context that I felt weren’t explained.\n\n\n4.4.2 Summary assessment\n\nstrong level of thorougness",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "reviews/Herber-Review.html#further-comments-1",
+    "href": "reviews/Herber-Review.html#further-comments-1",
+    "title": "Herber Project Review",
+    "section": "4.5 Further comments",
+    "text": "4.5 Further comments\nI wish I had more detailed critiques to offer, but I genuinely found very few areas that needed improvement. This project feels like a practically finished product. Everything is clearly presented and well thought out. Great job!",
+    "crumbs": [
+      "Reviewer 3"
+    ]
+  },
+  {
+    "objectID": "code/analysis-code/06_logistic-regression.html",
+    "href": "code/analysis-code/06_logistic-regression.html",
+    "title": "Logistic regression",
+    "section": "",
+    "text": "Logistic regression\nThis model was constructed to compare against the Random Forest approach\n\n# Loading libraries\nlibrary(lubridate)\n\n\nAttaching package: 'lubridate'\n\n\nThe following objects are masked from 'package:base':\n\n    date, intersect, setdiff, union\n\nlibrary(tidyverse)\n\n── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n✔ dplyr   1.1.4     ✔ readr   2.2.0\n✔ forcats 1.0.1     ✔ stringr 1.6.0\n✔ ggplot2 3.5.2     ✔ tibble  3.2.1\n✔ purrr   1.2.1     ✔ tidyr   1.3.2\n\n\n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors\n\nlibrary(tidymodels)\n\n── Attaching packages ────────────────────────────────────── tidymodels 1.4.1 ──\n✔ broom        1.0.12     ✔ rsample      1.3.2 \n✔ dials        1.4.2      ✔ tailor       0.1.0 \n✔ infer        1.1.0      ✔ tune         2.0.1 \n✔ modeldata    1.5.1      ✔ workflows    1.3.0 \n✔ parsnip      1.4.1      ✔ workflowsets 1.1.1 \n✔ recipes      1.3.1      ✔ yardstick    1.3.2 \n── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──\n✖ scales::discard() masks purrr::discard()\n✖ dplyr::filter()   masks stats::filter()\n✖ recipes::fixed()  masks stringr::fixed()\n✖ dplyr::lag()      masks stats::lag()\n✖ yardstick::spec() masks readr::spec()\n✖ recipes::step()   masks stats::step()\n\nlibrary(here)\n\nhere() starts at C:/Users/marco/Documents/marcoreina-MADA-project\n\nlibrary(gt)\n\n\n# Read data (same as RF)\namr_long_rf &lt;- read_csv(here(\"data/processed-data/amr_long.csv\"))\n\nRows: 688980 Columns: 10\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr  (8): Isolation.source, Source.type, BioSample, antigen_formula, serotyp...\ndbl  (1): year\ndttm (1): Create.date\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.\n\namr_long_rf &lt;- amr_long_rf %&gt;%\n  mutate(AMR_class_strict = if_else(AMR_status == \"COMPLETE\", AMR_class, \"NO AMR\"))\n\namr_wide_rf &lt;- amr_long_rf %&gt;%\n  select(Create.date, BioSample, AMR_class_strict, serotype, Source.type) %&gt;%\n  distinct(BioSample, AMR_class_strict, .keep_all = TRUE) %&gt;%\n  mutate(present = 1) %&gt;%\n  pivot_wider(\n    id_cols = c(Create.date, BioSample, serotype, Source.type),\n    names_from = AMR_class_strict,\n    values_from = present,\n    values_fill = 0\n  ) \n\namr_wide_rf$`Efflux Pump` = NULL\namr_wide_rf$`NO AMR` = NULL \n\namr_wide_rf &lt;- amr_wide_rf %&gt;%\n  mutate(\n    sample_year = as.factor(year(Create.date)),\n    sample_month = month(Create.date, label = TRUE),\n    total_amr_classes = rowSums(across(c(\"Aminoglycoside\", \"Fosfomycin\",\"Beta_lactam\", \"Gentamicin\", \"Trimethoprim\", \"Quinolone\", \"Phenicol\", \"Colistin\", \"Macrolide\", \"Bleomycin\", \"Tetracycline\", \"Sulfonamide\", \"Lincosamide\"))),\n    amr_prevalence = if_else(total_amr_classes == 0, 0, 1),\n    mdr_prevalence = if_else(total_amr_classes &lt;= 3, 0, 1)\n  )\n\n#Creating list with top serovars\ntop_20 &lt;- c(\"I 4,[5],12:i:-\", \"Infantis\", \"Typhimurium\", \"Newport\", \"Agona\", \"Kentucky\", \"Enteritidis\", \"Anatum\",     \"Saintpaul\", \"Braenderup\", \"Muenchen\", \"Sandiego\", \"Javiana\", \"Montevideo\", \"Oranienburg\", \"Thompson\", \"Mississippi\", \"Bareilly\", \"Poona\", \"Rubislaw\")\n\n# Creating the new column to  \"Other\" for serovars that are not in the top 20\namr_wide_rf &lt;- amr_wide_rf %&gt;%\n  mutate(top_20 = if_else(serotype %in% top_20, serotype, \"Other\"))\n\n# Set seed\nrngseed &lt;- 1234\nset.seed(rngseed)\n\namr_wide_rf &lt;- amr_wide_rf %&gt;%\n  mutate(amr_prevalence = factor(amr_prevalence, levels = c(1, 0)),\n          Tetracycline = factor(Tetracycline, levels = c(1, 0)),           \n          Aminoglycoside = factor(Aminoglycoside, levels = c(1, 0)),  \n          Sulfonamide = factor(Sulfonamide, levels = c(1, 0)),  \n          Beta_lactam = factor(Beta_lactam, levels = c(1, 0)),  \n          Phenicol = factor(Phenicol, levels = c(1, 0)),   \n  )\n\namr_wide_rf &lt;- amr_wide_rf %&gt;%\n  mutate()\n\n# Split into Training (75%) and Testing (25%)\n# Stratifying by amr_prevalence ensures the same ratio of resistant isolates in both sets\nset.seed(rngseed)\nsplit &lt;- initial_split(amr_wide_rf, prop = 0.75, strata = amr_prevalence)\ntrain_data &lt;- training(split)\ntest_data  &lt;- testing(split)\n\n\n# Define the logistic regression specification\nlr_spec &lt;- logistic_reg() %&gt;%\n  set_engine(\"glm\") %&gt;%\n  set_mode(\"classification\")\n\n# Create a recipe (standardizing predictors)\n# Note: For logistic regression, it's good practice to dummy-code factors\nlr_recipe &lt;- recipe(amr_prevalence ~ Source.type + top_20 + sample_month, data = train_data) %&gt;%\n  step_dummy(all_nominal_predictors())\n\n# Combine into a workflow\nlr_workflow &lt;- workflow() %&gt;%\n  add_recipe(lr_recipe) %&gt;%\n  add_model(lr_spec)\n\n# Fit the model\nlr_fit &lt;- lr_workflow %&gt;% \n  fit(data = train_data)\n\n# Calculate AUC for Training Data\ntrain_pred_lr &lt;- train_data %&gt;%\n  bind_cols(predict(lr_fit, new_data = train_data, type = \"prob\"))\n\ntrain_auc &lt;- train_pred_lr %&gt;% \n  roc_auc(truth = amr_prevalence, .pred_1)\n\ncat(\"Training AUC:\", train_auc$.estimate)\n\nTraining AUC: 0.8268975\n\n# Predict on test data\ntest_pred_lr &lt;- test_data %&gt;%\n  bind_cols(\n    predict(lr_fit, new_data = test_data),\n    predict(lr_fit, new_data = test_data, type = \"prob\")\n  )\n\n\n# Calculate metrics for Logistic Regression\nlr_metrics &lt;- test_pred_lr %&gt;%\n  metrics(truth = amr_prevalence, estimate = .pred_class, .pred_1) %&gt;%\n  mutate(model = \"Logistic Regression\")\n\n# Confusion Matrix\nlr_conf_mat &lt;- test_pred_lr %&gt;%\n  conf_mat(truth = amr_prevalence, estimate = .pred_class)\n\nprint(lr_conf_mat)\n\n          Truth\nPrediction     1     0\n         1  3178  1109\n         0  6449 50707\n\n# Get all major metrics (Accuracy, Kappa, Sens, Spec, Precision, etc.)\nlr_metrics &lt;- summary(lr_conf_mat)\nprint(lr_metrics)\n\n# A tibble: 13 × 3\n   .metric              .estimator .estimate\n   &lt;chr&gt;                &lt;chr&gt;          &lt;dbl&gt;\n 1 accuracy             binary        0.877 \n 2 kap                  binary        0.399 \n 3 sens                 binary        0.330 \n 4 spec                 binary        0.979 \n 5 ppv                  binary        0.741 \n 6 npv                  binary        0.887 \n 7 mcc                  binary        0.440 \n 8 j_index              binary        0.309 \n 9 bal_accuracy         binary        0.654 \n10 detection_prevalence binary        0.0698\n11 precision            binary        0.741 \n12 recall               binary        0.330 \n13 f_meas               binary        0.457 \n\n# Specific metrics for your table\nlr_auc &lt;- test_pred_lr %&gt;% roc_auc(truth = amr_prevalence, .pred_1)\nlr_sens &lt;- test_pred_lr %&gt;% sens(truth = amr_prevalence, estimate = .pred_class)\nlr_spec &lt;- test_pred_lr %&gt;% spec(truth = amr_prevalence, estimate = .pred_class)\n\ncat(\"Test AUC:\", lr_auc$.estimate, \"\\nSensitivity:\", lr_sens$.estimate, \"\\nSpecificity:\", lr_spec$.estimate)\n\nTest AUC: 0.8222631 \nSensitivity: 0.3301132 \nSpecificity: 0.9785973\n\n\n\nggplot(test_pred_lr, aes(x = .pred_1, fill = amr_prevalence)) +\n  geom_density(alpha = 0.6) +\n  scale_fill_manual(values = c(\"#D55E00\", \"#56B4E9\"), \n                    labels = c(\"Resistant\", \"Susceptible\"),\n                    name = \"Observed Status\") +\n  labs(title = \"Logistic Regression: Predicted Probability Distribution\",\n       x = \"Predicted Probability of Resistance\",\n       y = \"Density\") +\n  theme_bw()",
+    "crumbs": [
+      "Logistic Regression Model"
+    ]
   }
 ]

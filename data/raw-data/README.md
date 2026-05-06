@@ -1,14 +1,12 @@
 # raw-data
+This folder contains the original, unaltered data files used for the Salmonella AMR Genotypes Machine Learning project. In accordance with best practices for reproducible research, these files should never be edited directly. All cleaning and preprocessing are handled via scripts in the /code directory.
 
-This folder should contain all raw data. As needed add sub-folders.
+### Usage & Processing
+To maintain data integrity:
 
-Currently, as an example, it contains a simple made-up data-set in an Excel file.
+- Do Not Modify: Any changes to these files will break the reproducibility of the analysis.
 
-The dataset contains the variables `Height`, `Weight` and `Gender` of a few imaginary individuals.
+- Cleaning: All raw data is imported and cleaned using the project's R/Quarto scripts.
 
-The dataset purposefully contains some faulty entries that need to be cleaned.
-
-Generally, any dataset should contain some meta-data explaining what each variable in the dataset is. (This is often called a **Codebook**.) For this simple example, the codebook is given as a second sheet in the Excel file.
-
-This raw data-set should generally not be edited by hand. It should instead be loaded and processed/cleaned using code.
+- Output: Processed versions of these files are saved in the ../processed-data/ directory.
 

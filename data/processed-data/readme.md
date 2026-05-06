@@ -1,7 +1,12 @@
 # processed-data
 
-This folder contains data that has been processed and cleaned by code.
+This folder contains the original, unaltered data files used for the Salmonella AMR Genotypes Machine Learning project. In accordance with best practices for reproducible research, these files should never be edited directly. All cleaning and preprocessing are handled via scripts in the /code directory.
 
-Any files located in here are based on the raw data and can be re-created running the various processing/cleaning code scripts in the `code` folder.
+### Usage & Processing
+To maintain data integrity:
 
-You could add a codebook here, but you could also just provide enough comments in the code that produces the content in this folder for users to understand what is saved in this location.
+- Do Not Modify: Any changes to these files will break the reproducibility of the analysis.
+
+- Cleaning: All raw data is imported and cleaned using the project's R/Quarto scripts.
+
+- Output: Processed versions of these files are saved in the ../processed-data/ directory.
