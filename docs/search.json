@@ -180,7 +180,7 @@
     "href": "products/manuscript/manuscript-web.html",
     "title": "Project info",
     "section": "",
-    "text": "Author\n\nMarco Reina\\(^{1}\\)\n\nAuthor affiliations\n\nDepartment of Poultry Science, University of Georgia, Athens, GA, USA.\n\n\\(\\land\\) Corresponding author: marco.reinaantillon@uga.edu\n\\(\\dagger\\) The author utilized AI tools, specifically Qween and Gemini, for code troubleshooting; and the use of Copilot to refine the English writing.",
+    "text": "Warning: package 'knitr' was built under R version 4.5.2",
     "crumbs": [
       "Manuscript (web)"
     ]
@@ -373,8 +373,8 @@
     "objectID": "products/manuscript/manuscript-web.html#identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning",
     "href": "products/manuscript/manuscript-web.html#identifying-key-metadata-predictors-of-salmonella-amr-genotypes-through-machine-learning",
     "title": "Project info",
-    "section": "",
-    "text": "Author\n\nMarco Reina\\(^{1}\\)\n\nAuthor affiliations\n\nDepartment of Poultry Science, University of Georgia, Athens, GA, USA.\n\n\\(\\land\\) Corresponding author: marco.reinaantillon@uga.edu\n\\(\\dagger\\) The author utilized AI tools, specifically Qween and Gemini, for code troubleshooting; and the use of Copilot to refine the English writing.",
+    "section": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning",
+    "text": "Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning\nAuthor\n\nMarco Reina\\(^{1}\\)\n\nAuthor affiliations\n\nDepartment of Poultry Science, University of Georgia, Athens, GA, USA.\n\n\\(\\land\\) Corresponding author: marco.reinaantillon@uga.edu\n\\(\\dagger\\) The author utilized AI tools, specifically Qween and Gemini, for code troubleshooting; and the use of Copilot to refine the English writing.",
     "crumbs": [
       "Manuscript (web)"
     ]
@@ -517,5 +517,201 @@
     "title": "Herber Project Review",
     "section": "4.5 Further comments",
     "text": "4.5 Further comments\nI wish I had more detailed critiques to offer, but I genuinely found very few areas that needed improvement. This project feels like a practically finished product. Everything is clearly presented and well thought out. Great job!"
+  },
+  {
+    "objectID": "Adams-Project_Review.html",
+    "href": "Adams-Project_Review.html",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Title of project: Identifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning Name of project author(s): Marco Reina Name of project reviewer: Elle Adams\n\n\nHow well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n\nVery clear on the problem of antimicrobial resistance, and the limited access to whole genome sequencing tools as opposed to metadata. Sets you up really well for your question/hypothesis.\n\n\n\n\nstrong contextualization and motivation\n\n\n\n\n\nHow well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n\nCan metadata alone be used to predict AMR in Salmonella spp. Designing a machine learning model\n\n\n\n\nquestion/hypotheses fully clear\n\n\n\n\n\nHow well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n\nWell explained, no notes\n\n\n\n\nsource and overall structure of data well explained\n\n\n\n\n\nHow well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n\nLooking at yours makes me feel like I should go back and add to mine and explain my process more. Very thorough.\n\n\n\n\nessentially no weaknesses in wrangling and exploratory component\n\n\n\n\n\nWere the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n\nYour random forest models are well done and well defended in your manuscript, and you do mention toward the end why you chose to go with random forest. I wonder if you tested any other models anywhere else - only because Prof Handel has talked before about trying multiple and justifying. Not a deal breaker, just wanted to mention.\n\n\n\n\nstrong and reasonable analysis\n\n\n\n\n\nHow well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n\nVery nice\n\n\n\n\nresults are very well presented\n\n\n\n\n\nAre the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n\nReally well done\n\n\n\n\nstrong, complete and clear discussion\n\n\n\n\n\nSide note: When running your code, I got this warning: Warning message: Since gt v0.6.0 fmt_missing() is deprecated and will soon be removed. ℹ Use sub_missing() instead. You might want to make this substiution to maintain reproducibility for the the future."
+  },
+  {
+    "objectID": "Adams-Project_Review.html#background-context-and-motivation",
+    "href": "Adams-Project_Review.html#background-context-and-motivation",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n\nVery clear on the problem of antimicrobial resistance, and the limited access to whole genome sequencing tools as opposed to metadata. Sets you up really well for your question/hypothesis.\n\n\n\n\nstrong contextualization and motivation"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#question-description",
+    "href": "Adams-Project_Review.html#question-description",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n\nCan metadata alone be used to predict AMR in Salmonella spp. Designing a machine learning model\n\n\n\n\nquestion/hypotheses fully clear"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#data-description",
+    "href": "Adams-Project_Review.html#data-description",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n\nWell explained, no notes\n\n\n\n\nsource and overall structure of data well explained"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "href": "Adams-Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n\nLooking at yours makes me feel like I should go back and add to mine and explain my process more. Very thorough.\n\n\n\n\nessentially no weaknesses in wrangling and exploratory component"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#appropriateness-of-analysis",
+    "href": "Adams-Project_Review.html#appropriateness-of-analysis",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n\nYour random forest models are well done and well defended in your manuscript, and you do mention toward the end why you chose to go with random forest. I wonder if you tested any other models anywhere else - only because Prof Handel has talked before about trying multiple and justifying. Not a deal breaker, just wanted to mention.\n\n\n\n\nstrong and reasonable analysis"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#presentation",
+    "href": "Adams-Project_Review.html#presentation",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n\nVery nice\n\n\n\n\nresults are very well presented"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#discussionconclusions",
+    "href": "Adams-Project_Review.html#discussionconclusions",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n\nReally well done\n\n\n\n\nstrong, complete and clear discussion"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#further-comments",
+    "href": "Adams-Project_Review.html#further-comments",
+    "title": "Elle Adams Project Review",
+    "section": "",
+    "text": "Side note: When running your code, I got this warning: Warning message: Since gt v0.6.0 fmt_missing() is deprecated and will soon be removed. ℹ Use sub_missing() instead. You might want to make this substiution to maintain reproducibility for the the future."
+  },
+  {
+    "objectID": "Adams-Project_Review.html#structure",
+    "href": "Adams-Project_Review.html#structure",
+    "title": "Elle Adams Project Review",
+    "section": "2.1 Structure",
+    "text": "2.1 Structure\nIs the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all “junk” files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?\n\n2.1.1 Feedback and Comments\nInitially confused where the processing-code.qmd was, but I see you’ve included what you did in eda.qmd. So no problem.\n\n\n2.1.2 Summary assessment\n\nwell structured"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#documentation",
+    "href": "Adams-Project_Review.html#documentation",
+    "title": "Elle Adams Project Review",
+    "section": "2.2 Documentation",
+    "text": "2.2 Documentation\nHow well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?\n\n2.2.1 Feedback and Comments\nLots of descriptions of what the code does throughout\n\n\n2.2.2 Summary assessment\n\nfully and well documented"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#reproducibility",
+    "href": "Adams-Project_Review.html#reproducibility",
+    "title": "Elle Adams Project Review",
+    "section": "2.3 Reproducibility",
+    "text": "2.3 Reproducibility\nAre all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?\n\n2.3.1 Feedback and Comments\nI was able to perfectly rerun, the only thing I had to do was install some packages, which is nothing.\n\n\n2.3.2 Summary assessment\n\nfully reproducible without issues"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#thoroughness",
+    "href": "Adams-Project_Review.html#thoroughness",
+    "title": "Elle Adams Project Review",
+    "section": "2.4 Thoroughness",
+    "text": "2.4 Thoroughness\nHow thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?\n\n2.4.1 Feedback and Comments\nExtremely thorough, again makes me doubt mine.\n\n\n2.4.2 Summary assessment\n\nstrong level of thorougness"
+  },
+  {
+    "objectID": "Adams-Project_Review.html#further-comments-1",
+    "href": "Adams-Project_Review.html#further-comments-1",
+    "title": "Elle Adams Project Review",
+    "section": "2.5 Further comments",
+    "text": "2.5 Further comments\nN/A"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html",
+    "href": "Aljawad_Project_Review.html",
+    "title": "Al Jawad Project review",
+    "section": "",
+    "text": "Title of project:\nIdentifying Key Metadata Predictors of Salmonella AMR Genotypes through Machine Learning\nName of project author(s):\nMarco Reina\nName of project reviewer:\nSaraa Al Jawad"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#background-context-and-motivation",
+    "href": "Aljawad_Project_Review.html#background-context-and-motivation",
+    "title": "Al Jawad Project review",
+    "section": "3.1 Background, Context and Motivation",
+    "text": "3.1 Background, Context and Motivation\nHow well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?\n\n3.1.1 Feedback and Comments\nThe background is comprehensive and demonstrates strong subject knowledge, particularly in explaining antimicrobial resistance mechanisms and their relevance in Salmonella. The manuscript does a good job connecting surveillance systems to the availability of large-scale metadata.\n\n\n3.1.2 Summary assessment (PICK ONE, DELETE THE OTHERS)\n\nstrong contextualization and motivation"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#question-description",
+    "href": "Aljawad_Project_Review.html#question-description",
+    "title": "Al Jawad Project review",
+    "section": "3.2 Question description",
+    "text": "3.2 Question description\nHow well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?\n\n3.2.1 Feedback and Comments\nThe question is clear, but it is not clear what level of performance is considered good enough for the model to be useful.\n\n\n3.2.2 Summary assessment\n\nquestion/hypotheses somewhat explained"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#data-description",
+    "href": "Aljawad_Project_Review.html#data-description",
+    "title": "Al Jawad Project review",
+    "section": "3.3 Data description",
+    "text": "3.3 Data description\nHow well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?\n\n3.3.1 Feedback and Comments\nThe dataset is well described. The explanation of how the binary AMR outcome is constructed is clear and appropriate.\n\n\n3.3.2 Summary assessment\n\nsource and overall structure of data well explained"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "href": "Aljawad_Project_Review.html#data-wrangling-and-exploratory-analysis",
+    "title": "Al Jawad Project review",
+    "section": "3.4 Data wrangling and exploratory analysis",
+    "text": "3.4 Data wrangling and exploratory analysis\nHow well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?\n\n3.4.1 Feedback and Comments\nThe preprocessing steps are logical and well structured. The filtering and cleaning decisions are reasonable and aligned with the study goals.\n\n\n3.4.2 Summary assessment\n\nessentially no weaknesses in wrangling and exploratory component"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#appropriateness-of-analysis",
+    "href": "Aljawad_Project_Review.html#appropriateness-of-analysis",
+    "title": "Al Jawad Project review",
+    "section": "3.5 Appropriateness of Analysis",
+    "text": "3.5 Appropriateness of Analysis\nWere the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?\n\n3.5.1 Feedback and Comments\nThe choice of Random Forest is appropriate given the categorical nature of the predictors and the potential for nonlinear relationships. The evaluation approach (cross-validation + test set) is strong and demonstrates good modeling practice. The analysis could be improved by comparing it with other modeles such as logistic regression or LASSO. This would help show whether the machine learning model provides better performance compared to a baseline method.\n\n\n3.5.2 Summary assessment\n\nstrong and reasonable analysis"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#presentation",
+    "href": "Aljawad_Project_Review.html#presentation",
+    "title": "Al Jawad Project review",
+    "section": "3.6 Presentation",
+    "text": "3.6 Presentation\nHow well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?\n\n3.6.1 Feedback and Comments\nThe presentation is clear and well organized. Figures are readable and support the text effectively. One strength is the logical flow from EDA → modeling → evaluation, which makes the manuscript easy to follow.\n\n\n3.6.2 Summary assessment\n\nresults are very well presented"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#discussionconclusions",
+    "href": "Aljawad_Project_Review.html#discussionconclusions",
+    "title": "Al Jawad Project review",
+    "section": "3.7 Discussion/Conclusions",
+    "text": "3.7 Discussion/Conclusions\nAre the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?\n\n3.7.1 Feedback and Comments\nThe discussion appropriately interprets the results and acknowledges key limitations.\n\n\n3.7.2 Summary assessment\n\nstrong, complete and clear discussion"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#further-comments",
+    "href": "Aljawad_Project_Review.html#further-comments",
+    "title": "Al Jawad Project review",
+    "section": "3.8 Further comments",
+    "text": "3.8 Further comments\nThe project is very well done overall. The analysis and results are clearly explained and easy to follow. I also like how you presented the project as a web-based format, which makes it easy to navigate and explore."
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#structure",
+    "href": "Aljawad_Project_Review.html#structure",
+    "title": "Al Jawad Project review",
+    "section": "4.1 Structure",
+    "text": "4.1 Structure\nIs the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all “junk” files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?\n\n4.1.1 Feedback and Comments\nThe repository is well organized, with clearly labeled folders (code, data, results, manuscript). The workflow is easy to follow, and the numbering of scripts improves usability. The structure makes it easy to understand how different components connect.\n\n\n4.1.2 Summary assessment\n\nwell structured"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#documentation",
+    "href": "Aljawad_Project_Review.html#documentation",
+    "title": "Al Jawad Project review",
+    "section": "4.2 Documentation",
+    "text": "4.2 Documentation\nHow well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?\n\n4.2.1 Feedback and Comments\nThe documentation is clear and easy to follow. The workflow is easy to understand, and I was able to follow the steps without difficulty. Adding a bit more detail in the README file could make it even clearer for new users.\n\n\n4.2.2 Summary assessment\n\nfully and well documented"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#reproducibility",
+    "href": "Aljawad_Project_Review.html#reproducibility",
+    "title": "Al Jawad Project review",
+    "section": "4.3 Reproducibility",
+    "text": "4.3 Reproducibility\nAre all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?\n\n4.3.1 Feedback and Comments\nThe project appears reproducible, with clear structure and use of consistent tools. I did not encounter issues when reviewing the workflow.\n\n\n4.3.2 Summary assessment\n\nfully reproducible without issues"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#thoroughness",
+    "href": "Aljawad_Project_Review.html#thoroughness",
+    "title": "Al Jawad Project review",
+    "section": "4.4 Thoroughness",
+    "text": "4.4 Thoroughness\nHow thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?\n\n4.4.1 Feedback and Comments\nThe study is thorough in terms of data processing and modeling workflow.\n\n\n4.4.2 Summary assessment\n\nstrong level of thorougness"
+  },
+  {
+    "objectID": "Aljawad_Project_Review.html#further-comments-1",
+    "href": "Aljawad_Project_Review.html#further-comments-1",
+    "title": "Al Jawad Project review",
+    "section": "4.5 Further comments",
+    "text": "4.5 Further comments\nThis is a strong and well-structured project that demonstrates a solid understanding of both the biological context and machine learning workflow. Great job!"
   }
 ]
